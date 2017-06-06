@@ -1,25 +1,21 @@
 package com.example.administrator.my;
 
 import android.app.ActionBar;
+import android.app.AlertDialog.Builder;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.app.AlertDialog.Builder;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.Toast;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.sensoro.beacon.kit.Beacon;
 import com.sensoro.beacon.kit.BeaconManagerListener;
@@ -27,8 +23,9 @@ import com.sensoro.cloud.SensoroManager;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-public class HActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity {
 
     private ProgressDialog progressDialog;
     private SensoroManager sensoroManager;
@@ -58,8 +55,8 @@ public class HActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_h);
-        sensoroManager = SensoroManager.getInstance(HActivity.this);
+        setContentView(R.layout.activity_main);
+        sensoroManager = SensoroManager.getInstance(MainActivity.this);
         //初始化控件
         initWidget();
         initData();
@@ -255,7 +252,7 @@ public class HActivity extends FragmentActivity {
      * 弹出对话框
      */
     private void showDialog() {
-        progressDialog = new ProgressDialog(HActivity.this);
+        progressDialog = new ProgressDialog(MainActivity.this);
         progressDialog.setMessage("Loading...");
         progressDialog.setCancelable(true);
         progressDialog.show();
@@ -352,8 +349,8 @@ public class HActivity extends FragmentActivity {
     private void initData(){
         tabs=new ArrayList<TabItem>();
         tabs.add(new TabItem(R.mipmap.ic_launcher_round, R.string.tab_activity, ActivityFragment.class));
-        tabs.add(new TabItem(R.mipmap.ic_launcher_round, R.string.tab_history, historyFragment.class));
-        tabs.add(new TabItem(R.mipmap.ic_launcher_round, R.string.tab_setting, settingFragment.class));
+        tabs.add(new TabItem(R.mipmap.ic_launcher_round, R.string.tab_history, HistoryFragment.class));
+        tabs.add(new TabItem(R.mipmap.ic_launcher_round, R.string.tab_setting, SettingFragment.class));
         myTablayout_bottom.initData(tabs, new MyTabLayout.OnTabClickListener() {
             @Override
             public void onTabClick(TabItem tabItem) {

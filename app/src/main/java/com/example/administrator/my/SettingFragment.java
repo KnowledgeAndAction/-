@@ -10,7 +10,7 @@ import android.view.ViewGroup;
  * Created by Administrator on 2017/5/24.
  */
 
-public class settingFragment extends BaseFragment {
+public class SettingFragment extends BaseFragment {
     @Override
     public void fetchData() {
 
@@ -19,7 +19,7 @@ public class settingFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_bottom_3, container, false);
+        View view = inflater.inflate(R.layout.activity_bottom_setting, container, false);
         return view;
     }
 }

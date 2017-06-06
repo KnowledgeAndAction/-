@@ -8,23 +8,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class BeaconsFragment extends Fragment implements OnItemClickListener {
@@ -39,7 +31,7 @@ public class BeaconsFragment extends Fragment implements OnItemClickListener {
     Bitmap a0Bitmap;
     Bitmap c0Bitmap;
 
-    HActivity activity;
+    MainActivity activity;
 
     static final String GRID_KEY_IMG = "img";
     static final String GRID_KEY_ID = "id";
@@ -52,7 +44,7 @@ public class BeaconsFragment extends Fragment implements OnItemClickListener {
     }
 
     private void initCtrl() {
-        activity = (HActivity) getActivity();
+        activity = (MainActivity) getActivity();
         beaconsListView = (ListView) activity.findViewById(R.id.fragment_beacons_lv_beacons);
         beaconsListView.setOnItemClickListener(this);
         adapter = new BeaconAdaper(activity);
@@ -96,16 +88,16 @@ public class BeaconsFragment extends Fragment implements OnItemClickListener {
     class BeaconAdaper extends BaseAdapter {
 
         LayoutInflater layoutInflater;
-        HActivity activity;
+        MainActivity activity;
 
-        BeaconAdaper(HActivity activity) {
+        BeaconAdaper(MainActivity activity) {
             this.activity = activity;
             layoutInflater = LayoutInflater.from(activity);
         }
 
         @Override
         public int getCount() {
-            activity = (HActivity) activity;
+            activity = (MainActivity) activity;
             beacons = activity.beacons;
             if (beacons == null) {
                 return 0;

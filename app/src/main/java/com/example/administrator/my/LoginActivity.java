@@ -11,13 +11,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 import android.app.ProgressDialog;
-import android.bluetooth.BluetoothAdapter;
-import com.sensoro.beacon.kit.Beacon;
-import com.sensoro.beacon.kit.BeaconManagerListener;
-import com.sensoro.cloud.SensoroManager;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
+import com.sensoro.cloud.SensoroManager;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -95,7 +90,7 @@ public class LoginActivity extends AppCompatActivity {
                 editor.clear();
             }
             editor.apply();
-            Intent intent = new Intent(LoginActivity.this,HActivity.class);
+            Intent intent = new Intent(LoginActivity.this,MainActivity.class);
             startActivity(intent);
         } else {
             Toast.makeText(getApplicationContext(), "账号或密码错误", Toast.LENGTH_SHORT).show();
