@@ -5,13 +5,13 @@ import android.support.v4.app.Fragment;
 
 /**
  * Created by yx on 16/4/3.
+ * t
  */
 public abstract class BaseFragment extends Fragment {
 
     protected boolean isViewInitiated;
     protected boolean isVisibleToUser;
     protected boolean isDataInitiated;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

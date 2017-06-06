@@ -58,12 +58,11 @@ public class HActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_beacons);
+        setContentView(R.layout.activity_h);
         sensoroManager = SensoroManager.getInstance(HActivity.this);
         //初始化控件
         initWidget();
-//        initData();
-
+        initData();
     }
 
     /**
@@ -321,67 +320,67 @@ public class HActivity extends FragmentActivity {
         return status;
     }
 
-//    /**
-//     * 设置底部条目及对应界面的适配器      暂定
-//     */
-//    class FragmentAdapter extends FragmentPagerAdapter {
-//        public FragmentAdapter(FragmentManager fm) {
-//            super(fm);
-//        }
-//
-//        @Override
-//        public Fragment getItem(int position) {
-//            try {
-//                return tabs.get(position).tagFragmentClz.newInstance();
-//            } catch (InstantiationException e) {
-//                e.printStackTrace();
-//            } catch (IllegalAccessException e) {
-//                e.printStackTrace();
-//            }
-//            return null;
-//        }
-//
-//        @Override
-//        public int getCount() {
-//            return tabs.size();
-//        }
-//    }
-//
-//    /**
-//     * 设置底部条目及对应界面的适配器    暂定
-//     */
-//    private void initData(){
-//        tabs=new ArrayList<TabItem>();
-//        tabs.add(new TabItem(R.mipmap.ic_launcher_round, R.string.tab_activity, ActivityFragment.class));
-//        tabs.add(new TabItem(R.mipmap.ic_launcher_round, R.string.tab_history, historyFragment.class));
-//        tabs.add(new TabItem(R.mipmap.ic_launcher_round, R.string.tab_setting, settingFragment.class));
-//        myTablayout_bottom.initData(tabs, new MyTabLayout.OnTabClickListener() {
-//            @Override
-//            public void onTabClick(TabItem tabItem) {
-//                viewPager.setCurrentItem(tabs.indexOf(tabItem));
-//            }
-//        });
-//        myTablayout_bottom.setCurrentTab(0);
-//
-//        final FragmentAdapter adapter = new FragmentAdapter(getSupportFragmentManager());
-//        viewPager.setAdapter(adapter);
-//        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-//            @Override
-//            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-//
-//            }
-//
-//            @Override
-//            public void onPageSelected(int position) {
-//                myTablayout_bottom.setCurrentTab(position);
-//            }
-//
-//            @Override
-//            public void onPageScrollStateChanged(int state) {
-//
-//            }
-//        });
-//    }
+    /**
+     * 设置底部条目及对应界面的适配器      暂定
+     */
+    class FragmentAdapter extends FragmentPagerAdapter {
+        public FragmentAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            try {
+                return tabs.get(position).tagFragmentClz.newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        public int getCount() {
+            return tabs.size();
+        }
+    }
+
+    /**
+     * 设置底部条目及对应界面的适配器    暂定
+     */
+    private void initData(){
+        tabs=new ArrayList<TabItem>();
+        tabs.add(new TabItem(R.mipmap.ic_launcher_round, R.string.tab_activity, ActivityFragment.class));
+        tabs.add(new TabItem(R.mipmap.ic_launcher_round, R.string.tab_history, historyFragment.class));
+        tabs.add(new TabItem(R.mipmap.ic_launcher_round, R.string.tab_setting, settingFragment.class));
+        myTablayout_bottom.initData(tabs, new MyTabLayout.OnTabClickListener() {
+            @Override
+            public void onTabClick(TabItem tabItem) {
+                viewPager.setCurrentItem(tabs.indexOf(tabItem));
+            }
+        });
+        myTablayout_bottom.setCurrentTab(0);
+
+        final FragmentAdapter adapter = new FragmentAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(adapter);
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                myTablayout_bottom.setCurrentTab(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+    }
     /*
 	 * Beacon Change Listener.Use it to notificate updating of beacons.
 	 */
