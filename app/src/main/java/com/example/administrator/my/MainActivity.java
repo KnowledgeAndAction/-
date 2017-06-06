@@ -66,7 +66,6 @@ public class MainActivity extends FragmentActivity {
      * 初始化控件
      */
     private void initWidget() {
-
         isShow = true;
         //设置sdk
         setSDK();
@@ -291,6 +290,10 @@ public class MainActivity extends FragmentActivity {
 
     }
 
+    /**
+     *判断蓝牙是否可用
+     * @return
+     */
     private boolean isBlueEnable() {
         bluetoothManager=(BluetoothManager)getSystemService(BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
