@@ -80,12 +80,12 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
     /**
-     * 帐号密码的验证
+     * 帐号密码的验证ss
      */
     private void checkNumber() {
         String account = accountEdit.getText().toString();
         String password = passwordEdit.getText().toString();
-        if (account.equals("admin") && password.equals("123")) {
+        if (account.equals("123") && password.equals("123")) {
             editor = pref.edit();
             if (rememberPass.isChecked()) {
                 editor.putBoolean("remember_password", true);
