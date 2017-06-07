@@ -1,4 +1,4 @@
-package com.example.administrator.my;
+package com.example.administrator.my.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +15,7 @@ import org.json.JSONObject;
 //import com.itheima.mobilesafe74.R;
 //import com.itheima.mobilesafe74.utils.StreamUtil;
 //import com.itheima.mobilesafe74.utils.ToastUtil;
+import com.example.administrator.my.R;
 import com.example.administrator.my.utils.StreamUtil;
 import com.example.administrator.my.utils.ToastUtil;
 import com.lidroid.xutils.HttpUtils;
@@ -23,15 +24,11 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.Window;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;

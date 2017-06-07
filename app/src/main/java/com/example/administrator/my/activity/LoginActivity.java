@@ -1,4 +1,4 @@
-package com.example.administrator.my;
+package com.example.administrator.my.activity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 import android.app.ProgressDialog;
 
+import com.example.administrator.my.R;
 import com.sensoro.cloud.SensoroManager;
 
 

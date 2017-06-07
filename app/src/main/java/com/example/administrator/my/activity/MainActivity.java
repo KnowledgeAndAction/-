@@ -1,4 +1,4 @@
-package com.example.administrator.my;
+package com.example.administrator.my.activity;
 
 import android.app.ActionBar;
 import android.app.AlertDialog.Builder;
@@ -17,6 +17,12 @@ import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.widget.LinearLayout;
 
+import com.example.administrator.my.fragment.ActivityFragment;
+import com.example.administrator.my.fragment.HistoryFragment;
+import com.example.administrator.my.MyTabLayout;
+import com.example.administrator.my.R;
+import com.example.administrator.my.fragment.SettingFragment;
+import com.example.administrator.my.TabItem;
 import com.sensoro.beacon.kit.Beacon;
 import com.sensoro.beacon.kit.BeaconManagerListener;
 import com.sensoro.cloud.SensoroManager;
@@ -50,7 +56,6 @@ public class MainActivity extends FragmentActivity {
     BluetoothManager bluetoothManager;
     private BluetoothAdapter bluetoothAdapter;
     BeaconManagerListener beaconManagerListener;
-    private BeaconsFragment beaconsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,60 +153,14 @@ public class MainActivity extends FragmentActivity {
              */
             @Override
             public void onUpdateBeacon(final ArrayList<Beacon> beacons) {
-                /*
-				 * beacons has bean scaned in this scanning period.
-				 */
-                if (beaconsFragment == null) {
-                    beaconsFragment = (BeaconsFragment) getSupportFragmentManager().findFragmentByTag(TAG_FRAG_BEACONS);
-                }
-                if (beaconsFragment == null) {
-                    return;
-                }
-				/*
-				 * beaconsFragment.isVisible()
-				 */
-                if (beaconsFragment.isVisible()) {
-					/*
-					 * Add the update beacons into the grid.
-					 *
-					 * 添加一个新的云子到当前布局中
-					 *
-					 */
-                    for (Beacon beacon : beacons) {
-                        if (beacons.contains(beacon)) {
-                            continue;
-                        }
-						/*
-						 * filter
-						 */
 
-                        if (TextUtils.isEmpty(beaconFilter)) {
-                            beacons.add(beacon);
-                        } else {
-                            String matchString = String.format(matchFormat, beacon.getSerialNumber(), beacon.getMajor(), beacon.getMinor());
-                            if (matchString.contains(beaconFilter)) {
-                                beacons.add(beacon);
-                            }
-                        }
+
+                for (Beacon beacon : beacons) {
+                    if (isShow) {
+                        isShow = false;
+                        closeDialog();
                     }
                 }
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        for (OnBeaconChangeListener listener : beaconListeners) {
-                            if (listener == null) {
-                                continue;
-                            }
-                            listener.onBeaconChange(beacons);
-                        }
-                    }
-                });
-
-//                for (Beacon beacon : beacons) {
-//                    if (isShow) {
-//                        isShow = false;
-//                        closeDialog();
-//                    }
-//                }
             }
         };
         sensoroManager.setBeaconManagerListener(beaconManagerListener);
