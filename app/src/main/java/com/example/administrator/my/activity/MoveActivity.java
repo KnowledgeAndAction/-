@@ -10,7 +10,7 @@ import com.example.administrator.my.R;
 import com.example.administrator.my.utils.ToastUtil;
 
 /**
- * 此界面为签离界面
+ * 此界面为签到界面——周凯歌
  */
 public class MoveActivity extends AppCompatActivity {
     @Override

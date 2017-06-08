@@ -3,6 +3,9 @@ package com.example.administrator.my.utils;
 import android.content.Context;
 import android.widget.Toast;
 
+/**
+ * 土司工具
+ */
 public class ToastUtil {
 	/**
 	 * @param ctx	上下文环境

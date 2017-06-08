@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import com.example.administrator.my.R;
 
 /**
- * Created by Administrator on 2017/5/24.
+ * 设置界面——崔国钊
  */
 
 public class SettingFragment extends BaseFragment {

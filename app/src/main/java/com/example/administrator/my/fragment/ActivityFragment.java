@@ -9,8 +9,7 @@ import android.view.ViewGroup;
 import com.example.administrator.my.R;
 
 /**
- * 活动对应界面
- * Created by Administrator on 2017/5/24.
+ * 活动对应界面——周凯歌
  */
 
 public class ActivityFragment extends BaseFragment {

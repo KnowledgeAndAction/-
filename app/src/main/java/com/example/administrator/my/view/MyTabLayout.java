@@ -1,10 +1,12 @@
-package com.example.administrator.my;
+package com.example.administrator.my.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+
+import com.example.administrator.my.model.TabItem;
 
 import java.util.ArrayList;
 

@@ -14,15 +14,14 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.text.TextUtils;
 import android.widget.LinearLayout;
 
 import com.example.administrator.my.fragment.ActivityFragment;
 import com.example.administrator.my.fragment.HistoryFragment;
-import com.example.administrator.my.MyTabLayout;
+import com.example.administrator.my.view.MyTabLayout;
 import com.example.administrator.my.R;
 import com.example.administrator.my.fragment.SettingFragment;
-import com.example.administrator.my.TabItem;
+import com.example.administrator.my.model.TabItem;
 import com.sensoro.beacon.kit.Beacon;
 import com.sensoro.beacon.kit.BeaconManagerListener;
 import com.sensoro.cloud.SensoroManager;

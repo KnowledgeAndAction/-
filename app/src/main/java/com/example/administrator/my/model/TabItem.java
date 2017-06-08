@@ -1,4 +1,4 @@
-package com.example.administrator.my;
+package com.example.administrator.my.model;
 
 
 import com.example.administrator.my.fragment.BaseFragment;

@@ -1,4 +1,4 @@
-package com.example.administrator.my;
+package com.example.administrator.my.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -9,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.administrator.my.R;
+import com.example.administrator.my.model.TabItem;
 
 
 /**

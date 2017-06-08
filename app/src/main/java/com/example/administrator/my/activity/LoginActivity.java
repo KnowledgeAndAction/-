@@ -15,7 +15,9 @@ import android.app.ProgressDialog;
 import com.example.administrator.my.R;
 import com.sensoro.cloud.SensoroManager;
 
-
+/**
+ * 登录
+ */
 public class LoginActivity extends AppCompatActivity {
 
     private Button login;

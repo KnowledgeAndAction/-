@@ -11,7 +11,7 @@ import com.example.administrator.my.R;
 import com.example.administrator.my.utils.ToastUtil;
 
 /**
- * 此界面为签到界面
+ * 此界面为活动详情——周凯歌
  */
 public class DetailActivity extends AppCompatActivity {
 
