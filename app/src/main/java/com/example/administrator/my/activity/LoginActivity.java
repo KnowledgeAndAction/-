@@ -1,124 +1,140 @@
 package com.example.administrator.my.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.Toast;
-import android.app.ProgressDialog;
 
 import com.example.administrator.my.R;
-import com.sensoro.cloud.SensoroManager;
+import com.example.administrator.my.utils.Constant;
+import com.example.administrator.my.utils.SpUtil;
+import com.example.administrator.my.utils.ToastUtil;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import okhttp3.Call;
 
 /**
  * 登录
  */
 public class LoginActivity extends AppCompatActivity {
 
-    private Button login;
-    private EditText accountEdit;
-    private EditText passwordEdit;
-    private CheckBox rememberPass;
-    private SharedPreferences pref;
-    private SharedPreferences.Editor editor;
-    private CheckBox seeEdit;
-    private SharedPreferences.Editor edit;
-
+    private EditText et_account;
+    private EditText et_password;
+    private CheckBox cb_remember;
+    private Button bt_login;
+    private static final int USER_ORDINARY = 0;
+    private static final int USER_ADMIN = 1;
     private ProgressDialog progressDialog;
-    private SensoroManager sensoroManager;
-    private boolean isShow = true;
-    private Double light;
-    private String serialNumber;
-    private String accuracy;
-
-    private String lightString;
-    private String rssi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        sensoroManager = SensoroManager.getInstance(LoginActivity.this);
-        //初始化控件
-        initWidget();
-        pref = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean isSee = pref.getBoolean("remember_see", false);
-        if (isSee) {
-            seeEdit.setChecked(true);
-        }
-        boolean isRemember = pref.getBoolean("remember_password", false);
-        if (isRemember) {
-            String account = pref.getString("account", "");
-            String password = pref.getString("password", "");
-            accountEdit.setText(account);
-            passwordEdit.setText(password);
-            rememberPass.setChecked(true);
-        }
+
+        // 初始化控件
+        initView();
+
+        login();
     }
 
-    /**
-     * 初始化控件
-     */
-    private void initWidget() {
-        login = (Button) findViewById(R.id.bt_login);
-        accountEdit = (EditText) findViewById(R.id.userNumber);
-        rememberPass = (CheckBox) findViewById(R.id.cb_choose);
-        seeEdit = (CheckBox) findViewById(R.id.cb_see);
-        passwordEdit = (EditText) findViewById(R.id.password);
-        login.setOnClickListener(new View.OnClickListener() {
+    private void login() {
+        bt_login.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                checkNumber();     //验证帐号密码
+            public void onClick(View v) {
+                String account = et_account.getText().toString().trim();
+                String password = et_password.getText().toString().trim();
+                if (!account.equals("") && !password.equals("")) {
+                    showProgressDialog();
+                    checkLogin(account, password);
+                } else {
+                    ToastUtil.show("账号或密码不能为空");
+                }
             }
         });
     }
-    /**
-     * 帐号密码的验证ss
-     */
-    private void checkNumber() {
-        String account = accountEdit.getText().toString();
-        String password = passwordEdit.getText().toString();
-        if (account.equals("123") && password.equals("123")) {
-            editor = pref.edit();
-            if (rememberPass.isChecked()) {
-                editor.putBoolean("remember_password", true);
-                editor.putString("account", account);
-                editor.putString("password", password);
+
+    private void checkLogin(final String account, final String password) {
+        OkHttpUtils.get().url(Constant.TEST_URL+"login.do")
+                .addParams("Account",account)
+                .addParams("Password",password)
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        ToastUtil.show("登录失败，请稍后重试");
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        // 解析json数据
+                        getJson(response,account,password);
+                    }
+                });
+    }
+
+    private void getJson(String response, String account, String password) {
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            boolean flag = jsonObject.getBoolean("flag");
+            if (flag) {
+                // 检测是否记住密码
+                if (cb_remember.isChecked()) {
+                    SpUtil.putString("account",account);
+                    SpUtil.putString("password",password);
+                    SpUtil.putBoolean("check",true);
+                }
+
+                closeProgressDialog();
+
+                JSONObject result = jsonObject.getJSONObject("result");
+                int type = result.getInt("type");
+                if (type == USER_ORDINARY) {
+                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    finish();
+                } else if (type == USER_ADMIN) {
+                    startActivity(new Intent(getApplicationContext(), AdminActivity.class));
+                    finish();
+                }
             } else {
-                editor.clear();
+                closeProgressDialog();
+                ToastUtil.show("账号或密码错误");
             }
-            editor.apply();
-            Intent intent = new Intent(LoginActivity.this,MainActivity.class);
-            startActivity(intent);
-        } else {
-            Toast.makeText(getApplicationContext(), "账号或密码错误", Toast.LENGTH_SHORT).show();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
+    private void initView() {
+        et_account = (EditText) findViewById(R.id.et_account);
+        et_password = (EditText) findViewById(R.id.et_password);
+        cb_remember = (CheckBox) findViewById(R.id.cb_remember);
+        bt_login = (Button) findViewById(R.id.bt_login);
 
-//    @Override
-//    protected void onActivityResult(final int requestCode, final int resultCode,
-//                                    final Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        //检查蓝牙是否开启
-//        if (!sensoroManager.isBluetoothEnabled()) {
-//            Intent bluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-//            startActivityForResult(bluetoothIntent, 0);
-//        }
-//
-//    }
+        et_account.setText(SpUtil.getString("account",""));
+        et_password.setText(SpUtil.getString("password",""));
+        cb_remember.setChecked(SpUtil.getBoolean("check",false));
+    }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (sensoroManager != null) {
-            sensoroManager.stopService();
+    private void showProgressDialog() {
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("登录中");
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.show();
         }
-        System.exit(0);//退出应用
+    }
+
+    private void closeProgressDialog() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
     }
 }

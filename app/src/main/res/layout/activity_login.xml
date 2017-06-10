@@ -1,67 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.example.administrator.my.activity.LoginActivity">
+    android:background="#ffffff"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <EditText
+        android:id="@+id/et_account"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="账号"
-            android:textColor="#000"
-            android:textSize="18sp"
-            />
-        <EditText
-            android:layout_width="0dp"
-            android:id="@+id/userNumber"
-            android:layout_height="wrap_content"
-            android:layout_weight="3"/>
+        android:layout_height="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/shape"
+        android:drawableLeft="@mipmap/icon_account"
+        android:hint="账号"
+        android:padding="10dp"
+        android:textSize="16sp" />
 
-    </LinearLayout>
-
-    <LinearLayout
+    <EditText
+        android:id="@+id/et_password"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="密码"
-            android:textColor="#000"
-            android:textSize="18sp"
-            />
-        <EditText
-            android:layout_width="0dp"
-            android:id="@+id/password"
-            android:inputType="textPassword"
-            android:layout_height="wrap_content"
-            android:layout_weight="3"/>
-    </LinearLayout>
+        android:layout_height="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/shape"
+        android:drawableLeft="@mipmap/icon_password"
+        android:hint="账号"
+        android:inputType="textPassword"
+        android:padding="10dp"
+        android:textSize="16sp" />
+
+
     <CheckBox
+        android:id="@+id/cb_remember"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/cb_see"
-        android:text="显示密码"/>
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/cb_choose"
-        android:text="Remeber password"
-        />
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:text="记住密码"
+        android:textSize="16sp" />
+
     <Button
+        android:id="@+id/bt_login"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:text="LOGIN"
-        android:id="@+id/bt_login"
-        android:textSize="18sp"/>
+        android:layout_margin="25dp"
+        android:background="@drawable/button_bg"
+        android:text="登    录"
+        android:textColor="#ffffff"
+        android:textSize="18sp" />
 
 </LinearLayout>

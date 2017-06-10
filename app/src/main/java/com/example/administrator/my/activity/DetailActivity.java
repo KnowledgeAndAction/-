@@ -39,7 +39,7 @@ public class DetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(DetailActivity.this, MoveActivity.class);
                 startActivity(intent);
-                ToastUtil.show(getApplicationContext(),"签到成功");
+                ToastUtil.show("签到成功");
             }
         });
 

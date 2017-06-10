@@ -30,7 +30,7 @@ public class MoveActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MoveActivity.this,MainActivity.class));
-                ToastUtil.show(getApplicationContext(),"签离成功");
+                ToastUtil.show("签离成功");
             }
         });
     }
