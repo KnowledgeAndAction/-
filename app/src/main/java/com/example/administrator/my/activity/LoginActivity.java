@@ -22,7 +22,7 @@ import org.json.JSONObject;
 import okhttp3.Call;
 
 /**
- * 登录
+ * 登录——陈帅
  */
 public class LoginActivity extends AppCompatActivity {
 
@@ -89,8 +89,8 @@ public class LoginActivity extends AppCompatActivity {
                 if (cb_remember.isChecked()) {
                     SpUtil.putString("account",account);
                     SpUtil.putString("password",password);
-                    SpUtil.putBoolean("check",true);
                 }
+                SpUtil.putBoolean("check",cb_remember.isChecked());
 
                 closeProgressDialog();
 
@@ -118,9 +118,11 @@ public class LoginActivity extends AppCompatActivity {
         cb_remember = (CheckBox) findViewById(R.id.cb_remember);
         bt_login = (Button) findViewById(R.id.bt_login);
 
-        et_account.setText(SpUtil.getString("account",""));
-        et_password.setText(SpUtil.getString("password",""));
-        cb_remember.setChecked(SpUtil.getBoolean("check",false));
+        if (SpUtil.getBoolean("check",false)) {
+            et_account.setText(SpUtil.getString("account",""));
+            et_password.setText(SpUtil.getString("password",""));
+            cb_remember.setChecked(SpUtil.getBoolean("check",false));
+        }
     }
 
     private void showProgressDialog() {

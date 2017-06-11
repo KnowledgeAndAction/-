@@ -15,6 +15,7 @@
         android:background="@drawable/shape"
         android:drawableLeft="@mipmap/icon_account"
         android:hint="账号"
+        android:maxLines="1"
         android:padding="10dp"
         android:textSize="16sp" />
 
@@ -29,6 +30,7 @@
         android:drawableLeft="@mipmap/icon_password"
         android:hint="账号"
         android:inputType="textPassword"
+        android:maxLines="1"
         android:padding="10dp"
         android:textSize="16sp" />
 
@@ -45,11 +47,11 @@
     <Button
         android:id="@+id/bt_login"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:layout_margin="25dp"
         android:background="@drawable/button_bg"
+        android:padding="10dp"
         android:text="登    录"
         android:textColor="#ffffff"
         android:textSize="18sp" />
-
 </LinearLayout>
