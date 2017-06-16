@@ -14,4 +14,9 @@ public class Constant {
      * 测试接口地址
      */
     public static String TEST_URL = "http://123.206.57.216:8080/SchoolTestInterface/";
+
+    /**
+     * 接口地址
+     */
+    public static String API_URL = "http://api.hicc.cn/";
 }

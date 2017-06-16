@@ -11,6 +11,7 @@ import android.widget.EditText;
 
 import com.example.administrator.my.R;
 import com.example.administrator.my.utils.Constant;
+import com.example.administrator.my.utils.MD5Util;
 import com.example.administrator.my.utils.SpUtil;
 import com.example.administrator.my.utils.ToastUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -42,15 +43,18 @@ public class LoginActivity extends AppCompatActivity {
         // 初始化控件
         initView();
 
+        // 登录按钮点击事件
         login();
     }
 
+    // 登录按钮点击事件
     private void login() {
         bt_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String account = et_account.getText().toString().trim();
                 String password = et_password.getText().toString().trim();
+                // 如果账号密码不为空，检查是否正确
                 if (!account.equals("") && !password.equals("")) {
                     showProgressDialog();
                     checkLogin(account, password);
@@ -61,15 +65,22 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    // 检查是否登录成功
     private void checkLogin(final String account, final String password) {
-        OkHttpUtils.get().url(Constant.TEST_URL+"login.do")
+        // 对密码md5加密
+        String MD5Pass = MD5Util.strToMD5(password);
+        // 发送请求
+        OkHttpUtils
+                .get()
+                .url(Constant.API_URL + "api/TStudentLogin/GetStudentType")
                 .addParams("Account",account)
-                .addParams("Password",password)
+                .addParams("pwd", MD5Pass)
                 .build()
                 .execute(new StringCallback() {
                     @Override
                     public void onError(Call call, Exception e, int id) {
-                        ToastUtil.show("登录失败，请稍后重试");
+                        closeProgressDialog();
+                        ToastUtil.show("登录失败：" + e.toString());
                     }
 
                     @Override
@@ -80,11 +91,12 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
+    // 解析json数据
     private void getJson(String response, String account, String password) {
         try {
             JSONObject jsonObject = new JSONObject(response);
-            boolean flag = jsonObject.getBoolean("flag");
-            if (flag) {
+            boolean sucessed = jsonObject.getBoolean("sucessed");
+            if (sucessed) {
                 // 检测是否记住密码
                 if (cb_remember.isChecked()) {
                     SpUtil.putString("account",account);
@@ -92,26 +104,33 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 SpUtil.putBoolean("check",cb_remember.isChecked());
 
+                // 登录成功
+                int type = jsonObject.getInt("data");
                 closeProgressDialog();
-
-                JSONObject result = jsonObject.getJSONObject("result");
-                int type = result.getInt("type");
+                // 根据用户类型，跳转到不同页面
                 if (type == USER_ORDINARY) {
+                    // 跳转到普通用户界面
                     startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     finish();
                 } else if (type == USER_ADMIN) {
+                    // 跳转到管理员用户界面
                     startActivity(new Intent(getApplicationContext(), AdminActivity.class));
                     finish();
                 }
             } else {
+                // 登录失败
                 closeProgressDialog();
                 ToastUtil.show("账号或密码错误");
             }
         } catch (JSONException e) {
+            // json解析异常
             e.printStackTrace();
+            closeProgressDialog();
+            ToastUtil.show("登录失败：" + e.toString());
         }
     }
 
+    // 初始化控件
     private void initView() {
         et_account = (EditText) findViewById(R.id.et_account);
         et_password = (EditText) findViewById(R.id.et_password);

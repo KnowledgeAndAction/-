@@ -51,12 +51,12 @@ public class AdminActivity extends AppCompatActivity {
 
         initView();
 
-
-
         submitActive();
     }
 
+    // 设置时间选择按钮点击事件
     private void setDateTime() {
+        // 选择日期按钮
         bt_active_date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,6 +79,7 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
 
+        // 选择时间按钮
         bt_active_time.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,7 +111,7 @@ public class AdminActivity extends AppCompatActivity {
                 String activeLocation = et_active_location.getText().toString().trim();
                 String yunziId = et_yunzi_id.getText().toString().trim();
 
-
+                // 如果都不为空，提交活动
                 if (!activeName.equals("") && !activeDes.equals("") && !activeLocation.equals("")
                         && !yunziId.equals("") && !mDate.equals("") && !mTime.equals("") && mRule != -1) {
                     String dateTime = mDate + " " + mTime;
@@ -136,54 +137,88 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
 
+        // 设置时间选择按钮点击事件
         setDateTime();
     }
 
+    // 提交活动信息到数据库
     private void submitService(String activeName, String activeDes, String activeLocation, String yunziId, String dateTime, int mRule) {
-        OkHttpUtils.get().url(Constant.TEST_URL + "setActivity.do")
-                .addParams("activityName",activeName)
-                .addParams("activityDes",activeDes)
-                .addParams("sensoroId",yunziId)
-                .addParams("time",dateTime)
-                .addParams("location",activeLocation)
-                .addParams("rule",""+mRule)
+        // GET方法提交
+        OkHttpUtils
+                .get()
+                .url(Constant.API_URL + "api/TActivity/AddActivity")
+                .addParams("activityname", activeName)
+                .addParams("activitydec", activeDes)
+                .addParams("sensorid", yunziId)
+                .addParams("time", dateTime)
+                .addParams("location", activeLocation)
+                .addParams("rule", ""+mRule)
                 .build()
                 .execute(new StringCallback() {
                     @Override
                     public void onError(Call call, Exception e, int id) {
-                        closeProgressDialog();
-                        ToastUtil.show("提交失败，请稍后重试");
+                        ToastUtil.show("提交失败：" + e.toString());
                     }
 
                     @Override
                     public void onResponse(String response, int id) {
-                        try {
-                            closeProgressDialog();
-
-                            JSONObject jsonObject = new JSONObject(response);
-                            boolean flag = jsonObject.getBoolean("flag");
-                            if (flag) {
-                                et_active_name.setText("");
-                                et_active_des.setText("");
-                                et_yunzi_id.setText("");
-                                et_active_location.setText("");
-                                bt_active_date.setText("请选择日期");
-                                bt_active_time.setText("请选择时间");
-
-                                mDate = "";
-                                mTime = "";
-
-                                ToastUtil.showLong("提交成功");
-                            } else {
-                                ToastUtil.show("提交失败，请稍后重试");
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        AnalysisJson(response);
                     }
                 });
+
+        // POST方法提交
+        /*OkHttpUtils
+                .post()
+                .url(Constant.API_URL + "api/TActivity/AddActivityPost")
+                .addParams("ActivityName", activeName)
+                .addParams("ActivityDescription", activeDes)
+                .addParams("Time", dateTime)
+                .addParams("Location", activeLocation)
+                .addParams("Rule", ""+mRule)
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        ToastUtil.show("提交失败：" + e.toString());
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        AnalysisJson(response);
+                    }
+                });*/
     }
 
+    // 解析json数据
+    private void AnalysisJson(String response) {
+        try {
+            closeProgressDialog();
+
+            JSONObject jsonObject = new JSONObject(response);
+            boolean sucessed = jsonObject.getBoolean("sucessed");
+            if (sucessed) {
+                et_active_name.setText("");
+                et_active_des.setText("");
+                et_yunzi_id.setText("");
+                et_active_location.setText("");
+                bt_active_date.setText("请选择日期");
+                bt_active_time.setText("请选择时间");
+
+                mDate = "";
+                mTime = "";
+
+                ToastUtil.showLong("提交成功");
+            } else {
+                ToastUtil.show("提交失败，请稍后重试");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            closeProgressDialog();
+            ToastUtil.show("提交失败：" + e.toString());
+        }
+    }
+
+    // 初始化控件
     private void initView() {
         et_active_name = (EditText) findViewById(R.id.et_active_name);
         et_active_des = (EditText) findViewById(R.id.et_active_des);
@@ -193,7 +228,6 @@ public class AdminActivity extends AppCompatActivity {
         bt_active_date = (Button) findViewById(R.id.bt_active_date);
         bt_active_time = (Button) findViewById(R.id.bt_active_time);
         bt_submit = (Button) findViewById(R.id.bt_submit);
-
 
         rg_rule = (RadioGroup) findViewById(R.id.rg_rule);
     }
