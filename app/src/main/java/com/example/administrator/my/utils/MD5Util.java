@@ -8,7 +8,15 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class MD5Util {
-    public static String strToMD5(String sourceStr) {
+    public static String strToMD5(String plainText) {
+        String cipherText = null;
+        String salt = "Grow";
+        String oneCiphertext = MD5(plainText) + MD5(salt);
+        cipherText = MD5(oneCiphertext);
+        return cipherText;
+    }
+
+    private static String MD5(String sourceStr) {
         String result = "";
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
