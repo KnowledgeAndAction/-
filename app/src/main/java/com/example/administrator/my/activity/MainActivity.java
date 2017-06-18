@@ -114,6 +114,7 @@ public class MainActivity extends FragmentActivity {
 				 */
                 String key = getKey(beacon);
                 boolean state = sharedPreferences.getBoolean(key, false);
+                //TODO 该写这里
 //                if (state) {
 //					/*
 //					 * show notification
@@ -140,6 +141,7 @@ public class MainActivity extends FragmentActivity {
 //                intent.putExtra("rssi", rssi);                   //信号强度
 //                intent.putExtra("serialNumber", serialNumber);//序列号
 //                startActivity(intent);
+
             }
 
             @Override

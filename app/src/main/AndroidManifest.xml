@@ -34,6 +34,8 @@
 
         <service android:name="com.sensoro.beacon.kit.BeaconService" />
         <service android:name="com.sensoro.beacon.kit.IntentProcessorService" />
+
+
     </application>
 
 </manifest>
