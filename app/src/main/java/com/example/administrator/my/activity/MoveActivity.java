@@ -8,13 +8,13 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.administrator.my.R;
+import com.example.administrator.my.utils.Constant;
+import com.example.administrator.my.utils.SpUtil;
 import com.example.administrator.my.utils.ToastUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
-import java.sql.Time;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import okhttp3.Call;
@@ -29,26 +29,27 @@ public class MoveActivity extends AppCompatActivity {
     private TextView tv_inTime;
     private String mMinute1;
     private String inTime;
+    private TextView tv_activityName;
+    private String activeName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_move);
+        Intent intent = getIntent();
+        activeName = intent.getStringExtra("activeName");
         //初始化控件
-        initData();
+        initView();
         //获取数据
         getData();
     }
-
     /**
      * 获取数据的方法
      */
     private void getData() {
         //获取当前时间
         getTime();
-
     }
-
     /**
      * 获取系统时间
      */
@@ -56,20 +57,15 @@ public class MoveActivity extends AppCompatActivity {
         SimpleDateFormat df = new SimpleDateFormat("HH:mm");//("HH:mm:ss")(小时：分钟：秒)
         inTime = df.format(new Date());
         tv_inTime.setText(inTime);
-        /*long time=System.currentTimeMillis();
-        final Calendar mCalendar=Calendar.getInstance();
-        mCalendar.setTimeInMillis(time);
-        mHour = mCalendar.get(Calendar.HOUR) + "";//小时
-        //分钟
-        mMinute1 = mCalendar.get(Calendar.MINUTE) + "";*/
-
     }
 
     /**
      * 初始化控件
      */
-    private void initData() {
+    private void initView() {
         tv_inTime = (TextView) findViewById(R.id.tv_inTime);
+        tv_activityName = (TextView) findViewById(R.id.tv_activeName);
+        tv_activityName.setText(activeName);
         tv_inTime.setText(mHour+mMinute);
         Button moveButton = (Button) findViewById(R.id.moveButton);
         moveButton.setOnClickListener(new View.OnClickListener() {
@@ -87,8 +83,12 @@ public class MoveActivity extends AppCompatActivity {
     private void setTime(){
         OkHttpUtils
                 .get()
-                .url("http://123.123")
-                .addParams("inTime",inTime)
+                .url(Constant.API_URL+"api/TSign/InsertSign")
+//        api/TSign/InsertSign?account={account}&activityid={activityid}&intime={intime}&outtime={outtime}
+                .addParams("account", SpUtil.getString("account",""))
+                .addParams("activityid","1")
+                .addParams("intime",inTime)
+                .addParams("outtime",inTime)
                 .build()
                 .execute(new StringCallback() {
                     @Override

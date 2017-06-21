@@ -22,6 +22,7 @@ public class DetailActivity extends AppCompatActivity {
     private TextView activityDes;
     private TextView activtyName;
     private Active active;
+    private String activeName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +47,8 @@ public class DetailActivity extends AppCompatActivity {
         activityLocation = (TextView) findViewById(R.id.tv_location);
         activityDes = (TextView) findViewById(R.id.tv_des);
 
-        activtyName.setText(active.getActiveName());
+        activeName = active.getActiveName();
+        activtyName.setText(activeName);
         activityLocation.setText(active.getActiveLocation());
         activityDes.setText(active.getActiveDes());
 
@@ -55,6 +57,7 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(DetailActivity.this, MoveActivity.class);
+                intent.putExtra("activeName",active.getActiveName());
                 startActivity(intent);
                 ToastUtil.show("签到成功");
             }
