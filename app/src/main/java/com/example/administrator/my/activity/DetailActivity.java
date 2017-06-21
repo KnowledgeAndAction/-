@@ -33,7 +33,7 @@ public class DetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
         active = (Active) intent.getSerializableExtra("active");
-        Log.d("考虑",""+active);
+        Log.d("考虑", "" + active);
         //初始化数据
         initData();
 
@@ -57,9 +57,9 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(DetailActivity.this, MoveActivity.class);
-                intent.putExtra("activeName",active.getActiveName());
+                intent.putExtra("activeName", active.getActiveName());
                 startActivity(intent);
-                ToastUtil.show("签到成功");
+                finish();
             }
         });
 

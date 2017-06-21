@@ -1,6 +1,9 @@
 package com.example.administrator.my.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -31,7 +34,9 @@ public class MoveActivity extends AppCompatActivity {
     private String inTime;
     private TextView tv_activityName;
     private String activeName;
-
+    private MyBroadcast myBroadcast;
+    private String outTime;
+    private boolean isHere=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,21 +47,35 @@ public class MoveActivity extends AppCompatActivity {
         initView();
         //获取数据
         getData();
+        myBroadcast = new MyBroadcast();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("SET_BROADCST_OUT");
+        registerReceiver(myBroadcast, intentFilter);
     }
     /**
      * 获取数据的方法
      */
     private void getData() {
-        //获取当前时间
-        getTime();
+        //获取签到时间
+        getInTime();
     }
+
     /**
-     * 获取系统时间
+     * 获取签到时间
      */
-    private void getTime(){
+    private void getInTime(){
         SimpleDateFormat df = new SimpleDateFormat("HH:mm");//("HH:mm:ss")(小时：分钟：秒)
         inTime = df.format(new Date());
         tv_inTime.setText(inTime);
+        SpUtil.putString("inTime",inTime);
+    }
+    /**
+     * 获取签离时间
+     */
+    private void getOutTime() {
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm");//("HH:mm:ss")(小时：分钟：秒)
+        outTime = df.format(new Date());
+        SpUtil.putString("outTime",outTime);
     }
 
     /**
@@ -71,12 +90,19 @@ public class MoveActivity extends AppCompatActivity {
         moveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MoveActivity.this,MainActivity.class));
+                getOutTime();
                 //发送时间数据
-                setTime();
+                if(isHere){
+                    setTime();
+                }else {
+                    ToastUtil.show("请稍后重试");
+                }
             }
         });
     }
+
+
+
     /**
      * 发送时间数据
      */
@@ -84,11 +110,10 @@ public class MoveActivity extends AppCompatActivity {
         OkHttpUtils
                 .get()
                 .url(Constant.API_URL+"api/TSign/InsertSign")
-//        api/TSign/InsertSign?account={account}&activityid={activityid}&intime={intime}&outtime={outtime}
                 .addParams("account", SpUtil.getString("account",""))
                 .addParams("activityid","1")
                 .addParams("intime",inTime)
-                .addParams("outtime",inTime)
+                .addParams("outtime", outTime)
                 .build()
                 .execute(new StringCallback() {
                     @Override
@@ -99,7 +124,23 @@ public class MoveActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String s, int i) {
                         ToastUtil.show("保存成功");
+                        finish();
                     }
                 });
+    }
+    public class MyBroadcast extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            isHere=true;
+        }
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(myBroadcast!=null){
+            unregisterReceiver(myBroadcast);
+        }
+
     }
 }

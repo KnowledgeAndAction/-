@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 
 import com.example.administrator.my.R;
 import com.example.administrator.my.fragment.ActivityFragment;
@@ -89,6 +90,7 @@ public class MainActivity extends FragmentActivity {
             @Override
             public void onNewBeacon(Beacon beacon) {
                 //TODO 该写这里
+
 //                light = beacon.getLight();
                 String serialNumber = beacon.getSerialNumber();//序列号
                 SpUtil.putString("serialNumber",serialNumber);
@@ -113,7 +115,6 @@ public class MainActivity extends FragmentActivity {
                     Logs.d("发现云子");
                     Intent intent = new Intent();
                     intent.setAction("GET_YUNZI_ID");
-                    intent.putExtra("yunzi", serialNumber);
                     sendBroadcast(intent);
                 }
             }
@@ -128,6 +129,11 @@ public class MainActivity extends FragmentActivity {
             @Override
             public void onUpdateBeacon(final ArrayList<Beacon> beacons) {
                 for (Beacon beacon : beacons) {
+                    Intent intent = new Intent();
+                    intent.setAction("SET_BROADCST_OUT");
+                    sendBroadcast(intent);
+
+//                    System.out.println("健康jfk速度jfk基督教jfk的角度看jfk觉得");
                 }
             }
         };
