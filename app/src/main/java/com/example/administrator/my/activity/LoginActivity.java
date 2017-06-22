@@ -144,7 +144,6 @@ public class LoginActivity extends AppCompatActivity {
             cb_remember.setChecked(SpUtil.getBoolean("check",false));
         }
     }
-
     private void showProgressDialog() {
         if (progressDialog == null) {
             progressDialog = new ProgressDialog(this);
