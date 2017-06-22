@@ -58,6 +58,8 @@ public class DetailActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(DetailActivity.this, MoveActivity.class);
                 intent.putExtra("activeName", active.getActiveName());
+                intent.putExtra("location",active.getActiveLocation());
+                intent.putExtra("activityDes",active.getActiveDes());
                 startActivity(intent);
                 finish();
             }

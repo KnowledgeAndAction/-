@@ -1,9 +1,12 @@
 package com.example.administrator.my.activity;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -11,6 +14,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.administrator.my.R;
+import com.example.administrator.my.db.MyDatabaseHelper;
 import com.example.administrator.my.utils.Constant;
 import com.example.administrator.my.utils.SpUtil;
 import com.example.administrator.my.utils.ToastUtil;
@@ -37,12 +41,22 @@ public class MoveActivity extends AppCompatActivity {
     private MyBroadcast myBroadcast;
     private String outTime;
     private boolean isHere=false;
+    private MyDatabaseHelper dbHelper;
+    private String location;
+    private String activityDes;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_move);
+        //创建数据库
+        dbHelper = new MyDatabaseHelper(this,"userInformation.db",null,1);
+        dbHelper.getWritableDatabase();
+
         Intent intent = getIntent();
         activeName = intent.getStringExtra("activeName");
+        location = intent.getStringExtra("location");
+        activityDes = intent.getStringExtra("activityDes");
         //初始化控件
         initView();
         //获取数据
@@ -93,6 +107,9 @@ public class MoveActivity extends AppCompatActivity {
                 getOutTime();
                 //发送时间数据
                 if(isHere){
+                    //保存签到信息
+                    saveSignData();
+                    output();
                     setTime();
                 }else {
                     ToastUtil.show("请稍后重试");
@@ -101,6 +118,38 @@ public class MoveActivity extends AppCompatActivity {
         });
     }
 
+    private void output() {
+        SQLiteDatabase db=dbHelper.getWritableDatabase();
+        Cursor cursor=db.query("History",null,null,null,null,null,null);
+        if(cursor.moveToFirst()){
+            do{
+                String activityName=cursor.getString(cursor.getColumnIndex("activityName"));
+                String location=cursor.getString(cursor.getColumnIndex("location"));
+                String activityDes=cursor.getString(cursor.getColumnIndex("activityDes"));
+                String inTime=cursor.getString(cursor.getColumnIndex("inTime"));
+                String outTime=cursor.getString(cursor.getColumnIndex("outTime"));
+                System.out.println(activityName);
+                System.out.println(location);
+                System.out.println(activityDes);
+                System.out.println(inTime);
+                System.out.println(outTime);
+            }while (cursor.moveToNext());
+        }
+    }
+
+    /**
+     * 保存数据到本地
+     */
+    private void saveSignData() {
+        SQLiteDatabase db=dbHelper.getWritableDatabase();
+        ContentValues values=new ContentValues();
+        values.put("activityName",activeName);
+        values.put("location",location);
+        values.put("activityDes",activityDes);
+        values.put("inTime",inTime);
+        values.put("outTime",outTime);
+        db.insert("History",null,values);
+    }
 
 
     /**

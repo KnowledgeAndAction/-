@@ -14,6 +14,7 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 
 import com.example.administrator.my.R;
+import com.example.administrator.my.db.MyDatabaseHelper;
 import com.example.administrator.my.fragment.ActivityFragment;
 import com.example.administrator.my.fragment.HistoryFragment;
 import com.example.administrator.my.fragment.SettingFragment;
@@ -42,6 +43,7 @@ public class MainActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         sensoroManager = SensoroManager.getInstance(MainActivity.this);
 
