@@ -12,6 +12,10 @@ import com.example.administrator.my.R;
 import com.example.administrator.my.model.Active;
 import com.example.administrator.my.utils.ToastUtil;
 
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 /**
  * 此界面为活动详情——周凯歌
  */
@@ -48,6 +52,7 @@ public class DetailActivity extends AppCompatActivity {
         activityDes = (TextView) findViewById(R.id.tv_des);
 
         activeName = active.getActiveName();
+
         activtyName.setText(activeName);
         activityLocation.setText(active.getActiveLocation());
         activityDes.setText(active.getActiveDes());
@@ -56,14 +61,42 @@ public class DetailActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(DetailActivity.this, MoveActivity.class);
-                intent.putExtra("activeName", active.getActiveName());
-                intent.putExtra("location",active.getActiveLocation());
-                intent.putExtra("activityDes",active.getActiveDes());
-                startActivity(intent);
-                finish();
+                if(TimeCompare(active.getActiveTime().replace("T"," ").substring(0,16))){
+                    Intent intent = new Intent(DetailActivity.this, MoveActivity.class);
+                    intent.putExtra("activeName", active.getActiveName());
+                    intent.putExtra("location",active.getActiveLocation());
+                    intent.putExtra("activityDes",active.getActiveDes());
+                    startActivity(intent);
+                    finish();
+                }else {
+                    ToastUtil.show("未到签到时间");
+                }
+
             }
         });
 
+    }
+
+    /**
+     *判断是否到了签到时间   true/false
+     * @param signTime  需要签到的时间
+     */
+    private boolean TimeCompare(String signTime){
+        //格式化时间
+        SimpleDateFormat currentTime= new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        String presentTime = currentTime.format(new java.util.Date());//当前时间
+        try {
+            java.util.Date beginTime = currentTime.parse(signTime);
+            java.util.Date endTime = currentTime.parse(presentTime);
+            if(endTime.getTime()>=beginTime.getTime()) {
+//                System.out.println("运行了运行了运行了运行了运行了");
+                return true;
+            }else{
+                return false;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 }
