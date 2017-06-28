@@ -6,6 +6,22 @@ package com.example.administrator.my.utils;
 
 public class Constant {
     /**
+     * 用户账号（学号）
+     */
+    public static final String ACCOUNT = "account";
+    /**
+     * 用户密码
+     */
+    public static final String PASS_WORD = "pass_word";
+    /**
+     * 是否记住密码
+     */
+    public static final String IS_REMBER_PWD = "is_rember_pwd";
+    /**
+     * 用户类型
+     */
+    public static final String USER_TYPE = "user_type";
+    /**
      * sharedPreferences名字
      */
     public static String SHAREDPREFERENCES_NAME = "config";

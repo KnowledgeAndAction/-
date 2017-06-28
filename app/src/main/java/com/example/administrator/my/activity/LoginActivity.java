@@ -40,9 +40,11 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-
         // 初始化控件
         initView();
+
+        // 检查是否已经登录
+        checkIsEnter();
 
         // 登录按钮点击事件
         login();
@@ -67,9 +69,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     // 检查是否登录成功
-    private void checkLogin(final String account, final String password) {
+    private void checkLogin(final String account, String password) {
         // 对密码md5加密
-        String MD5Pass = MD5Util.strToMD5(password);
+        final String MD5Pass = MD5Util.strToMD5(password);
         // 发送请求
         OkHttpUtils
                 .get()
@@ -87,7 +89,7 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response, int id) {
                         // 解析json数据
-                        getJson(response,account,password);
+                        getJson(response,account,MD5Pass);
                     }
                 });
     }
@@ -99,25 +101,15 @@ public class LoginActivity extends AppCompatActivity {
             boolean sucessed = jsonObject.getBoolean("sucessed");
             if (sucessed) {
                 // 检测是否记住密码
-                if (cb_remember.isChecked()) {
-                    SpUtil.putString("account",account);
-                    SpUtil.putString("password",password);
-                }
-                SpUtil.putBoolean("check",cb_remember.isChecked());
+                checkUp(account,password);
 
                 // 登录成功
                 int type = jsonObject.getInt("data");
+                SpUtil.putInt(Constant.USER_TYPE, type);
                 closeProgressDialog();
+
                 // 根据用户类型，跳转到不同页面
-                if (type == USER_ORDINARY) {
-                    // 跳转到普通用户界面
-                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                    finish();
-                } else if (type == USER_ADMIN) {
-                    // 跳转到管理员用户界面
-                    startActivity(new Intent(getApplicationContext(), AdminActivity.class));
-                    finish();
-                }
+                enterApp(type);
             } else {
                 // 登录失败
                 closeProgressDialog();
@@ -131,6 +123,39 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    // 进入应用
+    private void enterApp(int type) {
+        if (type == USER_ORDINARY) {
+            // 跳转到普通用户界面
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            finish();
+        } else if (type == USER_ADMIN) {
+            // 跳转到管理员用户界面
+            startActivity(new Intent(getApplicationContext(), AdminActivity.class));
+            finish();
+        }
+    }
+
+    //检查是否勾选记住密码
+    private void checkUp(String userName,String mPwd) {
+        if (cb_remember.isChecked()) {
+            SpUtil.putString(Constant.ACCOUNT,userName);
+            SpUtil.putString(Constant.PASS_WORD,mPwd);
+            SpUtil.putBoolean(Constant.IS_REMBER_PWD,true);
+        } else {
+            SpUtil.putString(Constant.ACCOUNT,userName);
+            SpUtil.putString(Constant.PASS_WORD,mPwd);
+            SpUtil.putBoolean(Constant.IS_REMBER_PWD,false);
+        }
+    }
+
+    // 检查是否已经登陆
+    private void checkIsEnter() {
+        if (SpUtil.getBoolean(Constant.IS_REMBER_PWD,false)) {
+            enterApp(SpUtil.getInt(Constant.USER_TYPE,0));
+        }
+    }
+
     // 初始化控件
     private void initView() {
         et_account = (EditText) findViewById(R.id.et_account);
@@ -138,12 +163,11 @@ public class LoginActivity extends AppCompatActivity {
         cb_remember = (CheckBox) findViewById(R.id.cb_remember);
         bt_login = (Button) findViewById(R.id.bt_login);
 
-        if (SpUtil.getBoolean("check",false)) {
-            et_account.setText(SpUtil.getString("account",""));
-            et_password.setText(SpUtil.getString("password",""));
-            cb_remember.setChecked(SpUtil.getBoolean("check",false));
+        if (!SpUtil.getBoolean(Constant.IS_REMBER_PWD,false)) {
+            et_account.setText(SpUtil.getString(Constant.ACCOUNT,""));
         }
     }
+
     private void showProgressDialog() {
         if (progressDialog == null) {
             progressDialog = new ProgressDialog(this);
