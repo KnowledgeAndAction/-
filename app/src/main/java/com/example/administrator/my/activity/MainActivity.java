@@ -26,6 +26,8 @@ import com.sensoro.beacon.kit.Beacon;
 import com.sensoro.beacon.kit.BeaconManagerListener;
 import com.sensoro.cloud.SensoroManager;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
 
 public class MainActivity extends FragmentActivity {
@@ -263,10 +265,12 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        EventBus.getDefault().unregister(this);
         if(sensoroManager!=null){
             sensoroManager.stopService();
         }
         System.exit(0);
+
     }
 
 }

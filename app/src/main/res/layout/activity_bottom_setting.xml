@@ -4,12 +4,25 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center">
-    <TextView
-        android:id="@+id/bottom_text_3"
-        android:layout_width="wrap_content"
+
+    <Button
+        android:id="@+id/button_changeWorld"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="设置"
-        android:textSize="16sp"
-        android:textColor="@color/change_color_text"/>
+        android:background="@drawable/button_bg"
+        android:text="修改密码"
+        android:textSize="16sp"/>
+<View
+    android:layout_width="match_parent"
+    android:layout_height="1dp"
+    android:background="#e6e6e6"/>
+    <Button
+        android:id="@+id/button_esc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="注销"
+        android:background="@drawable/button_esc_bg"
+        android:textSize="16sp" />
+
 
 </LinearLayout>
