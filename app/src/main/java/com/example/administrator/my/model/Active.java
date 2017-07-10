@@ -11,6 +11,15 @@ public class Active implements Serializable{
     private String activeDes;
     private String activeTime;
     private String activeLocation;
+    private String sersorID;
+
+    public String getSersorID() {
+        return sersorID;
+    }
+
+    public void setSersorID(String sersorID) {
+        this.sersorID = sersorID;
+    }
 
     public String getActiveName() {
         return activeName;

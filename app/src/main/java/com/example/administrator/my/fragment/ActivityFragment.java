@@ -106,7 +106,7 @@ public class ActivityFragment extends BaseFragment {
 
         listView = (ListView) view.findViewById(R.id.lv_active);
 
-        showDialog();
+//        showDialog();
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -114,6 +114,7 @@ public class ActivityFragment extends BaseFragment {
                 Active active = mActiveList.get(position);
                 Intent intent = new Intent(getContext(), DetailActivity.class);
                 intent.putExtra("active", active);
+                intent.putExtra("yunziId",yunziId);
                 startActivity(intent);
             }
         });

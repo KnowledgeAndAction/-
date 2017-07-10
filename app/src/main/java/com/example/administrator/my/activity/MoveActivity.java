@@ -44,6 +44,8 @@ public class MoveActivity extends AppCompatActivity {
     private MyDatabaseHelper dbHelper;
     private String location;
     private String activityDes;
+    private String yunziId;
+    private boolean isCan = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +56,11 @@ public class MoveActivity extends AppCompatActivity {
         dbHelper.getWritableDatabase();
 
         Intent intent = getIntent();
+//        intent.getStringExtra("")
         activeName = intent.getStringExtra("activeName");
         location = intent.getStringExtra("location");
         activityDes = intent.getStringExtra("activityDes");
+        yunziId = intent.getStringExtra("yunziId");
         //初始化控件
         initView();
         //获取数据
@@ -106,7 +110,7 @@ public class MoveActivity extends AppCompatActivity {
             public void onClick(View v) {
                 getOutTime();
                 //发送时间数据
-                if(isHere){
+                if(isHere && isCan){
                     //保存签到信息
                     saveSignData();
                     output();
@@ -177,13 +181,26 @@ public class MoveActivity extends AppCompatActivity {
                     }
                 });
     }
-    public class MyBroadcast extends BroadcastReceiver {
+    public  class MyBroadcast extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
             isHere=true;
+            String[] sensor2ID = intent.getStringArrayExtra("sensor2ID");
+
+            isCan = isContains(sensor2ID,yunziId );
         }
     }
+
+    private boolean isContains(String[] strings, String s) {
+        for (String string : strings) {
+            if (string.equals(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

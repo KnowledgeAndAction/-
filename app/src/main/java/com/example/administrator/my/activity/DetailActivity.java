@@ -1,6 +1,9 @@
 package com.example.administrator.my.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,11 +13,13 @@ import android.widget.TextView;
 
 import com.example.administrator.my.R;
 import com.example.administrator.my.model.Active;
+import com.example.administrator.my.utils.SpUtil;
 import com.example.administrator.my.utils.ToastUtil;
 
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 /**
  * 此界面为活动详情——周凯歌
@@ -26,21 +31,23 @@ public class DetailActivity extends AppCompatActivity {
     private TextView activityDes;
     private TextView activtyName;
     private Active active;
-    private String activeName;
+    private MyBroadcast myBroadcast;
+    private String[] sensor2ID;
+    private String yunziId;
+    private boolean isCan = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-
         Intent intent = getIntent();
 
         active = (Active) intent.getSerializableExtra("active");
-        Log.d("考虑", "" + active);
+        yunziId = intent.getStringExtra("yunziId");
+
         //初始化数据
         initData();
-
     }
 
     /**
@@ -50,14 +57,20 @@ public class DetailActivity extends AppCompatActivity {
         activtyName = (TextView) findViewById(R.id.tv_name);
         activityLocation = (TextView) findViewById(R.id.tv_location);
         activityDes = (TextView) findViewById(R.id.tv_des);
+        loginButton = (Button) findViewById(R.id.loginButton);  //登录按钮
 
-        activeName = active.getActiveName();
-
-        activtyName.setText(activeName);
+        activtyName.setText(active.getActiveName());
         activityLocation.setText(active.getActiveLocation());
         activityDes.setText(active.getActiveDes());
 
-        loginButton = (Button) findViewById(R.id.loginButton);  //登录按钮
+        myBroadcast = new MyBroadcast();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("SET_BROADCST_OUT");
+        registerReceiver(myBroadcast, intentFilter);
+
+        ToastUtil.show("yunziId"+yunziId);
+        ToastUtil.show("sensor2ID"+sensor2ID);
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,15 +79,37 @@ public class DetailActivity extends AppCompatActivity {
                     intent.putExtra("activeName", active.getActiveName());
                     intent.putExtra("location",active.getActiveLocation());
                     intent.putExtra("activityDes",active.getActiveDes());
-                    startActivity(intent);
-                    finish();
+
+                    if(isCan){
+                        intent.putExtra("yunziId", yunziId);
+                        startActivity(intent);
+                        finish();
+                    }else {
+                        ToastUtil.show("无法进行签到，请稍后重试！");
+                    }
                 }else {
                     ToastUtil.show("未到签到时间");
                 }
-
             }
         });
+    }
 
+    public class MyBroadcast extends BroadcastReceiver {
+        //云子更新信息广播接受
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            sensor2ID = intent.getStringArrayExtra("sensor2ID");
+            isCan = isContains(sensor2ID,yunziId);
+        }
+    }
+
+    private boolean isContains(String[] strings, String s) {
+        for (String string : strings) {
+            if (string.equals(s)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
