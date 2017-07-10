@@ -40,6 +40,7 @@ public class MainActivity extends FragmentActivity {
     BluetoothManager bluetoothManager;
     private BluetoothAdapter bluetoothAdapter;
     private boolean isFirst = true;
+    private String serialNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,8 +97,9 @@ public class MainActivity extends FragmentActivity {
                 //TODO 该写这里
 
 //                light = beacon.getLight();
-                String serialNumber = beacon.getSerialNumber();//序列号
-                SpUtil.putString("serialNumber",serialNumber);
+                //序列号
+                serialNumber = beacon.getSerialNumber();
+                SpUtil.putString("serialNumber", serialNumber);
 //                accuracy = beacon.getAccuracy() * 100+"";    //距离
                 //信号强度
 //                rssi = beacon.getRssi() + "";
@@ -132,13 +134,17 @@ public class MainActivity extends FragmentActivity {
              */
             @Override
             public void onUpdateBeacon(final ArrayList<Beacon> beacons) {
+                String[] yunziIds = new String[beacons.size()];
+                int i = 0;
                 for (Beacon beacon : beacons) {
-                    Intent intent = new Intent();
-                    intent.setAction("SET_BROADCST_OUT");
-                    sendBroadcast(intent);
-
-//                    System.out.println("健康jfk速度jfk基督教jfk的角度看jfk觉得");
+                    yunziIds[i] = beacon.getSerialNumber();
+                    i++;
                 }
+                System.out.println(yunziIds.length);
+                Intent intent = new Intent();
+                intent.setAction("SET_BROADCST_OUT");
+                intent.putExtra("sensor2ID",yunziIds);
+                sendBroadcast(intent);
             }
         };
 
