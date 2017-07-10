@@ -47,6 +47,7 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
 
     @Override
     public void onClick(View view) {
+
         switch (view.getId()){
             case R.id.button_changeWorld:
                 Toast.makeText(getContext(),"正在开发中", Toast.LENGTH_SHORT).show();
