@@ -58,17 +58,13 @@ public class ChangePswActivity extends AppCompatActivity {
                 } else if (new_pwd.equals(old_pwd)) {
                     ToastUtil.show("新密码与旧密码相同！");
                 } else if (new_pwd_true.equals("")) {
-                    ToastUtil.show("请确认密码！");
+                    ToastUtil.show("请确认密码");
                 } else if (new_pwd_true.equals(new_pwd)) {
                     checkPassWorld(new_pwd);
                 } else {
                     ToastUtil.show("密码不一致！");
                 }
-                EventBus.getDefault().post(new ExitEvent());
-                Intent intent=new Intent(ChangePswActivity.this,LoginActivity.class);
-                startActivity(intent);
-                SpUtil.putBoolean(Constant.IS_REMBER_PWD,false);
-                finish();
+
             }
 
             //检查是否修改成功
@@ -91,6 +87,11 @@ public class ChangePswActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(String response, int id) {
                                 getJSON(response);
+                                EventBus.getDefault().post(new ExitEvent());
+                                Intent intent=new Intent(ChangePswActivity.this,LoginActivity.class);
+                                startActivity(intent);
+                                SpUtil.putBoolean(Constant.IS_REMBER_PWD,false);
+                                finish();
                             }
                         });
             }
