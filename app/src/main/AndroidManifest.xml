@@ -18,24 +18,40 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.LoginActivity">
+        <activity
+            android:name=".activity.SplashActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MainActivity" />
-        <activity android:name=".activity.DetailActivity" />
-        <activity android:name=".activity.MoveActivity" />
-        <activity android:name=".activity.HistoryDetailActivity" />
-        <activity android:name=".activity.ChangePswActivity" />
-        <activity android:name=".activity.AdminActivity" />
+        <activity
+            android:name=".activity.MainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.DetailActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.MoveActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.HistoryDetailActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.ChangePswActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.AdminActivity"
+            android:screenOrientation="portrait" />
 
         <service android:name="com.sensoro.beacon.kit.BeaconService" />
         <service android:name="com.sensoro.beacon.kit.IntentProcessorService" />
 
-
+        <activity
+            android:name=".activity.LoginActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

@@ -11,10 +11,8 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 
 import com.example.administrator.my.R;
-import com.example.administrator.my.db.MyDatabaseHelper;
 import com.example.administrator.my.fragment.ActivityFragment;
 import com.example.administrator.my.fragment.HistoryFragment;
 import com.example.administrator.my.fragment.SettingFragment;
@@ -237,9 +235,9 @@ public class MainActivity extends FragmentActivity {
      */
     private void initData() {
         tabs = new ArrayList<>();
-        tabs.add(new TabItem(R.mipmap.ic_launcher_round, R.string.tab_activity, ActivityFragment.class));
-        tabs.add(new TabItem(R.mipmap.ic_launcher_round, R.string.tab_history, HistoryFragment.class));
-        tabs.add(new TabItem(R.mipmap.ic_launcher_round, R.string.tab_setting, SettingFragment.class));
+        tabs.add(new TabItem(R.drawable.bottom_activity_selector, R.string.tab_activity, ActivityFragment.class));
+        tabs.add(new TabItem(R.drawable.bottom_history_selector, R.string.tab_history, HistoryFragment.class));
+        tabs.add(new TabItem(R.drawable.bottom_setting_selector, R.string.tab_setting, SettingFragment.class));
         myTablayout_bottom.initData(tabs, new MyTabLayout.OnTabClickListener() {
             @Override
             public void onTabClick(TabItem tabItem) {
