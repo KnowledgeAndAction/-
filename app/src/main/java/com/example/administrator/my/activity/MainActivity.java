@@ -7,10 +7,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 
 import com.example.administrator.my.R;
 import com.example.administrator.my.fragment.ActivityFragment;
@@ -28,7 +29,7 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends AppCompatActivity {
 
     private SensoroManager sensoroManager;
     private MyTabLayout myTablayout_bottom;
@@ -39,6 +40,7 @@ public class MainActivity extends FragmentActivity {
     private BluetoothAdapter bluetoothAdapter;
     private boolean isFirst = true;
     private String serialNumber;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +63,10 @@ public class MainActivity extends FragmentActivity {
     private void initWidget() {
         viewPager = (ViewPager) findViewById(R.id.viewPager_top);
         myTablayout_bottom = (MyTabLayout) findViewById(R.id.myTablayout_bottom);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(getResources().getString(R.string.app_name));
+        setSupportActionBar(toolbar);
 
         initData();
     }
@@ -109,13 +115,13 @@ public class MainActivity extends FragmentActivity {
                     intent.putExtra("yunzi", serialNumber);
                     sendBroadcast(intent);
                     isFirst = false;
-                } else if (SpUtil.getBoolean("destroy",true)){
+                } else if (SpUtil.getBoolean("destroy", true)) {
                     Logs.d("发现云子");
                     Intent intent = new Intent();
                     intent.setAction("GET_YUNZI_ID");
                     intent.putExtra("yunzi", serialNumber);
                     sendBroadcast(intent);
-                } else if (!SpUtil.getString("serialNumber","").equals(serialNumber)) {
+                } else if (!SpUtil.getString("serialNumber", "").equals(serialNumber)) {
                     Logs.d("发现云子");
                     Intent intent = new Intent();
                     intent.setAction("GET_YUNZI_ID");
@@ -141,7 +147,7 @@ public class MainActivity extends FragmentActivity {
                 System.out.println(yunziIds.length);
                 Intent intent = new Intent();
                 intent.setAction("SET_BROADCST_OUT");
-                intent.putExtra("sensor2ID",yunziIds);
+                intent.putExtra("sensor2ID", yunziIds);
                 sendBroadcast(intent);
             }
         };
@@ -189,7 +195,7 @@ public class MainActivity extends FragmentActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                    startActivityForResult(intent,1);
+                    startActivityForResult(intent, 1);
                 }
             }).setPositiveButton(R.string.no, new DialogInterface.OnClickListener() {
 
@@ -270,7 +276,7 @@ public class MainActivity extends FragmentActivity {
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
-        if(sensoroManager!=null){
+        if (sensoroManager != null) {
             sensoroManager.stopService();
         }
         System.exit(0);

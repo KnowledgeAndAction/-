@@ -1,6 +1,7 @@
 package com.example.administrator.my.activity;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.widget.RadioGroup;
 
 import com.example.administrator.my.R;
 import com.example.administrator.my.utils.Constant;
+import com.example.administrator.my.utils.SpUtil;
 import com.example.administrator.my.utils.ToastUtil;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
@@ -43,15 +45,32 @@ public class AdminActivity extends AppCompatActivity {
     private String mTime = "";
     private String mDate = "";
     private int mRule = -1;
+    private Button bt_exit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
 
+        // 初始化控件
         initView();
 
+        // 提交活动
         submitActive();
+
+        // 注销
+        exit();
+    }
+
+    private void exit() {
+        bt_exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                SpUtil.putBoolean(Constant.IS_REMBER_PWD,false);
+                finish();
+            }
+        });
     }
 
     // 设置时间选择按钮点击事件
@@ -102,7 +121,9 @@ public class AdminActivity extends AppCompatActivity {
         });
     }
 
+    // 提交活动
     private void submitActive() {
+        // 提交活动按钮点击事件
         bt_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,6 +144,7 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
 
+        // RadioGroup点击监听事件
         rg_rule.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
@@ -228,6 +250,7 @@ public class AdminActivity extends AppCompatActivity {
         bt_active_date = (Button) findViewById(R.id.bt_active_date);
         bt_active_time = (Button) findViewById(R.id.bt_active_time);
         bt_submit = (Button) findViewById(R.id.bt_submit);
+        bt_exit = (Button) findViewById(R.id.bt_exit);
 
         rg_rule = (RadioGroup) findViewById(R.id.rg_rule);
     }

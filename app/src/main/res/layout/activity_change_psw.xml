@@ -1,16 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.example.administrator.my.activity.ChangePswActivity">
-<android.support.v7.widget.Toolbar
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:orientation="vertical">
 
-</android.support.v7.widget.Toolbar>
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -39,15 +32,16 @@
             android:inputType="textPassword" />
 
     </android.support.design.widget.TextInputLayout>
-<Button
-    android:id="@+id/pwd_change"
-    android:layout_marginTop="20dp"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:text="确认修改"
-    android:textSize="16sp"
-    android:textColor="@color/mdtp_white"
-    android:background="@drawable/button_bg"/>
+
+    <Button
+        android:id="@+id/pwd_change"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/button_bg"
+        android:text="确认修改"
+        android:textColor="@color/mdtp_white"
+        android:textSize="16sp" />
 
 </LinearLayout>
