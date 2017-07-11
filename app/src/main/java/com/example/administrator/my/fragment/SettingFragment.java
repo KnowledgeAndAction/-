@@ -7,9 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.administrator.my.R;
+import com.example.administrator.my.activity.ChangePswActivity;
 import com.example.administrator.my.activity.LoginActivity;
 import com.example.administrator.my.bean.ExitEvent;
 import com.example.administrator.my.utils.Constant;
@@ -22,8 +24,8 @@ import org.greenrobot.eventbus.EventBus;
  */
 
 public class SettingFragment extends BaseFragment implements View.OnClickListener{
-    private Button button_changeWorld;
-    private Button button_esc;
+    private TextView button_changeWorld;
+    private TextView button_esc;
     @Override
     public void fetchData() {
 
@@ -38,8 +40,8 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
     }
 
     private void inItUI(View view) {
-        button_esc= (Button) view.findViewById(R.id.button_esc);
-        button_changeWorld= (Button) view.findViewById(R.id.button_changeWorld);
+        button_esc= (TextView) view.findViewById(R.id.button_esc);
+        button_changeWorld= (TextView) view.findViewById(R.id.button_changeWorld);
         button_esc.setOnClickListener(this);
         button_changeWorld.setOnClickListener(this);
     }
@@ -50,7 +52,8 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
 
         switch (view.getId()){
             case R.id.button_changeWorld:
-                Toast.makeText(getContext(),"正在开发中", Toast.LENGTH_SHORT).show();
+                Intent intent=new Intent(getContext(),ChangePswActivity.class);
+                startActivity(intent);
                 break;
             case R.id.button_esc:
                 EventBus.getDefault().post(new ExitEvent());
