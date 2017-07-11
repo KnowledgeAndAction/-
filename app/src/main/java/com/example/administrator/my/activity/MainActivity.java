@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.example.administrator.my.R;
+import com.example.administrator.my.bean.ExitEvent;
 import com.example.administrator.my.fragment.ActivityFragment;
 import com.example.administrator.my.fragment.HistoryFragment;
 import com.example.administrator.my.fragment.SettingFragment;
@@ -26,6 +27,8 @@ import com.sensoro.beacon.kit.BeaconManagerListener;
 import com.sensoro.cloud.SensoroManager;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
@@ -55,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
 
         //初始化控件
         initWidget();
+        // 注册监听退出登录的事件
+        EventBus.getDefault().register(this);
     }
 
     /**
@@ -271,7 +276,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(ExitEvent event) {
+        finish();
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -279,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
         if (sensoroManager != null) {
             sensoroManager.stopService();
         }
-        System.exit(0);
+//        System.exit(0);
 
     }
 

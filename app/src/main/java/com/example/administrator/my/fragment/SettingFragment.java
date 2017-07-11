@@ -52,6 +52,7 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
 
         switch (view.getId()){
             case R.id.button_changeWorld:
+                EventBus.getDefault().post(new ExitEvent());
                 Intent intent=new Intent(getContext(),ChangePswActivity.class);
                 startActivity(intent);
                 break;
