@@ -20,7 +20,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activity.SplashActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoTitle">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -53,7 +54,9 @@
         <service android:name="com.sensoro.beacon.kit.BeaconService" />
         <service android:name="com.sensoro.beacon.kit.IntentProcessorService" />
 
-        <activity android:name=".activity.GuideActivity"></activity>
+        <activity
+            android:name=".activity.GuideActivity"
+            android:theme="@style/AppTheme.NoTitle"></activity>
     </application>
 
 </manifest>
