@@ -17,6 +17,7 @@ public class HistoryDetailActivity extends AppCompatActivity {
     private TextView tv_hintime;
     private TextView tv_houttime;
     private TextView tv_hname;
+    private TextView tv_hlocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,11 +33,13 @@ public class HistoryDetailActivity extends AppCompatActivity {
         tv_hintime = (TextView) findViewById(R.id.tv_hintime);
         tv_houttime = (TextView) findViewById(R.id.tv_houttime);
         tv_hname = (TextView) findViewById(R.id.tv_hname);
+        tv_hlocation= (TextView) findViewById(R.id.tv_hlocation);
 
-        tv_details.setText(historyActivity.getActivityDescription());
+        tv_details.setText("  "+historyActivity.getActivityDescription());
         tv_hintime.setText(historyActivity.gethInTime().replace("T"," "));
-        tv_houttime.setText(historyActivity.gethOutTime().replace("T",""));
+        tv_houttime.setText(historyActivity.gethOutTime().replace("T"," "));
         tv_hname.setText(historyActivity.gethActivityName());
+        tv_hlocation.setText(historyActivity.getLocation());
 
     }
 
