@@ -70,7 +70,7 @@ public class SplashActivity extends AppCompatActivity {
             public void run() {
                 try {
                     Thread.sleep(3000);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException e)   {
                     e.printStackTrace();
                 }
                 mHandler.sendMessage(msg);
