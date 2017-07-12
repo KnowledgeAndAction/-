@@ -1,25 +1,25 @@
 package com.example.administrator.my.fragment;
 
-import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
+
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.administrator.my.R;
+
 import com.example.administrator.my.activity.DetailActivity;
+import com.example.administrator.my.activity.HistoryDetailActivity;
+import com.example.administrator.my.bean.HistoryActivity;
 import com.example.administrator.my.model.Active;
 import com.example.administrator.my.utils.Constant;
-import com.example.administrator.my.utils.Logs;
 import com.example.administrator.my.utils.SpUtil;
 import com.example.administrator.my.utils.ToastUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -34,32 +34,45 @@ import java.util.List;
 
 import okhttp3.Call;
 
+
 /**
  * 历史界面——崔国钊
  */
 
 public class HistoryFragment extends BaseFragment {
 
-    private List<Active> mActiveList = new ArrayList<>();
+    private List<HistoryActivity> mActiveList = new ArrayList<>();
     private ListView listView;
-    private HistoryFragment.MyBroadcast myBroadcast;
-    private String userId;
-    private ProgressDialog progressDialog;
 
     @Override
-    public void fetchData() {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_bottom_history, container, false);
+        initDate(view);
+        getActive();
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                HistoryActivity historyActivity = mActiveList.get(position);
+                Intent intent = new Intent(getContext(), HistoryDetailActivity.class);
+                intent.putExtra("hActivityId", historyActivity);
+
+//                intent.putExtra("userId", Constant.ACCOUNT);
+                startActivity(intent);
+            }
+        });
+        return view;
     }
 
-    private void getActive(String userId) {
+    private void getActive() {
         OkHttpUtils
                 .get()
-                .url(Constant.API_URL + "GET api/TSign/GetSign")
-                .addParams("userId",userId)
+                .url(Constant.API_URL + "api/TSign/GetSign")
+                .addParams("userId", SpUtil.getString(Constant.ACCOUNT, ""))
                 .build()
                 .execute(new StringCallback() {
                     @Override
                     public void onError(Call call, Exception e, int i) {
-
+                        ToastUtil.show("历史记录响应失败");
                     }
 
                     @Override
@@ -68,26 +81,38 @@ public class HistoryFragment extends BaseFragment {
                             JSONObject jsonObject = new JSONObject(s);
                             boolean sucessed = jsonObject.getBoolean("sucessed");
                             if (sucessed) {
+
                                 mActiveList.clear();
                                 JSONArray data = jsonObject.getJSONArray("data");
-                                for (int j = 0; j < data.length(); j++) {
-                                    JSONObject activity = data.getJSONObject(j);
-                                    String name = activity.getString("ActivityName");
-                                    String des = activity.getString("ActivityDescription");
-                                    String time = activity.getString("Time");
-                                    String location = activity.getString("Location");
 
-                                    Active active = new Active();
-                                    active.setActiveName(name);
-                                    active.setActiveTime(time);
-                                    active.setActiveDes(des);
-                                    active.setActiveLocation(location);
-                                    mActiveList.add(active);
+                                for (int j = 0; j < data.length(); j++) {
+                                    JSONObject hActivity = data.getJSONObject(j);
+                                    String hActivityId = hActivity.getString("ActivityId");
+                                    String hStudnetNum = hActivity.getString("StudnetNum");
+                                    String hInTime = hActivity.getString("InTime");
+                                    String hOutTime = hActivity.getString("OutTime");
+                                    String hActivityDescription = hActivity.getString("ActivityDescription");
+                                    String hTime = hActivity.getString("Time");
+                                    String hLocation = hActivity.getString("Location");
+                                    String hActivityName = hActivity.getString("ActivityName");
+
+
+                                    HistoryActivity historyActivity = new HistoryActivity();
+                                    historyActivity.sethActivityId(hActivityId);
+                                    historyActivity.sethStudnetNum(hStudnetNum);
+                                    historyActivity.sethInTime(hInTime);
+                                    historyActivity.sethOutTime(hOutTime);
+                                    historyActivity.setActivityDescription(hActivityDescription);
+                                    historyActivity.sethActivityName(hActivityName);
+                                    historyActivity.sethLocation(hLocation);
+                                    historyActivity.sethTime(hTime);
+                                    mActiveList.add(historyActivity);
                                 }
 
                                 HistoryFragment.MyAdapter adapter = new HistoryFragment.MyAdapter();
                                 listView.setAdapter(adapter);
-                                closeDialog();
+                            } else {
+                                ToastUtil.show("解析失败");
                             }
 
                         } catch (JSONException e) {
@@ -98,42 +123,12 @@ public class HistoryFragment extends BaseFragment {
     }
 
     @Override
-    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_bottom_active, container, false);
-
-        myBroadcast = new HistoryFragment.MyBroadcast();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("GET_YUNZI_ID");
-        getContext().registerReceiver(myBroadcast, intentFilter);
-
-        listView = (ListView) view.findViewById(R.id.lv_active);
-
-//        showDialog();
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Active active = mActiveList.get(position);
-                Intent intent = new Intent(getContext(), DetailActivity.class);
-                intent.putExtra("active", active);
-                intent.putExtra("userId",userId);
-                startActivity(intent);
-            }
-        });
-
-        return view;
+    public void fetchData() {
     }
 
-    public class MyBroadcast extends BroadcastReceiver {
-        //云子更新信息广播接受
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            userId = intent.getStringExtra("user");
-            getActive("1");
-            SpUtil.putBoolean("destroy",false);
 
-            //ToastUtil.show("发现云子");
-        }
+    private void initDate(View view) {
+        listView = (ListView) view.findViewById(R.id.lv_history);
     }
 
 
@@ -145,7 +140,7 @@ public class HistoryFragment extends BaseFragment {
         }
 
         @Override
-        public Active getItem(int position) {
+        public HistoryActivity getItem(int position) {
             return mActiveList.get(position);
         }
 
@@ -156,21 +151,21 @@ public class HistoryFragment extends BaseFragment {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            ActivityFragment.ViewHolder viewHolder;
+            ViewHolder viewHolder;
             if (convertView == null) {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_activity_list, parent, false);
-                viewHolder = new ActivityFragment.ViewHolder();
+                viewHolder = new HistoryFragment.ViewHolder();
                 viewHolder.tv_name = (TextView) convertView.findViewById(R.id.tv_name);
                 viewHolder.tv_location = (TextView) convertView.findViewById(R.id.tv_location);
                 viewHolder.tv_time = (TextView) convertView.findViewById(R.id.tv_time);
                 convertView.setTag(viewHolder);
             } else {
-                viewHolder = (ActivityFragment.ViewHolder) convertView.getTag();
+                viewHolder = (HistoryFragment.ViewHolder) convertView.getTag();
             }
 
-            viewHolder.tv_name.setText(getItem(position).getActiveName());
-            viewHolder.tv_location.setText(getItem(position).getActiveLocation());
-            viewHolder.tv_time.setText(getItem(position).getActiveTime().replace("T"," ").substring(0,16));
+            viewHolder.tv_name.setText(getItem(position).gethActivityName());
+            viewHolder.tv_location.setText(getItem(position).getLocation().replace("T", " "));
+            viewHolder.tv_time.setText(getItem(position).gethTime().replace("T", " ").substring(0, 16));
 
             return convertView;
         }
@@ -182,40 +177,4 @@ public class HistoryFragment extends BaseFragment {
         TextView tv_time;
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        // 取消注册广播
-        if (myBroadcast != null) {
-            Logs.i("取消注册广播");
-            getContext().unregisterReceiver(myBroadcast);
-        }
-        SpUtil.putBoolean("destroy",true);
-    }
-
-    /**
-     * 弹出对话框
-     */
-    private void showDialog() {
-        progressDialog = new ProgressDialog(getContext());
-        progressDialog.setMessage("Loading...");
-        progressDialog.setCancelable(true);
-        progressDialog.show();
-    }
-
-    /**
-     * 关闭对话框
-     */
-    private void closeDialog() {
-        if (progressDialog != null) {
-            progressDialog.dismiss();
-        }
-    }
-//
-//    @Nullable
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-//        View view = inflater.inflate(R.layout.activity_bottom_history, container, false);
-//        return view;
-//    }
 }
