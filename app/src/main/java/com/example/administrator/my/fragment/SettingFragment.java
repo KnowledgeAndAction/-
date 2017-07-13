@@ -6,14 +6,12 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.administrator.my.R;
 import com.example.administrator.my.activity.ChangePswActivity;
 import com.example.administrator.my.activity.LoginActivity;
-import com.example.administrator.my.bean.ExitEvent;
+import com.example.administrator.my.model.ExitEvent;
 import com.example.administrator.my.utils.Constant;
 import com.example.administrator.my.utils.SpUtil;
 

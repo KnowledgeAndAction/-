@@ -42,6 +42,7 @@
             android:name=".activity.MoveActivity"
             android:screenOrientation="portrait" />
         <activity
+            android:theme="@style/AppTheme.NoTitle"
             android:name=".activity.HistoryDetailActivity"
             android:screenOrientation="portrait" />
         <activity

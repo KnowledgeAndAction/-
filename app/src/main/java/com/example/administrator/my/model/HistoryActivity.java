@@ -1,4 +1,4 @@
-package com.example.administrator.my.bean;
+package com.example.administrator.my.model;
 
 import java.io.Serializable;
 
@@ -7,21 +7,21 @@ import java.io.Serializable;
  */
 
 public class HistoryActivity implements Serializable{
-    private String hStudnetNum;
+    private String hStudentNum;
     private String hInTime;
     private String hActivityId;
     private String hOutTime;
     private String hTime;
-    private String hLocationt;
+    private String hLocation;
     private String hActivityName;
     private String ActivityDescription;
 
     public String gethStudnetNum() {
-        return hStudnetNum;
+        return hStudentNum;
     }
 
     public void sethStudnetNum(String hStudnetNum) {
-        this.hStudnetNum = hStudnetNum;
+        this.hStudentNum = hStudnetNum;
     }
 
     public String gethInTime() {
@@ -57,11 +57,11 @@ public class HistoryActivity implements Serializable{
     }
 
     public String getLocation() {
-        return hLocationt;
+        return hLocation;
     }
 
     public void sethLocation(String hLocationt) {
-        this.hLocationt = hLocationt;
+        this.hLocation = hLocationt;
     }
 
     public String gethActivityName() {

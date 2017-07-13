@@ -1,6 +1,5 @@
 package com.example.administrator.my.activity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,7 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.example.administrator.my.R;
-import com.example.administrator.my.bean.ExitEvent;
+import com.example.administrator.my.model.ExitEvent;
 import com.example.administrator.my.utils.Constant;
 import com.example.administrator.my.utils.Logs;
 import com.example.administrator.my.utils.MD5Util;
@@ -23,8 +22,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import okhttp3.Call;
-
-import static com.example.administrator.my.utils.Constant.PASS_WORD;
 
 /**
  * 修改密码界面——崔国钊

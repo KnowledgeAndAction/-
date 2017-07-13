@@ -3,10 +3,15 @@ package com.example.administrator.my.activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.administrator.my.MyApplication;
 import com.example.administrator.my.R;
-import com.example.administrator.my.bean.HistoryActivity;
+import com.example.administrator.my.fragment.HistoryFragment;
+import com.example.administrator.my.model.HistoryActivity;
 
 /**
  * 历史活动详情——崔国钊
@@ -18,13 +23,14 @@ public class HistoryDetailActivity extends AppCompatActivity {
     private TextView tv_houttime;
     private TextView tv_hname;
     private TextView tv_hlocation;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history_detail);
         Intent intent = getIntent();
-        historyActivity = (HistoryActivity) intent.getSerializableExtra("hActivityId");
+        historyActivity = (HistoryActivity) intent.getSerializableExtra("ActivityId");
         initVie();
     }
 
@@ -33,13 +39,26 @@ public class HistoryDetailActivity extends AppCompatActivity {
         tv_hintime = (TextView) findViewById(R.id.tv_hintime);
         tv_houttime = (TextView) findViewById(R.id.tv_houttime);
         tv_hname = (TextView) findViewById(R.id.tv_hname);
-        tv_hlocation= (TextView) findViewById(R.id.tv_hlocation);
+        tv_hlocation = (TextView) findViewById(R.id.tv_hlocation);
+        toolbar= (Toolbar) findViewById(R.id.toolbar);
 
-        tv_details.setText("  "+historyActivity.getActivityDescription());
-        tv_hintime.setText(historyActivity.gethInTime().replace("T"," "));
-        tv_houttime.setText(historyActivity.gethOutTime().replace("T"," "));
+        tv_details.setText("  " + historyActivity.getActivityDescription());
+        tv_hintime.setText(historyActivity.gethInTime().replace("T", " "));
+        tv_houttime.setText(historyActivity.gethOutTime().replace("T", " "));
         tv_hname.setText(historyActivity.gethActivityName());
         tv_hlocation.setText(historyActivity.getLocation());
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        toolbar.setTitle("历史记录详情");
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
     }
 

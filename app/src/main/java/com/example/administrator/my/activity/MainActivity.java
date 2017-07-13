@@ -14,7 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.example.administrator.my.R;
-import com.example.administrator.my.bean.ExitEvent;
+import com.example.administrator.my.model.ExitEvent;
 import com.example.administrator.my.fragment.ActivityFragment;
 import com.example.administrator.my.fragment.HistoryFragment;
 import com.example.administrator.my.fragment.SettingFragment;

@@ -1,4 +1,4 @@
-package com.example.administrator.my.bean;
+package com.example.administrator.my.model;
 
 /**
  * Created by 666 on 2017/7/10.
