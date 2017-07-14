@@ -7,23 +7,25 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.hicc.information.sensorsignin.R;
-import cn.hicc.information.sensorsignin.db.MyDatabaseHelper;
-import cn.hicc.information.sensorsignin.utils.Constant;
-import cn.hicc.information.sensorsignin.utils.SpUtil;
-import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import cn.hicc.information.sensorsignin.db.MyDatabaseHelper;
+import cn.hicc.information.sensorsignin.utils.Constant;
+import cn.hicc.information.sensorsignin.utils.SpUtil;
+import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import okhttp3.Call;
 
 /**
@@ -40,12 +42,12 @@ public class MoveActivity extends AppCompatActivity {
     private String activeName;
     private MyBroadcast myBroadcast;
     private String outTime;
-    private boolean isHere=false;
     private MyDatabaseHelper dbHelper;
     private String location;
     private String activityDes;
     private String yunziId;
     private boolean isCan = false;
+    private List<String> sensorList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +58,6 @@ public class MoveActivity extends AppCompatActivity {
         dbHelper.getWritableDatabase();
 
         Intent intent = getIntent();
-//        intent.getStringExtra("")
         activeName = intent.getStringExtra("activeName");
         location = intent.getStringExtra("location");
         activityDes = intent.getStringExtra("activityDes");
@@ -110,7 +111,7 @@ public class MoveActivity extends AppCompatActivity {
             public void onClick(View v) {
                 getOutTime();
                 //发送时间数据
-                if(isHere && isCan){
+                if(isCan){
                     //保存签到信息
                     saveSignData();
                     output();
@@ -185,21 +186,14 @@ public class MoveActivity extends AppCompatActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            isHere=true;
-            String[] sensor2ID = intent.getStringArrayExtra("sensor2ID");
-
-            isCan = isContains(sensor2ID,yunziId );
+            // 获取接收到的云子id，添加到集合中
+            String sensor2ID = intent.getStringExtra("sensor2ID");
+            sensorList.add(sensor2ID);
+            // 如果当集合中包含进入活动的云子id，就可以签离
+            isCan = sensorList.contains(yunziId);
         }
     }
 
-    private boolean isContains(String[] strings, String s) {
-        for (String string : strings) {
-            if (string.equals(s)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     @Override
     protected void onDestroy() {

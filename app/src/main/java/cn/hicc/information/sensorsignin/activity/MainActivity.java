@@ -10,14 +10,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.hicc.information.sensorsignin.R;
-import cn.hicc.information.sensorsignin.fragment.ActivityFragment;
-import cn.hicc.information.sensorsignin.fragment.HistoryFragment;
-import cn.hicc.information.sensorsignin.fragment.SettingFragment;
-import cn.hicc.information.sensorsignin.model.ExitEvent;
-import cn.hicc.information.sensorsignin.model.TabItem;
-import cn.hicc.information.sensorsignin.utils.Logs;
-import cn.hicc.information.sensorsignin.utils.SpUtil;
-import cn.hicc.information.sensorsignin.view.MyTabLayout;
 import com.sensoro.beacon.kit.Beacon;
 import com.sensoro.beacon.kit.BeaconManagerListener;
 import com.sensoro.cloud.SensoroManager;
@@ -27,6 +19,16 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import cn.hicc.information.sensorsignin.fragment.ActivityFragment;
+import cn.hicc.information.sensorsignin.fragment.HistoryFragment;
+import cn.hicc.information.sensorsignin.fragment.SettingFragment;
+import cn.hicc.information.sensorsignin.model.DestroyFragment;
+import cn.hicc.information.sensorsignin.model.ExitEvent;
+import cn.hicc.information.sensorsignin.model.TabItem;
+import cn.hicc.information.sensorsignin.utils.Logs;
+import cn.hicc.information.sensorsignin.view.MyTabLayout;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,8 +36,9 @@ public class MainActivity extends AppCompatActivity {
     private MyTabLayout myTablayout_bottom;
     private ViewPager viewPager;
     private ArrayList<TabItem> tabs;
-    private boolean isFirst = true;
     private String serialNumber;
+    // 存储扫描到的云子id
+    private List<String> oldSerialNumber = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,29 +108,24 @@ public class MainActivity extends AppCompatActivity {
              */
             @Override
             public void onNewBeacon(Beacon beacon) {
-                //序列号
+                // 序列号
                 serialNumber = beacon.getSerialNumber();
-                SpUtil.putString("serialNumber", serialNumber);
-
-                if (isFirst) {
-                    Logs.d("发现云子");
+                Logs.d("serialNumber:" + serialNumber);
+                // 如果存储的云子id中不包含此次发现的  就将新的添加到集合中，发送广播
+                if (!oldSerialNumber.contains(serialNumber)) {
+                    oldSerialNumber.add(serialNumber);
+                    Logs.d("发现新云子:" + serialNumber);
                     Intent intent = new Intent();
-                    intent.setAction("GET_YUNZI_ID");
-                    intent.putExtra("yunzi", serialNumber);
-                    sendBroadcast(intent);
-                    isFirst = false;
-                } else if (SpUtil.getBoolean("destroy", true)) {
-                    Logs.d("发现云子");
-                    Intent intent = new Intent();
-                    intent.setAction("GET_YUNZI_ID");
-                    intent.putExtra("yunzi", serialNumber);
-                    sendBroadcast(intent);
-                } else if (!SpUtil.getString("serialNumber", "").equals(serialNumber)) {
-                    Logs.d("发现云子");
-                    Intent intent = new Intent();
+                    intent.putExtra("yunzi",serialNumber);
                     intent.setAction("GET_YUNZI_ID");
                     sendBroadcast(intent);
                 }
+
+                // 签到 签离界面需要的广播
+                Intent intent = new Intent();
+                intent.setAction("SET_BROADCST_OUT");
+                intent.putExtra("sensor2ID", beacon.getSerialNumber());
+                sendBroadcast(intent);
             }
 
             @Override
@@ -139,17 +137,13 @@ public class MainActivity extends AppCompatActivity {
              */
             @Override
             public void onUpdateBeacon(final ArrayList<Beacon> beacons) {
-                String[] yunziIds = new String[beacons.size()];
-                int i = 0;
                 for (Beacon beacon : beacons) {
-                    yunziIds[i] = beacon.getSerialNumber();
-                    i++;
+                    // 签到 签离界面需要的广播
+                    Intent intent = new Intent();
+                    intent.setAction("SET_BROADCST_OUT");
+                    intent.putExtra("sensor2ID", beacon.getSerialNumber());
+                    sendBroadcast(intent);
                 }
-                System.out.println(yunziIds.length);
-                Intent intent = new Intent();
-                intent.setAction("SET_BROADCST_OUT");
-                intent.putExtra("sensor2ID", yunziIds);
-                sendBroadcast(intent);
             }
         };
 
@@ -231,9 +225,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // 接收退出登录的消息
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(ExitEvent event) {
         finish();
+    }
+
+    // 接收fragment销毁时的消息
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(DestroyFragment destroyFragment) {
+        Logs.d("活动页销毁了");
+        // 将集合清空
+        oldSerialNumber.clear();
     }
 
     @Override
@@ -243,6 +246,8 @@ public class MainActivity extends AppCompatActivity {
         if (sensoroManager != null) {
             sensoroManager.stopService();
         }
+        // 如果activity销毁，就将集合清空
+        oldSerialNumber.clear();
     }
 
 }

@@ -4,18 +4,21 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.hicc.information.sensorsignin.R;
-import cn.hicc.information.sensorsignin.model.Active;
-import cn.hicc.information.sensorsignin.utils.ToastUtil;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+
+import cn.hicc.information.sensorsignin.model.Active;
+import cn.hicc.information.sensorsignin.utils.ToastUtil;
 
 /**
  * 此界面为活动详情——周凯歌
@@ -28,9 +31,10 @@ public class DetailActivity extends AppCompatActivity {
     private TextView activtyName;
     private Active active;
     private MyBroadcast myBroadcast;
-    private String[] sensor2ID;
+    private String sensor2ID;
     private String yunziId;
     private boolean isCan = false;
+    private List<String> sensorList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,13 +79,13 @@ public class DetailActivity extends AppCompatActivity {
                     intent.putExtra("activeName", active.getActiveName());
                     intent.putExtra("location",active.getActiveLocation());
                     intent.putExtra("activityDes",active.getActiveDes());
+                    intent.putExtra("yunziId", yunziId);
 
                     if(isCan){
-                        intent.putExtra("yunziId", yunziId);
                         startActivity(intent);
                         finish();
                     }else {
-                        ToastUtil.show("无法进行签到，请稍后重试！");
+                        ToastUtil.show("暂时无法进行签到，请稍后重试！");
                     }
                 }else {
                     ToastUtil.show("未到签到时间");
@@ -94,18 +98,12 @@ public class DetailActivity extends AppCompatActivity {
         //云子更新信息广播接受
         @Override
         public void onReceive(Context context, Intent intent) {
-            sensor2ID = intent.getStringArrayExtra("sensor2ID");
-            isCan = isContains(sensor2ID,yunziId);
+            // 获取接收到的云子id，添加到集合中
+            sensor2ID = intent.getStringExtra("sensor2ID");
+            sensorList.add(sensor2ID);
+            // 如果当集合中包含进入活动的云子id，就可以签到
+            isCan = sensorList.contains(yunziId);
         }
-    }
-
-    private boolean isContains(String[] strings, String s) {
-        for (String string : strings) {
-            if (string.equals(s)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -119,8 +117,7 @@ public class DetailActivity extends AppCompatActivity {
         try {
             java.util.Date beginTime = currentTime.parse(signTime);
             java.util.Date endTime = currentTime.parse(presentTime);
-            if(endTime.getTime()>=beginTime.getTime()) {
-//                System.out.println("运行了运行了运行了运行了运行了");
+            if(endTime.getTime() >= beginTime.getTime()) {
                 return true;
             }else{
                 return false;

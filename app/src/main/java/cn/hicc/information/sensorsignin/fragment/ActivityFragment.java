@@ -15,15 +15,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.hicc.information.sensorsignin.R;
-import cn.hicc.information.sensorsignin.activity.DetailActivity;
-import cn.hicc.information.sensorsignin.model.Active;
-import cn.hicc.information.sensorsignin.utils.Constant;
-import cn.hicc.information.sensorsignin.utils.Logs;
-import cn.hicc.information.sensorsignin.utils.SpUtil;
-import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,6 +26,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.hicc.information.sensorsignin.activity.DetailActivity;
+import cn.hicc.information.sensorsignin.model.Active;
+import cn.hicc.information.sensorsignin.model.DestroyFragment;
+import cn.hicc.information.sensorsignin.utils.Constant;
+import cn.hicc.information.sensorsignin.utils.Logs;
+import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import okhttp3.Call;
 
 /**
@@ -48,56 +49,57 @@ public class ActivityFragment extends BaseFragment {
     public void fetchData() {
     }
 
-    private void getActive(String yunziId) {
+    private void getActive(final String yunziId) {
         OkHttpUtils
                 .get()
                 .url(Constant.API_URL + "api/TActivity/GetActivity")
-                .addParams("sensorId",yunziId)
+                .addParams("sensorId", yunziId)
                 .build()
                 .execute(new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int i) {
+                    @Override
+                    public void onError(Call call, Exception e, int i) {
 
-            }
-
-            @Override
-            public void onResponse(String s, int i) {
-                try {
-                    JSONObject jsonObject = new JSONObject(s);
-                    boolean sucessed = jsonObject.getBoolean("sucessed");
-                    if (sucessed) {
-                        mActiveList.clear();
-                        JSONArray data = jsonObject.getJSONArray("data");
-                        for (int j = 0; j < data.length(); j++) {
-                            JSONObject activity = data.getJSONObject(j);
-                            String name = activity.getString("ActivityName");
-                            String des = activity.getString("ActivityDescription");
-                            String time = activity.getString("Time");
-                            String location = activity.getString("Location");
-
-                            Active active = new Active();
-                            active.setActiveName(name);
-                            active.setActiveTime(time);
-                            active.setActiveDes(des);
-                            active.setActiveLocation(location);
-                            mActiveList.add(active);
-                        }
-
-                        MyAdapter adapter = new MyAdapter();
-                        listView.setAdapter(adapter);
-                        closeDialog();
                     }
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+                    @Override
+                    public void onResponse(String s, int i) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(s);
+                            boolean sucessed = jsonObject.getBoolean("sucessed");
+                            if (sucessed) {
+                                JSONArray data = jsonObject.getJSONArray("data");
+                                for (int j = 0; j < data.length(); j++) {
+                                    JSONObject activity = data.getJSONObject(j);
+                                    String name = activity.getString("ActivityName");
+                                    String des = activity.getString("ActivityDescription");
+                                    String time = activity.getString("Time");
+                                    String location = activity.getString("Location");
+
+                                    Active active = new Active();
+                                    active.setSersorID(yunziId);
+                                    active.setActiveName(name);
+                                    active.setActiveTime(time);
+                                    active.setActiveDes(des);
+                                    active.setActiveLocation(location);
+                                    mActiveList.add(active);
+                                }
+
+                                MyAdapter adapter = new MyAdapter();
+                                listView.setAdapter(adapter);
+                                closeDialog();
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
     }
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_bottom_active, container, false);
+
 
         myBroadcast = new MyBroadcast();
         IntentFilter intentFilter = new IntentFilter();
@@ -114,7 +116,7 @@ public class ActivityFragment extends BaseFragment {
                 Active active = mActiveList.get(position);
                 Intent intent = new Intent(getContext(), DetailActivity.class);
                 intent.putExtra("active", active);
-                intent.putExtra("yunziId",yunziId);
+                intent.putExtra("yunziId", yunziId);
                 startActivity(intent);
             }
         });
@@ -128,9 +130,8 @@ public class ActivityFragment extends BaseFragment {
         public void onReceive(Context context, Intent intent) {
             yunziId = intent.getStringExtra("yunzi");
             getActive("1");
-            SpUtil.putBoolean("destroy",false);
 
-            ToastUtil.show("发现云子");
+            ToastUtil.show("发现云子:"+yunziId);
         }
     }
 
@@ -168,7 +169,7 @@ public class ActivityFragment extends BaseFragment {
 
             viewHolder.tv_name.setText(getItem(position).getActiveName());
             viewHolder.tv_location.setText(getItem(position).getActiveLocation());
-            viewHolder.tv_time.setText(getItem(position).getActiveTime().replace("T"," ").substring(0,16));
+            viewHolder.tv_time.setText(getItem(position).getActiveTime().replace("T", " ").substring(0, 16));
 
             return convertView;
         }
@@ -180,6 +181,8 @@ public class ActivityFragment extends BaseFragment {
         TextView tv_time;
     }
 
+
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -188,8 +191,10 @@ public class ActivityFragment extends BaseFragment {
             Logs.i("取消注册广播");
             getContext().unregisterReceiver(myBroadcast);
         }
-        SpUtil.putBoolean("destroy",true);
+        mActiveList.clear();
+        EventBus.getDefault().post(new DestroyFragment());
     }
+
 
     /**
      * 弹出对话框
