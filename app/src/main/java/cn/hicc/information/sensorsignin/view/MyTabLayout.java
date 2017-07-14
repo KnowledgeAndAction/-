@@ -6,13 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import cn.hicc.information.sensorsignin.model.TabItem;
-
 import java.util.ArrayList;
 
-/**
- * Created by yx on 16/4/3.
- */
+import cn.hicc.information.sensorsignin.model.TabItem;
+
 public class MyTabLayout extends LinearLayout implements View.OnClickListener{
 
     private ArrayList<TabItem> tabs;
