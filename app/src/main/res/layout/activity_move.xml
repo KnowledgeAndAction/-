@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.administrator.my.activity.MoveActivity">
+    tools:context="com.hicc.information.sensorsignin.cn.hicc.information.sensorsignin.activity.MoveActivity">
 
     <LinearLayout
         android:layout_width="wrap_content"

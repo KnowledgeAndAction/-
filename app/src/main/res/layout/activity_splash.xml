@@ -6,7 +6,7 @@
     android:background="@color/colorPrimary">
 
 
-    <com.example.administrator.my.view.CircleImageView
+    <cn.hicc.information.sensorsignin.view.CircleImageView
         android:id="@+id/icon"
         android:layout_width="80dp"
         android:layout_height="80dp"
