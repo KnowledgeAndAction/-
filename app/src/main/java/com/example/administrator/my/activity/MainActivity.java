@@ -1,9 +1,6 @@
 package com.example.administrator.my.activity;
 
-import android.app.AlertDialog.Builder;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothManager;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,13 +8,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 
 import com.example.administrator.my.R;
-import com.example.administrator.my.model.ExitEvent;
 import com.example.administrator.my.fragment.ActivityFragment;
 import com.example.administrator.my.fragment.HistoryFragment;
 import com.example.administrator.my.fragment.SettingFragment;
+import com.example.administrator.my.model.ExitEvent;
 import com.example.administrator.my.model.TabItem;
 import com.example.administrator.my.utils.Logs;
 import com.example.administrator.my.utils.SpUtil;
@@ -38,11 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private MyTabLayout myTablayout_bottom;
     private ViewPager viewPager;
     private ArrayList<TabItem> tabs;
-    private BluetoothManager bluetoothManager;
-    private BluetoothAdapter bluetoothAdapter;
     private boolean isFirst = true;
     private String serialNumber;
-    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,14 +44,28 @@ public class MainActivity extends AppCompatActivity {
 
         sensoroManager = SensoroManager.getInstance(MainActivity.this);
 
-        //设置sdk
+        // 设置sdk
         setSDK();
 
-        //初始化控件
+        // 初始化控件
         initWidget();
+
+        // 检查蓝牙是否可用
+        checkBluetooth();
 
         // 注册监听退出登录的事件
         EventBus.getDefault().register(this);
+    }
+
+    // 检查蓝牙是否可用
+    private void checkBluetooth() {
+        if (!sensoroManager.isBluetoothEnabled()) {
+            Intent bluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(bluetoothIntent, 0);
+        } else {
+            // 开启SDK
+            startSDK();
+        }
     }
 
     /**
@@ -68,11 +75,7 @@ public class MainActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.viewPager_top);
         myTablayout_bottom = (MyTabLayout) findViewById(R.id.myTablayout_bottom);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(getResources().getString(R.string.app_name));
-        setSupportActionBar(toolbar);
-
-        initData();
+        initLayout();
     }
 
 
@@ -102,15 +105,9 @@ public class MainActivity extends AppCompatActivity {
              */
             @Override
             public void onNewBeacon(Beacon beacon) {
-                //TODO 该写这里
-
-//                light = beacon.getLight();
                 //序列号
                 serialNumber = beacon.getSerialNumber();
                 SpUtil.putString("serialNumber", serialNumber);
-//                accuracy = beacon.getAccuracy() * 100+"";    //距离
-                //信号强度
-//                rssi = beacon.getRssi() + "";
 
                 if (isFirst) {
                     Logs.d("发现云子");
@@ -162,88 +159,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        //检查蓝牙是否可用
-        if (!sensoroManager.isBluetoothEnabled()) {
-            Intent bluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(bluetoothIntent, 0);
-        } else {
-            // 开启SDK
-            startSDK();
-        }
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // 判断蓝牙是否开启
-        boolean isBTEnable = openBluetooth();
-        if (isBTEnable) {
-            // 开启SDK
-            startSDK();
-        }
-    }
-
-    /**
-     * 打开蓝牙对话框
-     */
-    private boolean openBluetooth() {
-        bluetoothManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
-        bluetoothAdapter = bluetoothManager.getAdapter();
-        boolean status = bluetoothAdapter.isEnabled();
-        if (!status) {
-            Builder builder = new Builder(this);
-            builder.setNegativeButton(R.string.yes, new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                    startActivityForResult(intent, 1);
+        switch (requestCode) {
+            case 0:
+                // 蓝牙可用
+                if (sensoroManager.isBluetoothEnabled()) {
+                    startSDK();
                 }
-            }).setPositiveButton(R.string.no, new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            }).setTitle(R.string.ask_bt_open);
-            builder.show();
-        }
-
-        return status;
-    }
-
-    /**
-     * 设置底部条目及对应界面的适配器      暂定
-     */
-    class FragmentAdapter extends FragmentPagerAdapter {
-        public FragmentAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            try {
-                return tabs.get(position).tagFragmentClz.newInstance();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        public int getCount() {
-            return tabs.size();
+                break;
         }
     }
 
     /**
-     * 设置底部条目及对应界面的适配器    暂定
+     * 初始化布局
      */
-    private void initData() {
+    private void initLayout() {
         tabs = new ArrayList<>();
         tabs.add(new TabItem(R.drawable.bottom_activity_selector, R.string.tab_activity, ActivityFragment.class));
         tabs.add(new TabItem(R.drawable.bottom_history_selector, R.string.tab_history, HistoryFragment.class));
@@ -275,10 +204,38 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    /**
+     * 设置底部条目及对应界面的适配器
+     */
+    class FragmentAdapter extends FragmentPagerAdapter {
+        public FragmentAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            try {
+                return tabs.get(position).tagFragmentClz.newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        public int getCount() {
+            return tabs.size();
+        }
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(ExitEvent event) {
         finish();
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -286,8 +243,6 @@ public class MainActivity extends AppCompatActivity {
         if (sensoroManager != null) {
             sensoroManager.stopService();
         }
-//        System.exit(0);
-
     }
 
 }
