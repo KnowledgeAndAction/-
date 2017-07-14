@@ -1,25 +1,19 @@
 package com.example.administrator.my.activity;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.animation.AlphaAnimation;
-import android.widget.LinearLayout;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
+import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import java.io.FileOutputStream;
-import java.io.InputStream;
 
 import com.example.administrator.my.R;
 import com.example.administrator.my.utils.SpUtil;
 
 public class SplashActivity extends AppCompatActivity {
     private static final int ENTER_HOME = 100;
-    private TextView tv_version_name;
-    private RelativeLayout rl_root;
     private Handler mHandler = new Handler() {
         @Override
         //alt+ctrl+向下箭头,向下拷贝相同代码
@@ -32,13 +26,13 @@ public class SplashActivity extends AppCompatActivity {
             }
         }
     };
-    private InputStream stream;
-    private FileOutputStream fos;
-    private LinearLayout sl_root;
+    private RelativeLayout sl_root;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //去掉Activity上面的状态栏
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_splash);
 
         //初始化UI
@@ -56,7 +50,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void initUI() {
-        sl_root = (LinearLayout) findViewById(R.id.sl_root);
+        sl_root = (RelativeLayout) findViewById(R.id.sl_root);
     }
 
     private void initData() {
