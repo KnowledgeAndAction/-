@@ -5,7 +5,7 @@ import android.support.v4.app.Fragment;
 
 /**
  * Created by yx on 16/4/3.
- * t
+ * activity_login
  */
 public abstract class BaseFragment extends Fragment {
 

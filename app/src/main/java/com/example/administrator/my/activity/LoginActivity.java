@@ -3,7 +3,10 @@ package com.example.administrator.my.activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -34,6 +37,8 @@ public class LoginActivity extends AppCompatActivity {
     private static final int USER_ORDINARY = 0;
     private static final int USER_ADMIN = 1;
     private ProgressDialog progressDialog;
+    private TextInputLayout text_input_account;
+    private TextInputLayout text_input_pass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,14 +60,22 @@ public class LoginActivity extends AppCompatActivity {
         bt_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                boolean isLogin = true;
                 String account = et_account.getText().toString().trim();
                 String password = et_password.getText().toString().trim();
+
+                if (account.equals("")) {
+                    isLogin = false;
+                    text_input_account.setError("用户名为空");
+                }
+                if (password.equals("")) {
+                    isLogin = false;
+                    text_input_pass.setError("密码为空");
+                }
                 // 如果账号密码不为空，检查是否正确
-                if (!account.equals("") && !password.equals("")) {
+                if (isLogin) {
                     showProgressDialog();
                     checkLogin(account, password);
-                } else {
-                    ToastUtil.show("账号或密码不能为空");
                 }
             }
         });
@@ -162,6 +175,42 @@ public class LoginActivity extends AppCompatActivity {
         et_password = (EditText) findViewById(R.id.et_password);
         cb_remember = (CheckBox) findViewById(R.id.cb_remember);
         bt_login = (Button) findViewById(R.id.bt_login);
+
+        text_input_account = (TextInputLayout) findViewById(R.id.text_input_account);
+        text_input_pass = (TextInputLayout) findViewById(R.id.text_input_pass);
+
+        et_account.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!s.equals("")) {
+                    text_input_account.setError("");
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+        et_password.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!s.equals("")) {
+                    text_input_pass.setError("");
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
 
         if (!SpUtil.getBoolean(Constant.IS_REMBER_PWD,false)) {
             et_account.setText(SpUtil.getString(Constant.ACCOUNT,""));
