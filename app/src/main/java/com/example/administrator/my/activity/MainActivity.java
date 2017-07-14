@@ -38,8 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private MyTabLayout myTablayout_bottom;
     private ViewPager viewPager;
     private ArrayList<TabItem> tabs;
-
-    BluetoothManager bluetoothManager;
+    private BluetoothManager bluetoothManager;
     private BluetoothAdapter bluetoothAdapter;
     private boolean isFirst = true;
     private String serialNumber;
@@ -50,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         sensoroManager = SensoroManager.getInstance(MainActivity.this);
 
         //设置sdk
@@ -58,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
         //初始化控件
         initWidget();
+
         // 注册监听退出登录的事件
         EventBus.getDefault().register(this);
     }

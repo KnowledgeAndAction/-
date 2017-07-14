@@ -3,7 +3,7 @@
     android:id="@+id/sl_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#467CA8">
+    android:background="@color/colorPrimary">
 
 
     <com.example.administrator.my.view.CircleImageView
@@ -30,7 +30,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="30dp"
-        android:text="Copyright © 2016 - 2017 信息技术实验班. All Rights Reserved. "
+        android:text="Copyright © 2016 - 2017 信息技术实验班. All Rights Reserved"
         android:textColor="#ffffff"
-        android:textSize="8sp" />
+        android:textSize="10sp" />
 </RelativeLayout>

@@ -1,17 +1,5 @@
 package com.example.administrator.my.activity;
 
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-
-import com.example.administrator.my.R;
-import com.example.administrator.my.utils.SpUtil;
-
-import java.util.ArrayList;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,17 +10,18 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.example.administrator.my.R;
+import com.example.administrator.my.utils.SpUtil;
+
+import java.util.ArrayList;
+
 /**
- * 新手引导页面
- *
- * @author Kevin
- * @date 2015-10-17
+ * 引导页面
  */
 public class GuideActivity extends Activity {
 
@@ -44,8 +33,8 @@ public class GuideActivity extends Activity {
     private ArrayList<ImageView> mImageViewList; // imageView集合
 
     // 引导页图片id数组
-    private int[] mImageIds = new int[] { R.drawable.guide_1,
-            R.drawable.guide_2, R.drawable.guide_3 };
+    private int[] mImageIds = new int[]{R.drawable.guide_1,
+            R.drawable.guide_2, R.drawable.guide_3};
 
     // 小红点移动距离
     private int mPointDis;
@@ -129,7 +118,7 @@ public class GuideActivity extends Activity {
             @Override
             public void onClick(View v) {
                 //更新sp, 已经不是第一次进入了
-                SpUtil.putBoolean( "is_first_enter", false);
+                SpUtil.putBoolean("is_first_enter", false);
 
                 //跳到主页面
                 startActivity(new Intent(getApplicationContext(), LoginActivity.class));
