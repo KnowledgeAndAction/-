@@ -3,7 +3,9 @@ package com.example.administrator.my.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,15 +39,17 @@ import okhttp3.Call;
  * 历史界面——崔国钊
  */
 
-public class HistoryFragment extends BaseFragment {
+public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener  {
 
     private List<HistoryActivity> mActiveList = new ArrayList<>();
     private ListView listView;
     private boolean respond;
-
+    private SwipeRefreshLayout mSwipeLayout;
+    private static final int REFRESH_COMPLETE = 0X110;
+    View view;
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_bottom_history, container, false);
+         view = inflater.inflate(R.layout.activity_bottom_history, container, false);
         initDate(view);
         getActive();
         IsInternet isInternet=new IsInternet();
@@ -140,6 +144,15 @@ public class HistoryFragment extends BaseFragment {
 
     private void initDate(View view) {
         listView = (ListView) view.findViewById(R.id.lv_history);
+        mSwipeLayout= (SwipeRefreshLayout) view.findViewById(R.id.id_swipe_ly);
+        mSwipeLayout.setOnRefreshListener(this);
+        //mSwipeLayout.setColorSchemeColors();
+    }
+
+    @Override
+    public void onRefresh() {
+
+        mHandler.sendEmptyMessageDelayed(REFRESH_COMPLETE, 2000);
     }
 
 
@@ -187,5 +200,19 @@ public class HistoryFragment extends BaseFragment {
         TextView tv_location;
         TextView tv_time;
     }
+    private Handler mHandler = new Handler()
+    {
+        public void handleMessage(android.os.Message msg)
+        {
+            switch (msg.what)
+            {
+                case REFRESH_COMPLETE:
+                    getActive();
+                    initDate(view);
+                    mSwipeLayout.setRefreshing(false);
+                    break;
 
+            }
+        };
+    };
 }
