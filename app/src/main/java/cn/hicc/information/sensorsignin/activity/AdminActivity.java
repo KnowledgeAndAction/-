@@ -297,10 +297,10 @@ public class AdminActivity extends AppCompatActivity {
     private void showProgressDialog() {
         if (progressDialog == null) {
             progressDialog = new ProgressDialog(this);
-            progressDialog.setMessage("提交中...");
-            progressDialog.setCanceledOnTouchOutside(false);
-            progressDialog.show();
         }
+        progressDialog.setMessage("提交中...");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
     }
 
     private void closeProgressDialog() {

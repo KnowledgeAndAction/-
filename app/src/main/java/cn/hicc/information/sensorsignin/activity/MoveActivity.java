@@ -1,12 +1,10 @@
 package cn.hicc.information.sensorsignin.activity;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -17,12 +15,16 @@ import com.hicc.information.sensorsignin.R;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import cn.hicc.information.sensorsignin.db.MyDatabaseHelper;
+import cn.hicc.information.sensorsignin.db.MyDatabase;
+import cn.hicc.information.sensorsignin.model.SignActive;
 import cn.hicc.information.sensorsignin.utils.Constant;
 import cn.hicc.information.sensorsignin.utils.SpUtil;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
@@ -36,27 +38,26 @@ public class MoveActivity extends AppCompatActivity {
     private String mHour;
     private int mMinute;
     private TextView tv_inTime;
-    private String mMinute1;
     private String inTime;
     private TextView tv_activityName;
     private String activeName;
     private MyBroadcast myBroadcast;
     private String outTime;
-    private MyDatabaseHelper dbHelper;
     private String location;
     private String activityDes;
     private String yunziId;
     private boolean isCan = false;
     private List<String> sensorList = new ArrayList<>();
     private long activeId;
+    private MyDatabase database;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_move);
-        //创建数据库
-        dbHelper = new MyDatabaseHelper(this,"userInformation.db",null,1);
-        dbHelper.getWritableDatabase();
+        // 获取数据库
+        database = MyDatabase.getInstance();
 
         Intent intent = getIntent();
         activeName = intent.getStringExtra("activeName");
@@ -64,10 +65,13 @@ public class MoveActivity extends AppCompatActivity {
         activityDes = intent.getStringExtra("activityDes");
         yunziId = intent.getStringExtra("yunziId");
         activeId = intent.getLongExtra("activeId",0);
+
         //初始化控件
         initView();
+
         //获取数据
         getData();
+
         myBroadcast = new MyBroadcast();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("SET_BROADCST_OUT");
@@ -112,57 +116,38 @@ public class MoveActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 getOutTime();
-                //发送时间数据
+                // 如果可以签离
                 if(isCan){
-                    //保存签到信息
-                    saveSignData();
-                    output();
-                    setTime();
+                    // 发送时间数据
+                    signForService();
                 }else {
-                    ToastUtil.show("请稍后重试");
+                    ToastUtil.show("暂时无法签离，请稍后重试，并确保您在活动地点附近");
                 }
             }
         });
     }
 
-    private void output() {
-        SQLiteDatabase db=dbHelper.getWritableDatabase();
-        Cursor cursor=db.query("History",null,null,null,null,null,null);
-        if(cursor.moveToFirst()){
-            do{
-                String activityName=cursor.getString(cursor.getColumnIndex("activityName"));
-                String location=cursor.getString(cursor.getColumnIndex("location"));
-                String activityDes=cursor.getString(cursor.getColumnIndex("activityDes"));
-                String inTime=cursor.getString(cursor.getColumnIndex("inTime"));
-                String outTime=cursor.getString(cursor.getColumnIndex("outTime"));
-                System.out.println(activityName);
-                System.out.println(location);
-                System.out.println(activityDes);
-                System.out.println(inTime);
-                System.out.println(outTime);
-            }while (cursor.moveToNext());
-        }
-    }
 
     /**
      * 保存数据到本地
      */
-    private void saveSignData() {
-        SQLiteDatabase db=dbHelper.getWritableDatabase();
-        ContentValues values=new ContentValues();
-        values.put("activityName",activeName);
-        values.put("location",location);
-        values.put("activityDes",activityDes);
-        values.put("inTime",inTime);
-        values.put("outTime",outTime);
-        db.insert("History",null,values);
+    private void saveSignData(int save) {
+        SignActive signActive = new SignActive();
+        signActive.setActiveId(activeId);
+        signActive.setSave(save);
+        signActive.setInTime(inTime);
+        signActive.setNumber(SpUtil.getString(Constant.ACCOUNT,""));
+        signActive.setOutTime(outTime);
+
+        database.saveSignActive(signActive);
     }
 
 
     /**
      * 发送时间数据
      */
-    private void setTime(){
+    private void signForService(){
+        showDialog();
         OkHttpUtils
                 .get()
                 .url(Constant.API_URL+"api/TSign/InsertSign")
@@ -174,13 +159,28 @@ public class MoveActivity extends AppCompatActivity {
                 .execute(new StringCallback() {
                     @Override
                     public void onError(Call call, Exception e, int i) {
-                        ToastUtil.show("保存失败");
+                        closeDialog();
+                        ToastUtil.show("签离成功:" + e.toString());
+                        saveSignData(0);
+                        finish();
                     }
 
                     @Override
                     public void onResponse(String s, int i) {
-                        ToastUtil.show("保存成功");
-                        finish();
+                        closeDialog();
+                        try {
+                            JSONObject jsonObject = new JSONObject(s);
+                            if (jsonObject.getBoolean("sucessed")) {
+                                saveSignData(1);
+                                ToastUtil.show("签离成功");
+                                finish();
+                            } else {
+                                saveSignData(0);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            saveSignData(0);
+                        }
                     }
                 });
     }
@@ -203,6 +203,20 @@ public class MoveActivity extends AppCompatActivity {
         if(myBroadcast!=null){
             unregisterReceiver(myBroadcast);
         }
+    }
 
+    private void showDialog() {
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(this);
+        }
+        progressDialog.setMessage("签离中...");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+    }
+
+    private void closeDialog() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
     }
 }

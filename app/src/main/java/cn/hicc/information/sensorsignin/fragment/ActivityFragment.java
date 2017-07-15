@@ -204,7 +204,9 @@ public class ActivityFragment extends BaseFragment {
      * 弹出对话框
      */
     private void showDialog() {
-        progressDialog = new ProgressDialog(getContext());
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(getContext());
+        }
         progressDialog.setMessage("Loading...");
         progressDialog.setCancelable(true);
         progressDialog.show();

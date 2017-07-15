@@ -17,7 +17,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.hicc.information.sensorsignin.db.MyDatabase;
 import cn.hicc.information.sensorsignin.model.Active;
+import cn.hicc.information.sensorsignin.utils.Constant;
+import cn.hicc.information.sensorsignin.utils.SpUtil;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
 
 /**
@@ -35,11 +38,14 @@ public class DetailActivity extends AppCompatActivity {
     private String yunziId;
     private boolean isCan = false;
     private List<String> sensorList = new ArrayList<>();
+    private MyDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
+        database = MyDatabase.getInstance();
 
         Intent intent = getIntent();
 
@@ -68,28 +74,31 @@ public class DetailActivity extends AppCompatActivity {
         intentFilter.addAction("SET_BROADCST_OUT");
         registerReceiver(myBroadcast, intentFilter);
 
-        ToastUtil.show("yunziId"+yunziId);
-        ToastUtil.show("sensor2ID"+sensor2ID);
-
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(TimeCompare(active.getActiveTime().replace("T"," ").substring(0,16))){
-                    Intent intent = new Intent(DetailActivity.this, MoveActivity.class);
-                    intent.putExtra("activeName", active.getActiveName());
-                    intent.putExtra("location",active.getActiveLocation());
-                    intent.putExtra("activityDes",active.getActiveDes());
-                    intent.putExtra("activeId",active.getActiveId());
-                    intent.putExtra("yunziId", yunziId);
+                // 如果还没有签到过
+                if (!database.isSign(SpUtil.getString(Constant.ACCOUNT, ""), active.getActiveId())) {
+                    if (TimeCompare(active.getActiveTime().replace("T", " ").substring(0, 16))) {
+                        // 如果能检测到云子 可以签到
+                        if (isCan) {
+                            Intent intent = new Intent(DetailActivity.this, MoveActivity.class);
+                            intent.putExtra("activeName", active.getActiveName());
+                            intent.putExtra("location", active.getActiveLocation());
+                            intent.putExtra("activityDes", active.getActiveDes());
+                            intent.putExtra("activeId", active.getActiveId());
+                            intent.putExtra("yunziId", yunziId);
 
-                    if(isCan){
-                        startActivity(intent);
-                        finish();
-                    }else {
-                        ToastUtil.show("暂时无法进行签到，请稍后重试！");
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            ToastUtil.show("暂时无法进行签到，请稍后重试，并确保您在活动地点附近");
+                        }
+                    } else {
+                        ToastUtil.show("未到签到时间");
                     }
-                }else {
-                    ToastUtil.show("未到签到时间");
+                } else {
+                    ToastUtil.show("您已经签到过");
                 }
             }
         });
@@ -108,19 +117,20 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     /**
-     *判断是否到了签到时间   true/false
-     * @param signTime  需要签到的时间
+     * 判断是否到了签到时间   true/false
+     *
+     * @param signTime 需要签到的时间
      */
-    private boolean TimeCompare(String signTime){
+    private boolean TimeCompare(String signTime) {
         //格式化时间
-        SimpleDateFormat currentTime= new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        SimpleDateFormat currentTime = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         String presentTime = currentTime.format(new java.util.Date());//当前时间
         try {
             java.util.Date beginTime = currentTime.parse(signTime);
             java.util.Date endTime = currentTime.parse(presentTime);
-            if(endTime.getTime() >= beginTime.getTime()) {
+            if (endTime.getTime() >= beginTime.getTime()) {
                 return true;
-            }else{
+            } else {
                 return false;
             }
         } catch (ParseException e) {

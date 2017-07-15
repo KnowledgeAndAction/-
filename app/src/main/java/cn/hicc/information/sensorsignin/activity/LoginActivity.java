@@ -267,10 +267,10 @@ public class LoginActivity extends AppCompatActivity {
     private void showProgressDialog() {
         if (progressDialog == null) {
             progressDialog = new ProgressDialog(this);
-            progressDialog.setMessage("登录中");
-            progressDialog.setCanceledOnTouchOutside(false);
-            progressDialog.show();
         }
+        progressDialog.setMessage("登录中");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
     }
 
     private void closeProgressDialog() {

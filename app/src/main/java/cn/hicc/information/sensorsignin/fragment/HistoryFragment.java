@@ -123,7 +123,7 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
                                     HistoryFragment.MyAdapter adapter = new HistoryFragment.MyAdapter();
                                     listView.setAdapter(adapter);
                                 } else {
-                                    ToastUtil.show("解析失败");
+                                    ToastUtil.show("没有记录");
                                     mSwipeLayout.setRefreshing(false);
                                 }
 

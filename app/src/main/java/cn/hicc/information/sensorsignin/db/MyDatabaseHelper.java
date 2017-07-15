@@ -11,17 +11,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class MyDatabaseHelper extends SQLiteOpenHelper {
     public static final String HISTORY_TABLE = "create table History("
             + "id integer primary key autoincrement,"
-            + "userNumber text,"
-            + "activityName text,"
-            + "location text,"
-            + "activityDes text,"
-            + "rule text,"
+            + "number text,"
+            + "activeId integer,"
+            + "save integer,"
             + "inTime text,"
             + "outTime text)";
-    private Context mContext;
+
     public MyDatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
-        mContext=context;
     }
 
     @Override
