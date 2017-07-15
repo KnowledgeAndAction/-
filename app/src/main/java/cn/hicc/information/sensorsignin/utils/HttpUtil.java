@@ -54,7 +54,6 @@ public class HttpUtil {
 
             // 获得响应体
             String result = response.body().string();
-            System.out.println(result);
             // 解析json数据
             JSONObject jsonObject = new JSONObject(result);
             // 获得返回的token

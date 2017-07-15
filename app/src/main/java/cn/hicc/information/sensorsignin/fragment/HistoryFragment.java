@@ -3,25 +3,17 @@ package cn.hicc.information.sensorsignin.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.hicc.information.sensorsignin.R;
-import cn.hicc.information.sensorsignin.activity.HistoryDetailActivity;
-import cn.hicc.information.sensorsignin.model.HistoryActivity;
-import cn.hicc.information.sensorsignin.model.IsInternet;
-import cn.hicc.information.sensorsignin.utils.Constant;
-import cn.hicc.information.sensorsignin.utils.SpUtil;
-import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -32,6 +24,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.hicc.information.sensorsignin.activity.HistoryDetailActivity;
+import cn.hicc.information.sensorsignin.model.HistoryActivity;
+import cn.hicc.information.sensorsignin.model.IsInternet;
+import cn.hicc.information.sensorsignin.utils.Constant;
+import cn.hicc.information.sensorsignin.utils.SpUtil;
+import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import okhttp3.Call;
 
 
@@ -78,12 +76,12 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
                     .execute(new StringCallback() {
                         @Override
                         public void onError(Call call, Exception e, int i) {
+                            mSwipeLayout.setRefreshing(false);
                             if (respond){
-                            ToastUtil.show("历史记录响应失败");
+                                ToastUtil.show("历史记录响应失败");
                             }else {
                                 ToastUtil.show("当前网络不可用，请检查网络连接");
                             }
-
                         }
 
                         @Override
@@ -92,7 +90,6 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
                                 JSONObject jsonObject = new JSONObject(s);
                                 boolean sucessed = jsonObject.getBoolean("sucessed");
                                 if (sucessed) {
-
                                     mActiveList.clear();
                                     JSONArray data = jsonObject.getJSONArray("data");
                                     if (data.length() == 0) {
@@ -122,15 +119,17 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
                                             mActiveList.add(historyActivity);
                                         }
                                     }
-
+                                    mSwipeLayout.setRefreshing(false);
                                     HistoryFragment.MyAdapter adapter = new HistoryFragment.MyAdapter();
                                     listView.setAdapter(adapter);
                                 } else {
                                     ToastUtil.show("解析失败");
+                                    mSwipeLayout.setRefreshing(false);
                                 }
 
                             } catch (JSONException e) {
                                 e.printStackTrace();
+                                mSwipeLayout.setRefreshing(false);
                             }
                         }
                     });
@@ -146,13 +145,12 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
         listView = (ListView) view.findViewById(R.id.lv_history);
         mSwipeLayout= (SwipeRefreshLayout) view.findViewById(R.id.id_swipe_ly);
         mSwipeLayout.setOnRefreshListener(this);
-        //mSwipeLayout.setColorSchemeColors();
     }
 
     @Override
     public void onRefresh() {
 
-        mHandler.sendEmptyMessageDelayed(REFRESH_COMPLETE, 2000);
+        getActive();
     }
 
 
@@ -200,19 +198,4 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
         TextView tv_location;
         TextView tv_time;
     }
-    private Handler mHandler = new Handler()
-    {
-        public void handleMessage(android.os.Message msg)
-        {
-            switch (msg.what)
-            {
-                case REFRESH_COMPLETE:
-                    getActive();
-                    initDate(view);
-                    mSwipeLayout.setRefreshing(false);
-                    break;
-
-            }
-        };
-    };
 }

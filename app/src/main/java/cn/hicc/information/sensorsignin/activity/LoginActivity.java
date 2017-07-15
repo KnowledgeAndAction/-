@@ -1,9 +1,13 @@
 package cn.hicc.information.sensorsignin.activity;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,16 +17,19 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 
 import com.hicc.information.sensorsignin.R;
-import cn.hicc.information.sensorsignin.utils.Constant;
-import cn.hicc.information.sensorsignin.utils.MD5Util;
-import cn.hicc.information.sensorsignin.utils.SpUtil;
-import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import cn.hicc.information.sensorsignin.utils.Constant;
+import cn.hicc.information.sensorsignin.utils.MD5Util;
+import cn.hicc.information.sensorsignin.utils.SpUtil;
+import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import okhttp3.Call;
 
 /**
@@ -53,6 +60,46 @@ public class LoginActivity extends AppCompatActivity {
 
         // 登录按钮点击事件
         login();
+
+        // 检查权限
+        checkPermission();
+    }
+
+    private void checkPermission() {
+        List<String> permissionList = new ArrayList<>();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            permissionList.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+
+        if (!permissionList.isEmpty()) {
+            String[] permissions = permissionList.toArray(new String[permissionList.size()]);
+            ActivityCompat.requestPermissions(this, permissions, 1);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 1:
+                if (grantResults.length > 0) {
+                    for (int grantResult : grantResults) {
+                        if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                            ToastUtil.show("我们需要访问您的位置，来确定活动地点");
+                            return;
+                        }
+                    }
+                } else {
+                    ToastUtil.show("出了个小错误");
+                    finish();
+                }
+                break;
+        }
     }
 
     // 登录按钮点击事件
