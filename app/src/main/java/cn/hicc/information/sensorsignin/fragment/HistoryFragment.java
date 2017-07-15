@@ -106,7 +106,6 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
                                             String hLocation = hActivity.getString("Location");
                                             String hActivityName = hActivity.getString("ActivityName");
 
-
                                             HistoryActivity historyActivity = new HistoryActivity();
                                             historyActivity.sethActivityId(hActivityId);
                                             historyActivity.sethStudnetNum(hStudnetNum);
