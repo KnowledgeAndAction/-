@@ -48,6 +48,7 @@ public class MoveActivity extends AppCompatActivity {
     private String yunziId;
     private boolean isCan = false;
     private List<String> sensorList = new ArrayList<>();
+    private long activeId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +63,7 @@ public class MoveActivity extends AppCompatActivity {
         location = intent.getStringExtra("location");
         activityDes = intent.getStringExtra("activityDes");
         yunziId = intent.getStringExtra("yunziId");
+        activeId = intent.getLongExtra("activeId",0);
         //初始化控件
         initView();
         //获取数据
@@ -165,7 +167,7 @@ public class MoveActivity extends AppCompatActivity {
                 .get()
                 .url(Constant.API_URL+"api/TSign/InsertSign")
                 .addParams("account", SpUtil.getString("account",""))
-                .addParams("activityid","1")
+                .addParams("activityid",activeId+"")
                 .addParams("intime",inTime)
                 .addParams("outtime", outTime)
                 .build()
@@ -182,8 +184,8 @@ public class MoveActivity extends AppCompatActivity {
                     }
                 });
     }
-    public  class MyBroadcast extends BroadcastReceiver {
 
+    public  class MyBroadcast extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             // 获取接收到的云子id，添加到集合中

@@ -79,6 +79,7 @@ public class DetailActivity extends AppCompatActivity {
                     intent.putExtra("activeName", active.getActiveName());
                     intent.putExtra("location",active.getActiveLocation());
                     intent.putExtra("activityDes",active.getActiveDes());
+                    intent.putExtra("activeId",active.getActiveId());
                     intent.putExtra("yunziId", yunziId);
 
                     if(isCan){

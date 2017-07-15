@@ -58,7 +58,7 @@ public class ActivityFragment extends BaseFragment {
                 .execute(new StringCallback() {
                     @Override
                     public void onError(Call call, Exception e, int i) {
-
+                        ToastUtil.show("获取活动失败，请稍后重试");
                     }
 
                     @Override
@@ -74,8 +74,10 @@ public class ActivityFragment extends BaseFragment {
                                     String des = activity.getString("ActivityDescription");
                                     String time = activity.getString("Time");
                                     String location = activity.getString("Location");
+                                    long activeId = activity.getLong("Nid");
 
                                     Active active = new Active();
+                                    active.setActiveId(activeId);
                                     active.setSersorID(yunziId);
                                     active.setActiveName(name);
                                     active.setActiveTime(time);
@@ -87,6 +89,8 @@ public class ActivityFragment extends BaseFragment {
                                 MyAdapter adapter = new MyAdapter();
                                 listView.setAdapter(adapter);
                                 closeDialog();
+                            } else {
+                                Logs.d("这个云子上没有活动："+yunziId);
                             }
 
                         } catch (JSONException e) {
@@ -129,7 +133,7 @@ public class ActivityFragment extends BaseFragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             yunziId = intent.getStringExtra("yunzi");
-            getActive("1");
+            getActive(yunziId);
 
             ToastUtil.show("发现云子:"+yunziId);
         }

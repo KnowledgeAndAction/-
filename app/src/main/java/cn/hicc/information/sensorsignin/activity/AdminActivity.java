@@ -8,9 +8,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioGroup;
 
 import com.hicc.information.sensorsignin.R;
+import com.uuzuche.lib_zxing.activity.CodeUtils;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -30,7 +32,7 @@ import okhttp3.Call;
  * 管理员添加活动界面——陈帅
  */
 public class AdminActivity extends AppCompatActivity {
-
+    private static final int SCAN_CODE = 0;
     private static final int REAL = 0;
     private static final int NO_REAL = 1;
     private EditText et_active_name;
@@ -253,6 +255,43 @@ public class AdminActivity extends AppCompatActivity {
         bt_exit = (Button) findViewById(R.id.bt_exit);
 
         rg_rule = (RadioGroup) findViewById(R.id.rg_rule);
+
+        ImageView iv_scan = (ImageView) findViewById(R.id.iv_scan);
+        iv_scan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(AdminActivity.this, ScanActivity.class),SCAN_CODE);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        /**
+         * 处理二维码扫描结果
+         */
+        if (requestCode == SCAN_CODE) {
+            //处理扫描结果（在界面上显示）
+            if (null != data) {
+                Bundle bundle = data.getExtras();
+                if (bundle == null) {
+                    return;
+                }
+                if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
+                    String result = bundle.getString(CodeUtils.RESULT_STRING);
+                    // 解析后操作
+                    if (result.substring(0,4).equals("http")) {
+                        result = result.substring(13,25);
+                    } else {
+                        result = result.substring(0,12);
+                    }
+                    et_yunzi_id.setText(result);
+                } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
+                    ToastUtil.show("解析二维码失败");
+                }
+            }
+        }
     }
 
     private void showProgressDialog() {

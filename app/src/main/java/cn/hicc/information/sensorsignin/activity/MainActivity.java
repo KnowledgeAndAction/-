@@ -92,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
          * 启动 SDK 服务
          **/
         try {
+            Logs.d("开启sensoro服务");
             sensoroManager.startService();
         } catch (Exception e) {
             e.printStackTrace(); // 捕获异常信息
@@ -244,6 +245,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
         if (sensoroManager != null) {
+            Logs.d("MainActivity销毁了，停止服务");
             sensoroManager.stopService();
         }
         // 如果activity销毁，就将集合清空

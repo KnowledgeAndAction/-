@@ -12,6 +12,15 @@ public class Active implements Serializable{
     private String activeTime;
     private String activeLocation;
     private String sersorID;
+    private long activeId;
+
+    public long getActiveId() {
+        return activeId;
+    }
+
+    public void setActiveId(long activeId) {
+        this.activeId = activeId;
+    }
 
     public String getSersorID() {
         return sersorID;
