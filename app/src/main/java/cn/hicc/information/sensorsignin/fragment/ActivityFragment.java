@@ -5,6 +5,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,10 +29,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.hicc.information.sensorsignin.activity.DetailActivity;
+import cn.hicc.information.sensorsignin.db.MyDatabase;
+import cn.hicc.information.sensorsignin.db.MyDatabaseHelper;
 import cn.hicc.information.sensorsignin.model.Active;
 import cn.hicc.information.sensorsignin.model.DestroyFragment;
+import cn.hicc.information.sensorsignin.model.SignActive;
 import cn.hicc.information.sensorsignin.utils.Constant;
 import cn.hicc.information.sensorsignin.utils.Logs;
+import cn.hicc.information.sensorsignin.utils.SpUtil;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import okhttp3.Call;
 
@@ -44,7 +50,8 @@ public class ActivityFragment extends BaseFragment {
     private MyBroadcast myBroadcast;
     private String yunziId;
     private ProgressDialog progressDialog;
-
+    private MyDatabaseHelper dbHelper;
+    private long activeId;
     @Override
     public void fetchData() {
     }
@@ -127,6 +134,8 @@ public class ActivityFragment extends BaseFragment {
 
         return view;
     }
+
+
 
     public class MyBroadcast extends BroadcastReceiver {
         //云子更新信息广播接受

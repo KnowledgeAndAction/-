@@ -13,22 +13,31 @@ import com.hicc.information.sensorsignin.R;
 import com.sensoro.beacon.kit.Beacon;
 import com.sensoro.beacon.kit.BeaconManagerListener;
 import com.sensoro.cloud.SensoroManager;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.hicc.information.sensorsignin.db.MyDatabase;
 import cn.hicc.information.sensorsignin.fragment.ActivityFragment;
 import cn.hicc.information.sensorsignin.fragment.HistoryFragment;
 import cn.hicc.information.sensorsignin.fragment.SettingFragment;
 import cn.hicc.information.sensorsignin.model.DestroyFragment;
 import cn.hicc.information.sensorsignin.model.ExitEvent;
+import cn.hicc.information.sensorsignin.model.SignActive;
 import cn.hicc.information.sensorsignin.model.TabItem;
+import cn.hicc.information.sensorsignin.utils.Constant;
 import cn.hicc.information.sensorsignin.utils.Logs;
+import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import cn.hicc.information.sensorsignin.view.MyTabLayout;
+import okhttp3.Call;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private String serialNumber;
     // 存储扫描到的云子id
     private List<String> oldSerialNumber = new ArrayList<>();
+    private MyDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +56,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         sensoroManager = SensoroManager.getInstance(MainActivity.this);
-
+        //上传数据
+        initData();
         // 设置sdk
         setSDK();
 
@@ -59,7 +70,39 @@ public class MainActivity extends AppCompatActivity {
         // 注册监听退出登录的事件
         EventBus.getDefault().register(this);
     }
+//上传未存储到网络的数据
+    private void initData() {
+        database = MyDatabase.getInstance();
+        List<SignActive> unSaveActives = database.getUnSaveActives();
+        for (final SignActive unSaveActive : unSaveActives) {
+            OkHttpUtils.get()
+                    .url(Constant.API_URL+"api/TSign/InsertSign")
+                    .addParams("account",unSaveActive.getNumber())
+                    .addParams("activityid",unSaveActive.getActiveId()+"")
+                    .addParams("intime",unSaveActive.getInTime())
+                    .addParams("outtime",unSaveActive.getOutTime())
+                    .build()
+                    .execute(new StringCallback() {
+                        @Override
+                        public void onError(Call call, Exception e, int id) {
 
+                        }
+
+                        @Override
+                        public void onResponse(String response, int id) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                if (jsonObject.getBoolean("sucessed")) {
+                                    Logs.d("上传成功");
+                                    database.updateSignActive(unSaveActive.getActiveId(),true);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+        }
+    }
     // 检查蓝牙是否可用
     private void checkBluetooth() {
         if (!sensoroManager.isBluetoothEnabled()) {
