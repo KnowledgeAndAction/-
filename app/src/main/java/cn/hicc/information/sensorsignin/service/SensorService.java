@@ -171,6 +171,7 @@ public class SensorService extends Service {
                                 sendBroadcast(intent);
                             }
                         }
+                        // 每隔10秒检测一次
                         Thread.sleep(1000*10);
                     }
                 } catch (Exception e) {
