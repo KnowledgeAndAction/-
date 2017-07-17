@@ -279,14 +279,18 @@ public class AdminActivity extends AppCompatActivity {
                     return;
                 }
                 if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
-                    String result = bundle.getString(CodeUtils.RESULT_STRING);
-                    // 解析后操作
-                    if (result.substring(0,4).equals("http")) {
-                        result = result.substring(13,25);
-                    } else {
-                        result = result.substring(0,12);
+                    try {
+                        String result = bundle.getString(CodeUtils.RESULT_STRING);
+                        // 解析后操作
+                        if (result.substring(0,4).equals("http")) {
+                            result = result.substring(13,25);
+                        } else {
+                            result = result.substring(0,12);
+                        }
+                        et_yunzi_id.setText(result);
+                    } catch (StringIndexOutOfBoundsException e) {
+                        ToastUtil.showLong("请确保您扫描的是云子上的二维码");
                     }
-                    et_yunzi_id.setText(result);
                 } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
                     ToastUtil.show("解析二维码失败");
                 }

@@ -8,10 +8,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
 
 import com.hicc.information.sensorsignin.R;
-import com.sensoro.beacon.kit.Beacon;
-import com.sensoro.beacon.kit.BeaconManagerListener;
 import com.sensoro.cloud.SensoroManager;
 
 import org.greenrobot.eventbus.EventBus;
@@ -19,15 +18,16 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cn.hicc.information.sensorsignin.fragment.ActivityFragment;
 import cn.hicc.information.sensorsignin.fragment.HistoryFragment;
 import cn.hicc.information.sensorsignin.fragment.SettingFragment;
-import cn.hicc.information.sensorsignin.model.DestroyFragment;
 import cn.hicc.information.sensorsignin.model.ExitEvent;
 import cn.hicc.information.sensorsignin.model.TabItem;
-import cn.hicc.information.sensorsignin.utils.Logs;
+import cn.hicc.information.sensorsignin.service.SensorService;
+import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import cn.hicc.information.sensorsignin.view.MyTabLayout;
 
 public class MainActivity extends AppCompatActivity {
@@ -36,9 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private MyTabLayout myTablayout_bottom;
     private ViewPager viewPager;
     private ArrayList<TabItem> tabs;
-    private String serialNumber;
-    // 存储扫描到的云子id
-    private List<String> oldSerialNumber = new ArrayList<>();
+    private static Boolean isExit = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
         sensoroManager = SensoroManager.getInstance(MainActivity.this);
 
-        // 设置sdk
-        setSDK();
 
         // 初始化控件
         initWidget();
@@ -66,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
             Intent bluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(bluetoothIntent, 0);
         } else {
-            // 开启SDK
-            startSDK();
+            // 开启服务
+            startService(new Intent(this, SensorService.class));
         }
     }
 
@@ -82,75 +78,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    // 开启SDK
-    private void startSDK() {
-        /**
-         * 设置启用云服务 (上传传感器数据，如电量、UMM等)。如果不设置，默认为关闭状态。
-         **/
-        sensoroManager.setCloudServiceEnable(true);
-        /**
-         * 启动 SDK 服务
-         **/
-        try {
-            Logs.d("开启sensoro服务");
-            sensoroManager.startService();
-        } catch (Exception e) {
-            e.printStackTrace(); // 捕获异常信息
-        }
-    }
-
-    /**
-     * 设置SDK
-     */
-    private void setSDK() {
-        BeaconManagerListener beaconManagerListener = new BeaconManagerListener() {
-            /**
-             * 发现传感器
-             */
-            @Override
-            public void onNewBeacon(Beacon beacon) {
-                // 序列号
-                serialNumber = beacon.getSerialNumber();
-                Logs.d("serialNumber:" + serialNumber);
-                // 如果存储的云子id中不包含此次发现的  就将新的添加到集合中，发送广播
-                if (!oldSerialNumber.contains(serialNumber)) {
-                    oldSerialNumber.add(serialNumber);
-                    Logs.d("发现新云子:" + serialNumber);
-                    Intent intent = new Intent();
-                    intent.putExtra("yunzi",serialNumber);
-                    intent.setAction("GET_YUNZI_ID");
-                    sendBroadcast(intent);
-                }
-
-                // 签到 签离界面需要的广播
-                Intent intent = new Intent();
-                intent.setAction("SET_BROADCST_OUT");
-                intent.putExtra("sensor2ID", beacon.getSerialNumber());
-                sendBroadcast(intent);
-            }
-
-            @Override
-            public void onGoneBeacon(Beacon beacon) {
-            }
-
-            /**
-             * 传感器更新
-             */
-            @Override
-            public void onUpdateBeacon(final ArrayList<Beacon> beacons) {
-                for (Beacon beacon : beacons) {
-                    // 签到 签离界面需要的广播
-                    Intent intent = new Intent();
-                    intent.setAction("SET_BROADCST_OUT");
-                    intent.putExtra("sensor2ID", beacon.getSerialNumber());
-                    sendBroadcast(intent);
-                }
-            }
-        };
-
-        sensoroManager.setBeaconManagerListener(beaconManagerListener);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -158,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
             case 0:
                 // 蓝牙可用
                 if (sensoroManager.isBluetoothEnabled()) {
-                    startSDK();
+                    startService(new Intent(MainActivity.this, SensorService.class));
                 }
                 break;
         }
@@ -181,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
         myTablayout_bottom.setCurrentTab(0);
 
         final FragmentAdapter adapter = new FragmentAdapter(getSupportFragmentManager());
+        viewPager.setOffscreenPageLimit(3);
         viewPager.setAdapter(adapter);
         viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -232,24 +160,40 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
-    // 接收fragment销毁时的消息
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(DestroyFragment destroyFragment) {
-        Logs.d("活动页销毁了");
-        // 将集合清空
-        oldSerialNumber.clear();
-    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
-        if (sensoroManager != null) {
-            Logs.d("MainActivity销毁了，停止服务");
-            sensoroManager.stopService();
+        stopService(new Intent(this,SensorService.class));
+    }
+
+    // 监听返回键
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK){
+            exitBy2Click();
         }
-        // 如果activity销毁，就将集合清空
-        oldSerialNumber.clear();
+        return false;
+    }
+
+    // 双击退出程序
+    private void exitBy2Click() {
+        Timer tExit = null;
+        if (isExit == false) {
+            isExit = true; // 准备退出
+            ToastUtil.show("再按一次退出程序");
+            tExit = new Timer();
+            tExit.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    isExit = false; // 取消退出
+                }
+            }, 2000); // 如果2秒钟内没有按下返回键，则启动定时器取消掉刚才执行的任务
+
+        } else {
+            finish();
+        }
     }
 
 }

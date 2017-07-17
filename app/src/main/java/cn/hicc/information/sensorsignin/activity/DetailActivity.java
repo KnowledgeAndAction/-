@@ -138,4 +138,12 @@ public class DetailActivity extends AppCompatActivity {
         }
         return true;
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (myBroadcast != null) {
+            unregisterReceiver(myBroadcast);
+        }
+    }
 }

@@ -1,6 +1,5 @@
 package cn.hicc.information.sensorsignin.fragment;
 
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -18,7 +17,6 @@ import com.hicc.information.sensorsignin.R;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
-import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,7 +26,6 @@ import java.util.List;
 
 import cn.hicc.information.sensorsignin.activity.DetailActivity;
 import cn.hicc.information.sensorsignin.model.Active;
-import cn.hicc.information.sensorsignin.model.DestroyFragment;
 import cn.hicc.information.sensorsignin.utils.Constant;
 import cn.hicc.information.sensorsignin.utils.Logs;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
@@ -43,7 +40,8 @@ public class ActivityFragment extends BaseFragment {
     private ListView listView;
     private MyBroadcast myBroadcast;
     private String yunziId;
-    private ProgressDialog progressDialog;
+    private MyAdapter adapter;
+    private SensorGoneBroadcast sensorGoneBroadcast;
 
     @Override
     public void fetchData() {
@@ -86,9 +84,7 @@ public class ActivityFragment extends BaseFragment {
                                     mActiveList.add(active);
                                 }
 
-                                MyAdapter adapter = new MyAdapter();
-                                listView.setAdapter(adapter);
-                                closeDialog();
+                                adapter.notifyDataSetChanged();
                             } else {
                                 Logs.d("这个云子上没有活动："+yunziId);
                             }
@@ -110,9 +106,14 @@ public class ActivityFragment extends BaseFragment {
         intentFilter.addAction("GET_YUNZI_ID");
         getContext().registerReceiver(myBroadcast, intentFilter);
 
-        listView = (ListView) view.findViewById(R.id.lv_active);
+        sensorGoneBroadcast = new SensorGoneBroadcast();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("SENSOR_GONE");
+        getContext().registerReceiver(sensorGoneBroadcast, filter);
 
-//        showDialog();
+        listView = (ListView) view.findViewById(R.id.lv_active);
+        adapter = new MyAdapter();
+        listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -126,6 +127,20 @@ public class ActivityFragment extends BaseFragment {
         });
 
         return view;
+    }
+
+    public class SensorGoneBroadcast extends BroadcastReceiver {
+        // 云子消失广播接受
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Logs.d("接收到了云子消失的广播");
+            String sensorNumber = intent.getStringExtra("sensorNumber");
+            Active active = getActiveForSensor(sensorNumber);
+            if (active != null) {
+                mActiveList.remove(active);
+                adapter.notifyDataSetChanged();
+            }
+        }
     }
 
     public class MyBroadcast extends BroadcastReceiver {
@@ -195,29 +210,18 @@ public class ActivityFragment extends BaseFragment {
             Logs.i("取消注册广播");
             getContext().unregisterReceiver(myBroadcast);
         }
+        if (sensorGoneBroadcast != null) {
+            getContext().unregisterReceiver(sensorGoneBroadcast);
+        }
         mActiveList.clear();
-        EventBus.getDefault().post(new DestroyFragment());
     }
 
-
-    /**
-     * 弹出对话框
-     */
-    private void showDialog() {
-        if (progressDialog == null) {
-            progressDialog = new ProgressDialog(getContext());
+    private Active getActiveForSensor(String number) {
+        for (Active active : mActiveList) {
+            if (number.equals(active.getSersorID())) {
+                return active;
+            }
         }
-        progressDialog.setMessage("Loading...");
-        progressDialog.setCancelable(true);
-        progressDialog.show();
-    }
-
-    /**
-     * 关闭对话框
-     */
-    private void closeDialog() {
-        if (progressDialog != null) {
-            progressDialog.dismiss();
-        }
+        return null;
     }
 }

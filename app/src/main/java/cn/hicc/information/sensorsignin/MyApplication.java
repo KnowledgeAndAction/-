@@ -3,12 +3,13 @@ package cn.hicc.information.sensorsignin;
 import android.app.Application;
 import android.content.Context;
 
-import cn.hicc.information.sensorsignin.utils.HttpUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import cn.hicc.information.sensorsignin.utils.HttpUtil;
+import cn.hicc.information.sensorsignin.utils.Logs;
 import okhttp3.Authenticator;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -42,6 +43,17 @@ public class MyApplication extends Application {
                 .build();
 
         OkHttpUtils.initClient(okHttpClient);
+
+        // 捕获全局未捕获的异常
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable ex) {
+                // 输出异常
+                ex.printStackTrace();
+                Logs.d("捕获到的异常：" + ex.toString());
+
+            }
+        });
     }
 
     public static Context getContext () {

@@ -45,6 +45,8 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
     private SwipeRefreshLayout mSwipeLayout;
     private static final int REFRESH_COMPLETE = 0X110;
     View view;
+    private MyAdapter adapter;
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
          view = inflater.inflate(R.layout.activity_bottom_history, container, false);
@@ -67,7 +69,6 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
     }
 
     private void getActive() {
-
             OkHttpUtils
                     .get()
                     .url(Constant.API_URL + "api/TSign/GetSign")
@@ -89,8 +90,8 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
                             try {
                                 JSONObject jsonObject = new JSONObject(s);
                                 boolean sucessed = jsonObject.getBoolean("sucessed");
+                                mActiveList.clear();
                                 if (sucessed) {
-                                    mActiveList.clear();
                                     JSONArray data = jsonObject.getJSONArray("data");
                                     if (data.length() == 0) {
                                         ToastUtil.show("没有记录");
@@ -118,14 +119,11 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
                                             mActiveList.add(historyActivity);
                                         }
                                     }
-                                    mSwipeLayout.setRefreshing(false);
-                                    HistoryFragment.MyAdapter adapter = new HistoryFragment.MyAdapter();
-                                    listView.setAdapter(adapter);
                                 } else {
                                     ToastUtil.show("没有记录");
-                                    mSwipeLayout.setRefreshing(false);
                                 }
-
+                                mSwipeLayout.setRefreshing(false);
+                                adapter.notifyDataSetChanged();
                             } catch (JSONException e) {
                                 e.printStackTrace();
                                 mSwipeLayout.setRefreshing(false);
@@ -144,6 +142,9 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
         listView = (ListView) view.findViewById(R.id.lv_history);
         mSwipeLayout= (SwipeRefreshLayout) view.findViewById(R.id.id_swipe_ly);
         mSwipeLayout.setOnRefreshListener(this);
+
+        adapter = new MyAdapter();
+        listView.setAdapter(adapter);
     }
 
     @Override

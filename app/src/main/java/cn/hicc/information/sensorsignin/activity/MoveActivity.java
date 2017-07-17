@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -26,6 +27,7 @@ import java.util.List;
 import cn.hicc.information.sensorsignin.db.MyDatabase;
 import cn.hicc.information.sensorsignin.model.SignActive;
 import cn.hicc.information.sensorsignin.utils.Constant;
+import cn.hicc.information.sensorsignin.utils.Logs;
 import cn.hicc.information.sensorsignin.utils.SpUtil;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import okhttp3.Call;
@@ -51,6 +53,7 @@ public class MoveActivity extends AppCompatActivity {
     private long activeId;
     private MyDatabase database;
     private ProgressDialog progressDialog;
+    private boolean isClick = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +68,7 @@ public class MoveActivity extends AppCompatActivity {
         activityDes = intent.getStringExtra("activityDes");
         yunziId = intent.getStringExtra("yunziId");
         activeId = intent.getLongExtra("activeId",0);
+        SpUtil.putString("yunziId",yunziId);
 
         //初始化控件
         initView();
@@ -92,7 +96,6 @@ public class MoveActivity extends AppCompatActivity {
         SimpleDateFormat df = new SimpleDateFormat("HH:mm");//("HH:mm:ss")(小时：分钟：秒)
         inTime = df.format(new Date());
         tv_inTime.setText(inTime);
-        SpUtil.putString("inTime",inTime);
     }
     /**
      * 获取签离时间
@@ -100,7 +103,6 @@ public class MoveActivity extends AppCompatActivity {
     private void getOutTime() {
         SimpleDateFormat df = new SimpleDateFormat("HH:mm");//("HH:mm:ss")(小时：分钟：秒)
         outTime = df.format(new Date());
-        SpUtil.putString("outTime",outTime);
     }
 
     /**
@@ -118,6 +120,7 @@ public class MoveActivity extends AppCompatActivity {
                 getOutTime();
                 // 如果可以签离
                 if(isCan){
+                    isClick = true;
                     // 发送时间数据
                     signForService();
                 }else {
@@ -185,24 +188,53 @@ public class MoveActivity extends AppCompatActivity {
                 });
     }
 
-    public  class MyBroadcast extends BroadcastReceiver {
+    public class MyBroadcast extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             // 获取接收到的云子id，添加到集合中
             String sensor2ID = intent.getStringExtra("sensor2ID");
+            Logs.d("签离界面接收到了云子id消息:" + sensor2ID);
             sensorList.add(sensor2ID);
             // 如果当集合中包含进入活动的云子id，就可以签离
             isCan = sensorList.contains(yunziId);
+
+            // 离开时间超过10分钟，自动签离
+            boolean isLeave = intent.getBooleanExtra("isLeave", false);
+            if (isLeave) {
+                isClick = true;
+                getOutTime();
+                signForService();
+                finish();
+            }
         }
     }
-
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(myBroadcast!=null){
+        Logs.d("onDestroy");
+        if(myBroadcast != null){
             unregisterReceiver(myBroadcast);
         }
+        if (!isClick) {
+            getOutTime();
+            Logs.d("onDestroy");
+            signForService();
+        }
+    }
+
+    // 重写返回键  使其回到桌面
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                // 通过隐示意图 开启桌面
+                Intent intent = new Intent(Intent.ACTION_MAIN);
+                intent.addCategory(Intent.CATEGORY_HOME);
+                startActivity(intent);
+                return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     private void showDialog() {
