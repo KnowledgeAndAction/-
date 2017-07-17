@@ -64,6 +64,7 @@ public class AdminActivity extends AppCompatActivity {
         exit();
     }
 
+    // 注销
     private void exit() {
         bt_exit.setOnClickListener(new View.OnClickListener() {
             @Override
