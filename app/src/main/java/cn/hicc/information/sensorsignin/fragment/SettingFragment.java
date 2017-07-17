@@ -36,7 +36,9 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
         inItUI(view);
         return view;
     }
-
+/**
+ * 实例化两个按钮
+ * */
     private void inItUI(View view) {
         button_esc= (TextView) view.findViewById(R.id.button_esc);
         button_changeWorld= (TextView) view.findViewById(R.id.button_changeWorld);
@@ -44,7 +46,7 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
         button_changeWorld.setOnClickListener(this);
     }
 
-
+//设置按钮的点击事件。
     @Override
     public void onClick(View view) {
 
