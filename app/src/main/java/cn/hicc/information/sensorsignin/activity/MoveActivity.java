@@ -93,7 +93,7 @@ public class MoveActivity extends AppCompatActivity {
      * 获取签到时间
      */
     private void getInTime(){
-        SimpleDateFormat df = new SimpleDateFormat("HH:mm");//("HH:mm:ss")(小时：分钟：秒)
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");//("HH:mm:ss")(小时：分钟：秒)
         inTime = df.format(new Date());
         tv_inTime.setText(inTime);
     }
@@ -101,7 +101,7 @@ public class MoveActivity extends AppCompatActivity {
      * 获取签离时间
      */
     private void getOutTime() {
-        SimpleDateFormat df = new SimpleDateFormat("HH:mm");//("HH:mm:ss")(小时：分钟：秒)
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");//("HH:mm:ss")(小时：分钟：秒)
         outTime = df.format(new Date());
     }
 
@@ -221,6 +221,7 @@ public class MoveActivity extends AppCompatActivity {
             Logs.d("onDestroy");
             signForService();
         }
+        SpUtil.remove("yunziId");
     }
 
     // 重写返回键  使其回到桌面

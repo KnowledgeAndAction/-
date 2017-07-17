@@ -38,6 +38,7 @@ public class SensorService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Logs.d("onStartCommand");
+        SpUtil.remove("yunziId");
         sensoroManager = SensoroManager.getInstance(this);
         setSDK();
         startSDK();
@@ -162,7 +163,8 @@ public class SensorService extends Service {
                             long end = df.parse(endTime).getTime();
                             // 如果超过10分钟未检测到云子  就自动签离  1000*60*10 10分钟
                             Log.d("SIGN_TAG","时间间隔"+ (end-start));
-                            if (Math.abs(end-start) > 1000*60*10) {
+                            // TODO 设置时间
+                            if (Math.abs(end-start) > 1000*60*1) {
                                 // 自动签离
                                 Log.d("SIGN_TAG","发送自动签离的广播");
                                 Intent intent = new Intent();
