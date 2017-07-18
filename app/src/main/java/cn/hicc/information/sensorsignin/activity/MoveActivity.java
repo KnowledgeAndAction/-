@@ -21,6 +21,7 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -37,8 +38,6 @@ import okhttp3.Call;
  */
 public class MoveActivity extends AppCompatActivity {
 
-    private String mHour;
-    private int mMinute;
     private TextView tv_inTime;
     private String inTime;
     private TextView tv_activityName;
@@ -54,6 +53,7 @@ public class MoveActivity extends AppCompatActivity {
     private MyDatabase database;
     private ProgressDialog progressDialog;
     private boolean isClick = false;
+    private TextView tv_total_time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +80,46 @@ public class MoveActivity extends AppCompatActivity {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("SET_BROADCST_OUT");
         registerReceiver(myBroadcast, intentFilter);
+
+        updataTime();
     }
+
+    private void updataTime() {
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                while (true) {
+                    try {
+                        Thread.sleep(1000);
+                        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+                        // 获取当前时间
+                        long now = System.currentTimeMillis();
+                        // 计算从签到时间开始，经过了多长时间
+                        long total = now - df.parse(inTime).getTime();
+                        // 将毫秒转换成时间格式
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(total);
+                        // 计算天数
+                        long days = total / (1000 * 60 * 60 * 24);
+                        // 计算小时数
+                        final long hours = (total-days*(1000 * 60 * 60 * 24))/(1000* 60 * 60);
+                        // 转换成时间格式
+                        final String totalTime = df.format(calendar.getTime());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                tv_total_time.setText(hours + ":" + totalTime.substring(totalTime.indexOf(":")+1));
+                            }
+                        });
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }.start();
+    }
+
     /**
      * 获取数据的方法
      */
@@ -95,7 +134,7 @@ public class MoveActivity extends AppCompatActivity {
     private void getInTime(){
         SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");//("HH:mm:ss")(小时：分钟：秒)
         inTime = df.format(new Date());
-        tv_inTime.setText(inTime);
+        tv_inTime.setText("签到时间：" + inTime);
     }
     /**
      * 获取签离时间
@@ -111,9 +150,11 @@ public class MoveActivity extends AppCompatActivity {
     private void initView() {
         tv_inTime = (TextView) findViewById(R.id.tv_inTime);
         tv_activityName = (TextView) findViewById(R.id.tv_activeName);
-        tv_activityName.setText(activeName);
-        tv_inTime.setText(mHour+mMinute);
+        tv_total_time = (TextView) findViewById(R.id.tv_total_time);
         Button moveButton = (Button) findViewById(R.id.moveButton);
+
+        tv_activityName.setText(activeName);
+
         moveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

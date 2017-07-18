@@ -130,23 +130,25 @@ public class MainActivity extends AppCompatActivity {
     // 显示更新对话框
     protected void showUpDataDialog(String description, final String appUrl) {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
-        //设置对话框左上角图标
+        // 设置对话框左上角图标
         builder.setIcon(R.mipmap.logo);
-        //设置对话框标题
+        // 设置不能取消
+        builder.setCancelable(false);
+        // 设置对话框标题
         builder.setTitle("发现新版本");
-        //设置对话框内容
+        // 设置对话框内容
         builder.setMessage(description);
-        //设置积极的按钮
+        // 设置积极的按钮
         builder.setPositiveButton("立即更新", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //下载apk
+                // 下载apk
                 downLoadApk(appUrl);
                 // 显示一个进度条对话框
                 showProgressDialog();
             }
         });
-        //设置消极的按钮
+        // 设置消极的按钮
         builder.setNegativeButton("暂不更新", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

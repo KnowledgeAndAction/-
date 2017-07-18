@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:name="cn.hicc.information.sensorsignin.MyApplication"
@@ -51,19 +51,33 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoTitle" />
         <activity
-            android:name="cn.hicc.information.sensorsignin.activity.AdminActivity"
-            android:screenOrientation="portrait" />
+            android:name="cn.hicc.information.sensorsignin.activity.AddActiveActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoTitle" />
         <activity
             android:name="cn.hicc.information.sensorsignin.activity.GuideActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoTitle" />
-        <activity android:name="cn.hicc.information.sensorsignin.activity.ScanActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name="cn.hicc.information.sensorsignin.activity.ScanActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="cn.hicc.information.sensorsignin.activity.AdminActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="cn.hicc.information.sensorsignin.activity.AdminActiveActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoTitle" />
+        <activity
+            android:name="cn.hicc.information.sensorsignin.activity.ChangeActiveActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoTitle" />
 
         <service android:name="cn.hicc.information.sensorsignin.service.SensorService" />
-
         <service android:name="com.sensoro.beacon.kit.BeaconService" />
         <service android:name="com.sensoro.beacon.kit.IntentProcessorService" />
+
+
     </application>
 
 </manifest>

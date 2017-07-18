@@ -41,6 +41,7 @@ public class DetailActivity extends AppCompatActivity {
     private List<String> sensorList = new ArrayList<>();
     private MyDatabase database;
     private Toolbar toolbar;
+    private TextView tv_time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +68,7 @@ public class DetailActivity extends AppCompatActivity {
         activityDes = (TextView) findViewById(R.id.tv_des);
         loginButton = (Button) findViewById(R.id.loginButton);  //签到按钮
         toolbar = (Toolbar) findViewById(R.id.atoolbar);
+        tv_time = (TextView) findViewById(R.id.tv_time);
 
         toolbar.setTitle(active.getActiveName());
         setSupportActionBar(toolbar);
@@ -79,8 +81,9 @@ public class DetailActivity extends AppCompatActivity {
         });
 
         activtyName.setText(active.getActiveName());
-        activityLocation.setText(active.getActiveLocation());
+        activityLocation.setText("地点：" + active.getActiveLocation());
         activityDes.setText(active.getActiveDes());
+        tv_time.setText("时间：" + active.getActiveTime().substring(11,16));
 
         myBroadcast = new MyBroadcast();
         IntentFilter intentFilter = new IntentFilter();

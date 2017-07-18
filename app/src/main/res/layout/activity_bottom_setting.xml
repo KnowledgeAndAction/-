@@ -27,16 +27,19 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#e6e6e6" />
+
     <TextView
         android:id="@+id/tv_checkToUpdate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
         android:layout_marginBottom="3dp"
         android:background="@drawable/button_esc_bg"
         android:gravity="center"
         android:padding="10dp"
         android:text="检测更新"
         android:textSize="16sp"/>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"

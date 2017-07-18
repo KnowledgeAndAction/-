@@ -30,6 +30,7 @@ dependencies {
     compile files('libs/sensoro-beacon-kit-4.3.jar')
     compile files('libs/android-async-http-1.4.6.jar')
 
+
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.zhy:okhttputils:2.6.2'
@@ -37,10 +38,12 @@ dependencies {
     compile 'com.wdullaer:materialdatetimepicker:3.2.2'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.android.support:design:25.3.1'
-    testCompile 'junit:junit:4.12'
-
     compile 'cn.yipianfengye.android:zxing-library:1.9'
+    testCompile 'junit:junit:4.12'
 }
+
+
+
 
 
 

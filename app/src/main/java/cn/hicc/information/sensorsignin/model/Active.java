@@ -13,6 +13,15 @@ public class Active implements Serializable{
     private String activeLocation;
     private String sersorID;
     private long activeId;
+    private int rule;
+
+    public int getRule() {
+        return rule;
+    }
+
+    public void setRule(int rule) {
+        this.rule = rule;
+    }
 
     public long getActiveId() {
         return activeId;

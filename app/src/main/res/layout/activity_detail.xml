@@ -1,32 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    >
-<android.support.design.widget.AppBarLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:theme="@style/AppTheme.AppBarOverlay"
-    app:elevation="0dp">
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/atoolbar"
+    android:orientation="vertical">
+
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
-        app:popupTheme="@style/AppTheme.PopupOverlay"></android.support.v7.widget.Toolbar>
-</android.support.design.widget.AppBarLayout>
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:elevation="0dp">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/atoolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
+        </android.support.v7.widget.Toolbar>
+    </android.support.design.widget.AppBarLayout>
 
     <TextView
         android:id="@+id/tv_name"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="38dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
         android:text="活动名称"
-        android:textColor="#000"
+        android:textColor="#000000"
         android:textSize="28sp" />
 
     <TextView
@@ -34,36 +35,54 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="38dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="15dp"
         android:text="A2-208"
         android:textColor="#000"
-        android:textSize="20sp" />
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="38dp"
+        android:layout_marginTop="15dp"
+        android:text="18:00"
+        android:textColor="#000"
+        android:textSize="18sp" />
 
 
     <ScrollView
-        android:layout_marginTop="20dp"
-        android:layout_width="wrap_content"
-        android:layout_height="200dp">
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginTop="10dp"
+        android:padding="5dp">
+
         <TextView
             android:id="@+id/tv_des"
-            android:padding="18dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="38dp"
-            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="5dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="5dp"
             android:text="A2-20898989898989jdkjfkjkfjjdkfjksjdkfjksjdkfjkdkfjksdjkfjkdjfkksdjkfjksdjfkjdkjfkjdkjfkjkdjfkdjkfjksdjfkjjfkdsjf;jakjfklsldkfjsldjfkjdkfjkdjfkjdkfjkdjkfjkdjfkjdkjfkjdkfjkdjfkjdkfjkdjfkjdkjfkddfkjdkjfkjfjasfkjieojlwkjfojsiofjlksdjaiofdskfjoewiofjslkjfiejijklsjifoejlkjfioelkfjdslkjfioeklfjidkljfiedkfjkdjfkjdkjfkjkdjfkjdkjfkjdkjfkdjkfdkfkdjfkdjkfkdkjfkjdjfjkjdkfjkjdkjfkjdkjfkjdkjfkdjkjfkdfgfdgfggfddfdfdfdfdffdfdfdfdfdfdfdfdfdfdfdfdfj8"
-            android:textColor="#000"
-            android:textSize="20sp" />
+            android:textColor="#000000"
+            android:textSize="16sp" />
     </ScrollView>
-
 
 
     <Button
         android:id="@+id/loginButton"
-        android:layout_marginTop="40dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="签到"
-        android:textSize="28sp" />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="35dp"
+        android:layout_marginRight="35dp"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:paddingBottom="18dp"
+        android:paddingTop="18dp"
+        android:text="签  到"
+        android:textColor="#ffffff"
+        android:textSize="18sp" />
 </LinearLayout>
