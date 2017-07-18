@@ -37,7 +37,8 @@
             android:screenOrientation="portrait" />
         <activity
             android:name="cn.hicc.information.sensorsignin.activity.DetailActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoTitle" />
         <activity
             android:name="cn.hicc.information.sensorsignin.activity.MoveActivity"
             android:screenOrientation="portrait" />

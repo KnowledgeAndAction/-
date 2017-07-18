@@ -43,7 +43,6 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
     private ListView listView;
     private boolean respond;
     private SwipeRefreshLayout mSwipeLayout;
-    private static final int REFRESH_COMPLETE = 0X110;
     View view;
     private MyAdapter adapter;
 
@@ -94,7 +93,7 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
                                 if (sucessed) {
                                     JSONArray data = jsonObject.getJSONArray("data");
                                     if (data.length() == 0) {
-                                        ToastUtil.show("没有记录");
+                                        ToastUtil.show("没有历史记录");
                                     } else {
                                         for (int j = 0; j < data.length(); j++) {
                                             JSONObject hActivity = data.getJSONObject(j);

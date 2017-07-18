@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.hicc.information.sensorsignin.cn.hicc.information.sensorsignin.activity.HistoryDetailActivity">
+    android:orientation="vertical">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -21,7 +20,7 @@
             app:popupTheme="@style/AppTheme.PopupOverlay" />
     </android.support.design.widget.AppBarLayout>
 
-    <TextView
+   <!-- <TextView
         android:id="@+id/tv_hname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,7 +28,7 @@
         android:layout_marginLeft="30dp"
         android:layout_marginTop="8dp"
         android:text="啦啦啦啦"
-        android:textSize="22sp" />
+        android:textSize="22sp" />-->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -102,7 +101,6 @@
         android:id="@+id/tv_details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#fdfdfe"
         android:padding="8dp"
         android:paddingLeft="16dp"
         android:paddingTop="16dp"

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -39,6 +40,7 @@ public class DetailActivity extends AppCompatActivity {
     private boolean isCan = false;
     private List<String> sensorList = new ArrayList<>();
     private MyDatabase database;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +65,18 @@ public class DetailActivity extends AppCompatActivity {
         activtyName = (TextView) findViewById(R.id.tv_name);
         activityLocation = (TextView) findViewById(R.id.tv_location);
         activityDes = (TextView) findViewById(R.id.tv_des);
-        loginButton = (Button) findViewById(R.id.loginButton);  //登录按钮
+        loginButton = (Button) findViewById(R.id.loginButton);  //签到按钮
+        toolbar = (Toolbar) findViewById(R.id.atoolbar);
+
+        toolbar.setTitle(active.getActiveName());
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
         activtyName.setText(active.getActiveName());
         activityLocation.setText(active.getActiveLocation());
@@ -102,6 +115,7 @@ public class DetailActivity extends AppCompatActivity {
                 }
             }
         });
+
     }
 
     public class MyBroadcast extends BroadcastReceiver {

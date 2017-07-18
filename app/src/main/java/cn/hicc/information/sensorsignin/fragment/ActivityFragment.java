@@ -150,7 +150,7 @@ public class ActivityFragment extends BaseFragment {
             yunziId = intent.getStringExtra("yunzi");
             getActive(yunziId);
 
-            ToastUtil.show("发现云子:"+yunziId);
+            //ToastUtil.show("发现云子:"+yunziId);
         }
     }
 
