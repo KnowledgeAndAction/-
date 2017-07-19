@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_add"
+        android:title="添加活动"
+        android:orderInCategory="80"
+        android:icon="@mipmap/ic_add_circle_outline_white_48dp"
+        app:showAsAction="ifRoom" />
+</menu>

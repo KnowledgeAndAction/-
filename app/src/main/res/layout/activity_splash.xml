@@ -22,7 +22,7 @@
         android:layout_marginTop="18dp"
         android:text="智慧校园"
         android:textColor="#ffffff"
-        android:textSize="30sp" />
+        android:textSize="28sp" />
 
     <TextView
         android:layout_width="wrap_content"

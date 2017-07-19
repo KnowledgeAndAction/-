@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tabs>
+    <tab
+        id="@+id/tab_active"
+        icon="@drawable/bottom_activity_selector"
+        title="活动"
+        barColorWhenSelected="#03A9F4" />
+    <tab
+        id="@+id/tab_history"
+        icon="@drawable/bottom_history_selector"
+        title="历史"
+        barColorWhenSelected="#5D4037" />
+    <tab
+        id="@+id/tab_setting"
+        icon="@drawable/bottom_setting_selector"
+        title="设置"
+        barColorWhenSelected="#045563" />
+</tabs>

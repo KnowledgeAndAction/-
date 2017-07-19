@@ -137,8 +137,9 @@ public class ActivityFragment extends BaseFragment {
             String sensorNumber = intent.getStringExtra("sensorNumber");
             Active active = getActiveForSensor(sensorNumber);
             if (active != null) {
-                mActiveList.remove(active);
-                adapter.notifyDataSetChanged();
+                // TODO 暂时不动态更新
+                //mActiveList.remove(active);
+                //adapter.notifyDataSetChanged();
             }
         }
     }

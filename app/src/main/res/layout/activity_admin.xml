@@ -6,19 +6,6 @@
     android:padding="5dp">
 
     <Button
-        android:id="@+id/bt_add"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:backgroundTint="@color/colorPrimary"
-        android:paddingBottom="18dp"
-        android:paddingTop="18dp"
-        android:text="添加活动"
-        android:textColor="#ffffff"
-        android:textSize="18sp" />
-
-    <Button
         android:id="@+id/bt_look"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,7 +15,7 @@
         android:backgroundTint="@color/colorPrimary"
         android:paddingBottom="18dp"
         android:paddingTop="18dp"
-        android:text="查看活动"
+        android:text="管理活动"
         android:textColor="#ffffff"
         android:textSize="18sp" />
 

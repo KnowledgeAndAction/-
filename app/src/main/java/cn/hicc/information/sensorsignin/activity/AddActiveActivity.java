@@ -252,6 +252,7 @@ public class AddActiveActivity extends AppCompatActivity {
                 mTime = "";
 
                 ToastUtil.showLong("提交成功");
+                finish();
             } else {
                 ToastUtil.show("提交失败，请稍后重试");
             }

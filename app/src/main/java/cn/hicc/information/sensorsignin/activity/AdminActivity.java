@@ -26,11 +26,9 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void initView() {
-        Button bt_add = (Button) findViewById(R.id.bt_add);
         Button bt_look = (Button) findViewById(R.id.bt_look);
         Button bt_exit = (Button) findViewById(R.id.bt_exit);
 
-        bt_add.setOnClickListener(this);
         bt_look.setOnClickListener(this);
         bt_exit.setOnClickListener(this);
     }
@@ -38,9 +36,6 @@ public class AdminActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.bt_add:
-                startActivity(new Intent(this, AddActiveActivity.class));
-                break;
             case R.id.bt_look:
                 startActivity(new Intent(this, AdminActiveActivity.class));
                 break;

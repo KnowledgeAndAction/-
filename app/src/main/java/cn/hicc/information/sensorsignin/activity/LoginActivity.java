@@ -4,6 +4,8 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
@@ -12,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -30,6 +33,7 @@ import cn.hicc.information.sensorsignin.utils.Constant;
 import cn.hicc.information.sensorsignin.utils.MD5Util;
 import cn.hicc.information.sensorsignin.utils.SpUtil;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
+import cn.hicc.information.sensorsignin.view.CustomVideoView;
 import okhttp3.Call;
 
 /**
@@ -46,14 +50,19 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private TextInputLayout text_input_account;
     private TextInputLayout text_input_pass;
+    private CustomVideoView videoview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        //去掉Activity上面的状态栏
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setContentView(R.layout.activity_login_tow);
 
         // 初始化控件
         initView();
+
+        initVideo();
 
         // 检查是否已经登录
         checkIsEnter();
@@ -63,6 +72,36 @@ public class LoginActivity extends AppCompatActivity {
 
         // 检查权限
         checkPermission();
+    }
+
+    private void initVideo() {
+        //加载视频资源控件
+        videoview = (CustomVideoView) findViewById(R.id.videoview);
+        //设置播放加载路径
+        videoview.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.video));
+        //播放
+        videoview.start();
+        //循环播放
+        videoview.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                videoview.start();
+            }
+        });
+    }
+
+    //返回重启加载
+    @Override
+    protected void onRestart() {
+        initVideo();
+        super.onRestart();
+    }
+
+    //防止锁屏或者切出的时候，音乐在播放
+    @Override
+    protected void onStop() {
+        videoview.stopPlayback();
+        super.onStop();
     }
 
     private void checkPermission() {
@@ -187,7 +226,7 @@ public class LoginActivity extends AppCompatActivity {
     private void enterApp(int type) {
         if (type == USER_ORDINARY) {
             // 跳转到普通用户界面
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            startActivity(new Intent(getApplicationContext(), MainActivityTow.class));
             finish();
         } else if (type == USER_ADMIN) {
             // 跳转到管理员用户界面

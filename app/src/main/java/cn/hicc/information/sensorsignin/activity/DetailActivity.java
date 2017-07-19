@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -42,11 +44,13 @@ public class DetailActivity extends AppCompatActivity {
     private MyDatabase database;
     private Toolbar toolbar;
     private TextView tv_time;
+    private SwipeRefreshLayout refreshLayout;
+    private CollapsingToolbarLayout toolbarLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
+        setContentView(R.layout.activity_detail_tow);
 
         database = MyDatabase.getInstance();
 
@@ -57,20 +61,12 @@ public class DetailActivity extends AppCompatActivity {
 
         //初始化数据
         initData();
+
+        initView();
     }
 
-    /**
-     * 初始化数据
-     */
-    private void initData() {
-        activtyName = (TextView) findViewById(R.id.tv_name);
-        activityLocation = (TextView) findViewById(R.id.tv_location);
-        activityDes = (TextView) findViewById(R.id.tv_des);
-        loginButton = (Button) findViewById(R.id.loginButton);  //签到按钮
-        toolbar = (Toolbar) findViewById(R.id.atoolbar);
-        tv_time = (TextView) findViewById(R.id.tv_time);
-
-        toolbar.setTitle(active.getActiveName());
+    private void initView() {
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -80,7 +76,24 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
-        activtyName.setText(active.getActiveName());
+        refreshLayout = (SwipeRefreshLayout) findViewById(R.id.refreshLayout);
+        refreshLayout.setEnabled(false);
+
+        toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
+
+        // 设置标题和背景图
+        toolbarLayout.setTitle(active.getActiveName());
+    }
+
+    /**
+     * 初始化数据
+     */
+    private void initData() {
+        activityLocation = (TextView) findViewById(R.id.tv_location);
+        activityDes = (TextView) findViewById(R.id.tv_des);
+        loginButton = (Button) findViewById(R.id.loginButton);  //签到按钮
+        tv_time = (TextView) findViewById(R.id.tv_time);
+
         activityLocation.setText("地点：" + active.getActiveLocation());
         activityDes.setText(active.getActiveDes());
         tv_time.setText("时间：" + active.getActiveTime().substring(11,16));

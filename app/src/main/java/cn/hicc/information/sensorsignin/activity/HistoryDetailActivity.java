@@ -1,6 +1,8 @@
 package cn.hicc.information.sensorsignin.activity;
 
 import android.content.Intent;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -25,7 +27,7 @@ public class HistoryDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_history_detail);
+        setContentView(R.layout.activity_history_detail_tow);
         Intent intent = getIntent();
         historyActivity = (HistoryActivity) intent.getSerializableExtra("ActivityId");
         initVie();
@@ -35,27 +37,30 @@ public class HistoryDetailActivity extends AppCompatActivity {
         tv_details = (TextView) findViewById(R.id.tv_details);
         tv_hintime = (TextView) findViewById(R.id.tv_hintime);
         tv_houttime = (TextView) findViewById(R.id.tv_houttime);
-        //tv_hname = (TextView) findViewById(R.id.tv_hname);
         tv_hlocation = (TextView) findViewById(R.id.tv_hlocation);
-        toolbar= (Toolbar) findViewById(R.id.toolbar);
 
         tv_details.setText("  " + historyActivity.getActivityDescription());
-        tv_hintime.setText(historyActivity.gethInTime().replace("T", " "));
-        tv_houttime.setText(historyActivity.gethOutTime().replace("T", " "));
-        //tv_hname.setText(historyActivity.gethActivityName());
-        tv_hlocation.setText(historyActivity.getLocation());
+        tv_hintime.setText("签到时间："+historyActivity.gethInTime().replace("T", " "));
+        tv_houttime.setText("签离时间："+historyActivity.gethOutTime().replace("T", " "));
+        tv_hlocation.setText("地点："+historyActivity.getLocation());
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-
-        toolbar.setTitle(historyActivity.gethActivityName());
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 finish();
             }
         });
+
+        SwipeRefreshLayout refreshLayout = (SwipeRefreshLayout) findViewById(R.id.refreshLayout);
+        refreshLayout.setEnabled(false);
+
+        CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
+
+        // 设置标题
+        toolbarLayout.setTitle(historyActivity.gethActivityName());
 
     }
 

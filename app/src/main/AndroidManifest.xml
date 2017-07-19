@@ -22,7 +22,7 @@
         <activity
             android:name="cn.hicc.information.sensorsignin.activity.SplashActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoTitle">
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,7 +33,12 @@
             android:name="cn.hicc.information.sensorsignin.activity.MainActivity"
             android:screenOrientation="portrait" />
         <activity
+            android:name="cn.hicc.information.sensorsignin.activity.MainActivityTow"
+            android:theme="@style/AppTheme.NoTitle"
+            android:screenOrientation="portrait" />
+        <activity
             android:name="cn.hicc.information.sensorsignin.activity.LoginActivity"
+            android:theme="@style/AppTheme.NoTitle"
             android:screenOrientation="portrait" />
         <activity
             android:name="cn.hicc.information.sensorsignin.activity.DetailActivity"

@@ -113,7 +113,8 @@ public class SensorService extends Service {
             public void onGoneBeacon(Beacon beacon) {
                 Logs.d("service一个云子消失了:" + beacon.getSerialNumber());
                 if (oldSerialNumber.contains(beacon.getSerialNumber())) {
-                    oldSerialNumber.remove(beacon.getSerialNumber());
+                    // TODO 暂时不做动态的
+                    //oldSerialNumber.remove(beacon.getSerialNumber());
                     Intent intent = new Intent();
                     intent.setAction("SENSOR_GONE");
                     intent.putExtra("sensorNumber", beacon.getSerialNumber());

@@ -17,9 +17,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.hicc.information.sensorsignin.R;
-import cn.hicc.information.sensorsignin.utils.SpUtil;
 
 import java.util.ArrayList;
+
+import cn.hicc.information.sensorsignin.utils.SpUtil;
+import cn.hicc.information.sensorsignin.view.ZoomOutPageTransformer;
 
 /**
  * 引导页面
@@ -53,6 +55,7 @@ public class GuideActivity extends Activity {
         btnStart = (Button) findViewById(R.id.btn_start);
 
         initData();// 先初始化数据
+        mViewPager.setPageTransformer(true, new ZoomOutPageTransformer());
         mViewPager.setAdapter(new GuideAdapter());// 设置数据
 
         mViewPager.setOnPageChangeListener(new OnPageChangeListener() {

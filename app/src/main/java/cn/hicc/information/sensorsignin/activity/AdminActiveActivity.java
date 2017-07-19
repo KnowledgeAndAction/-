@@ -6,6 +6,8 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -41,6 +43,17 @@ public class AdminActiveActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipe_refresh;
     private MyAdapter myAdapter;
     private List<Active> mActiveList = new ArrayList<>();
+    private Toolbar.OnMenuItemClickListener onMenuItemClick = new Toolbar.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(MenuItem menuItem) {
+            switch (menuItem.getItemId()) {
+                case R.id.action_add:
+                    startActivity(new Intent(AdminActiveActivity.this, AddActiveActivity.class));
+                    break;
+            }
+            return true;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +65,9 @@ public class AdminActiveActivity extends AppCompatActivity {
 
     private void initView() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("查看活动");
+        toolbar.setTitle("管理活动");
         setSupportActionBar(toolbar);
+        toolbar.setOnMenuItemClickListener(onMenuItemClick);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -200,5 +214,11 @@ public class AdminActiveActivity extends AppCompatActivity {
         TextView tv_name;
         TextView tv_location;
         TextView tv_time;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_tool_bar, menu);
+        return true;
     }
 }
