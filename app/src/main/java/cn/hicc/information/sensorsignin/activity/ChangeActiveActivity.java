@@ -270,6 +270,7 @@ public class ChangeActiveActivity extends AppCompatActivity {
                             closeProgressDialog();
                             if (sucessed) {
                                 ToastUtil.show("修改活动成功");
+                                finish();
                             } else {
                                 ToastUtil.show("修改活动失败");
                             }

@@ -107,7 +107,7 @@
             android:backgroundTint="#7a03a9f4"
             android:paddingBottom="15dp"
             android:paddingTop="15dp"
-            android:text="登录"
+            android:text="登  录"
             android:textColor="#ffffff"
             android:textSize="16sp" />
 

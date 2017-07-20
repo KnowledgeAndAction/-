@@ -78,7 +78,7 @@ public class LoginActivity extends AppCompatActivity {
         //加载视频资源控件
         videoview = (CustomVideoView) findViewById(R.id.videoview);
         //设置播放加载路径
-        videoview.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.video));
+        videoview.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.video3));
         //播放
         videoview.start();
         //循环播放
@@ -102,6 +102,15 @@ public class LoginActivity extends AppCompatActivity {
     protected void onStop() {
         videoview.stopPlayback();
         super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // 释放资源
+        if (videoview != null) {
+            videoview.suspend();
+        }
     }
 
     private void checkPermission() {

@@ -113,7 +113,7 @@ public class AdminActiveActivity extends AppCompatActivity {
     private void getActive() {
         OkHttpUtils
                 .get()
-                .url(Constant.API_URL + "api/TActivity/GetActivity1")
+                .url(Constant.API_URL + "api/TActivity/GetActivityByAccount")
                 .addParams("account", SpUtil.getString(Constant.ACCOUNT, ""))
                 .build()
                 .execute(new StringCallback() {

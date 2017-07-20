@@ -95,7 +95,7 @@ public class DetailActivity extends AppCompatActivity {
         tv_time = (TextView) findViewById(R.id.tv_time);
 
         activityLocation.setText("地点：" + active.getActiveLocation());
-        activityDes.setText(active.getActiveDes());
+        activityDes.setText("  "+active.getActiveDes());
         tv_time.setText("时间：" + active.getActiveTime().substring(11,16));
 
         myBroadcast = new MyBroadcast();
