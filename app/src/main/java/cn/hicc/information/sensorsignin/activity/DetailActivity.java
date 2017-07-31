@@ -124,7 +124,7 @@ public class DetailActivity extends AppCompatActivity {
                             ToastUtil.show("暂时无法进行签到，请稍后重试，并确保您在活动地点附近");
                         }
                     } else {
-                        ToastUtil.show("未到签到时间");
+                        ToastUtil.show("不符合签到时间");
                     }
                 } else {
                     ToastUtil.show("您已经签到过");
@@ -158,7 +158,8 @@ public class DetailActivity extends AppCompatActivity {
         try {
             java.util.Date beginTime = currentTime.parse(signTime);
             java.util.Date endTime = currentTime.parse(presentTime);
-            if (endTime.getTime() >= beginTime.getTime()) {
+            // 可以提前10分钟签到并且不能超过要求签到时间5个小时
+            if (((endTime.getTime() + 1000*60*10) >= beginTime.getTime()) && ((endTime.getTime() - beginTime.getTime()) <= 1000*60*60*5)) {
                 return true;
             } else {
                 return false;
