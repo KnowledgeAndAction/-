@@ -127,7 +127,7 @@
                 android:layout_margin="25dp"
                 android:background="@drawable/button_bg"
                 android:padding="10dp"
-                android:text="修 改"
+                android:text="确认修改"
                 android:textColor="#ffffff"
                 android:textSize="18sp" />
 

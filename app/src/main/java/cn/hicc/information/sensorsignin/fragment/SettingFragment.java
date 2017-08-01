@@ -111,13 +111,36 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
                         });
                 break;
             case R.id.tv_esc:
-                EventBus.getDefault().post(new ExitEvent());
-                startActivity(new Intent(getContext(), LoginActivity.class));
-
-                SpUtil.putBoolean(Constant.IS_REMBER_PWD, false);
-
+                showConfirmDialog();
                 break;
         }
+    }
+
+    private void showConfirmDialog() {
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getContext());
+        //设置对话框左上角图标
+        builder.setIcon(R.mipmap.logo);
+        //设置对话框标题
+        builder.setTitle("是否退出");
+        //设置文本内容
+        builder.setMessage("您将会退出应用");
+        //设置积极的按钮
+        builder.setPositiveButton("确认退出", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                EventBus.getDefault().post(new ExitEvent());
+                startActivity(new Intent(getContext(), LoginActivity.class));
+                SpUtil.putBoolean(Constant.IS_REMBER_PWD, false);
+            }
+        });
+        //设置消极的按钮
+        builder.setNegativeButton("暂不推出", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.show();
     }
 
 //    private void show_dialog(String s) {
@@ -125,7 +148,7 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
 //        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_view, null);
 //        // 获取对话框的文本内容控件
 //        TextView tv_content = (TextView) view.findViewById(R.id.tv_action);
-//        // 给控件设置文本，这里根据你传过来的值进行设置，很实用
+//        // 给控件设置文本，这里根据你传过来的值进行设置
 //        tv_content.setText(s);
 //        // 设置Dialog没有标题，这个一定要在设置内容之前定义
 //        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);

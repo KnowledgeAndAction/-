@@ -4,6 +4,8 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -40,7 +42,7 @@ import okhttp3.Call;
  * 登录——陈帅
  */
 public class LoginActivity extends AppCompatActivity {
-
+    private Drawable seen,unseen;
     private EditText et_account;
     private EditText et_password;
     private CheckBox cb_remember;
@@ -266,6 +268,9 @@ public class LoginActivity extends AppCompatActivity {
 
     // 初始化控件
     private void initView() {
+        //Resources res = getResources();
+        //seen=res.getDrawable(R.mipmap.seen);
+        //unseen=res.getDrawable(R.mipmap.unseen);
         et_account = (EditText) findViewById(R.id.et_account);
         et_password = (EditText) findViewById(R.id.et_password);
         cb_remember = (CheckBox) findViewById(R.id.cb_remember);
@@ -274,6 +279,8 @@ public class LoginActivity extends AppCompatActivity {
         text_input_account = (TextInputLayout) findViewById(R.id.text_input_account);
         text_input_pass = (TextInputLayout) findViewById(R.id.text_input_pass);
 
+        //seen.setBounds(0,0,seen.getMinimumWidth(),seen.getMinimumHeight());
+        //seen.getBounds().set(0,1,0,0);
         et_account.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

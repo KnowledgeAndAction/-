@@ -142,7 +142,6 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
         mSwipeLayout= (SwipeRefreshLayout) view.findViewById(R.id.id_swipe_ly);
         mSwipeLayout.setColorSchemeResources(R.color.colorPrimary , R.color.colorAccent, R.color.colorPrimaryDark);
         mSwipeLayout.setOnRefreshListener(this);
-
         adapter = new MyAdapter();
         listView.setAdapter(adapter);
     }
