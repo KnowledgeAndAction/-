@@ -34,7 +34,6 @@ public class DetailActivity extends AppCompatActivity {
     private Button loginButton;
     private TextView activityLocation;
     private TextView activityDes;
-    private TextView activtyName;
     private Active active;
     private MyBroadcast myBroadcast;
     private String sensor2ID;
@@ -50,7 +49,7 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail_tow);
+        setContentView(R.layout.activity_detail);
 
         database = MyDatabase.getInstance();
 
@@ -93,10 +92,12 @@ public class DetailActivity extends AppCompatActivity {
         activityDes = (TextView) findViewById(R.id.tv_des);
         loginButton = (Button) findViewById(R.id.loginButton);  //签到按钮
         tv_time = (TextView) findViewById(R.id.tv_time);
+        TextView tv_end_time = (TextView) findViewById(R.id.tv_end_time);
 
         activityLocation.setText("地点：" + active.getActiveLocation());
-        activityDes.setText("  "+active.getActiveDes());
-        tv_time.setText("时间：" + active.getActiveTime().substring(11,16));
+        activityDes.setText("    "+active.getActiveDes());
+        tv_time.setText("开始时间：" + active.getActiveTime().replace("T", " ").substring(0, 16));
+        tv_end_time.setText("结束时间：" + active.getEndTime().replace("T", " ").substring(0, 16));
 
         myBroadcast = new MyBroadcast();
         IntentFilter intentFilter = new IntentFilter();
@@ -107,27 +108,55 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // 如果还没有签到过
-                if (!database.isSign(SpUtil.getString(Constant.ACCOUNT, ""), active.getActiveId())) {
-                    if (TimeCompare(active.getActiveTime().replace("T", " ").substring(0, 16))) {
-                        // 如果能检测到云子 可以签到
-                        if (isCan) {
-                            Intent intent = new Intent(DetailActivity.this, MoveActivity.class);
-                            intent.putExtra("activeName", active.getActiveName());
-                            intent.putExtra("location", active.getActiveLocation());
-                            intent.putExtra("activityDes", active.getActiveDes());
-                            intent.putExtra("activeId", active.getActiveId());
-                            intent.putExtra("yunziId", yunziId);
+                switch (active.getRule()) {
+                    // 日常活动
+                    case 1:
+                        if (TimeCompare(active.getActiveTime().replace("T", " ").substring(0, 16))) {
+                            // 如果能检测到云子 可以签到
+                            if (isCan) {
+                                Intent intent = new Intent(DetailActivity.this, MoveActivity.class);
+                                intent.putExtra("activeName", active.getActiveName());
+                                intent.putExtra("location", active.getActiveLocation());
+                                intent.putExtra("activityDes", active.getActiveDes());
+                                intent.putExtra("activeId", active.getActiveId());
+                                intent.putExtra("yunziId", yunziId);
+                                intent.putExtra("endTime", active.getEndTime());
 
-                            startActivity(intent);
-                            finish();
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                ToastUtil.show("暂时无法进行签到，请稍后重试，并确保您在活动地点附近");
+                            }
                         } else {
-                            ToastUtil.show("暂时无法进行签到，请稍后重试，并确保您在活动地点附近");
+                            ToastUtil.show("不符合签到时间");
                         }
-                    } else {
-                        ToastUtil.show("不符合签到时间");
-                    }
-                } else {
-                    ToastUtil.show("您已经签到过");
+                        break;
+                    // 普通活动
+                    case 0:
+                        if (!database.isSign(SpUtil.getString(Constant.ACCOUNT, ""), active.getActiveId())) {
+                            if (TimeCompare(active.getActiveTime().replace("T", " ").substring(0, 16))) {
+                                // 如果能检测到云子 可以签到
+                                if (isCan) {
+                                    Intent intent = new Intent(DetailActivity.this, MoveActivity.class);
+                                    intent.putExtra("activeName", active.getActiveName());
+                                    intent.putExtra("location", active.getActiveLocation());
+                                    intent.putExtra("activityDes", active.getActiveDes());
+                                    intent.putExtra("activeId", active.getActiveId());
+                                    intent.putExtra("yunziId", yunziId);
+                                    intent.putExtra("endTime", active.getEndTime());
+
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    ToastUtil.show("暂时无法进行签到，请稍后重试，并确保您在活动地点附近");
+                                }
+                            } else {
+                                ToastUtil.show("不符合签到时间");
+                            }
+                        } else {
+                            ToastUtil.show("您已经签到过");
+                        }
+                        break;
                 }
             }
         });
@@ -157,9 +186,10 @@ public class DetailActivity extends AppCompatActivity {
         String presentTime = currentTime.format(new java.util.Date());//当前时间
         try {
             java.util.Date beginTime = currentTime.parse(signTime);
-            java.util.Date endTime = currentTime.parse(presentTime);
-            // 可以提前10分钟签到并且不能超过要求签到时间5个小时
-            if (((endTime.getTime() + 1000*60*10) >= beginTime.getTime()) && ((endTime.getTime() - beginTime.getTime()) <= 1000*60*60*5)) {
+            java.util.Date current = currentTime.parse(presentTime);
+            java.util.Date aEndTime = currentTime.parse(active.getEndTime().replace("T", " ").substring(0, 16));
+            // 可以提前10分钟签到     并且不能超过要活动结束时间
+            if (((current.getTime() + 1000*60*10) >= beginTime.getTime()) && (current.getTime() < aEndTime.getTime())) {
                 return true;
             } else {
                 return false;

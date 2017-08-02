@@ -52,9 +52,7 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
         initDate(view);
         getActive();
         IsInternet isInternet=new IsInternet();
-        //isInternet.isNetworkAvalible(getContext());
         respond=isInternet.isNetworkAvalible(getContext());
-        //isInternet.checkNetwork(getActivity());
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
               public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -115,6 +113,7 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
                                             historyActivity.sethActivityName(hActivityName);
                                             historyActivity.sethLocation(hLocation);
                                             historyActivity.sethTime(hTime);
+                                            historyActivity.setEndTime(hActivity.getString("EndTime"));
                                             mActiveList.add(historyActivity);
                                         }
                                     }
@@ -186,7 +185,7 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
 
             viewHolder.tv_name.setText(getItem(position).gethActivityName());
             viewHolder.tv_location.setText(getItem(position).getLocation().replace("T", " "));
-            viewHolder.tv_time.setText(getItem(position).gethTime().replace("T", " ").substring(0, 16));
+            viewHolder.tv_time.setText(getItem(position).gethInTime().replace("T", " ").substring(0, 16));
 
             return convertView;
         }

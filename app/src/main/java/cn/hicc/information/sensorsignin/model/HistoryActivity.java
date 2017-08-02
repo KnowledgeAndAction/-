@@ -15,6 +15,15 @@ public class HistoryActivity implements Serializable{
     private String hLocation;
     private String hActivityName;
     private String ActivityDescription;
+    private String endTime;
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
 
     public String gethStudnetNum() {
         return hStudentNum;

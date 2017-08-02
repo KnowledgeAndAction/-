@@ -10,6 +10,8 @@
     <string name="b0">b0</string>
     <string name="c0">c0</string>
     <string name="tab_activity">活动</string>
+    <string name="tab_admin_activity">管理活动</string>
+    <string name="tab_admin_sign">签到记录</string>
     <string name="tab_history">历史</string>
     <string name="tab_setting">设置</string>
     <string name="yes">是</string>

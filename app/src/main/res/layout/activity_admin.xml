@@ -2,35 +2,35 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="5dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
 
-    <Button
-        android:id="@+id/bt_look"
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="5dp"
-        android:backgroundTint="@color/colorPrimary"
-        android:paddingBottom="18dp"
-        android:paddingTop="18dp"
-        android:text="管理活动"
-        android:textColor="#ffffff"
-        android:textSize="18sp" />
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:elevation="0dp">
 
-    <Button
-        android:id="@+id/bt_exit"
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager_top"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="5dp"
-        android:backgroundTint="#d91e1e"
-        android:paddingBottom="18dp"
-        android:paddingTop="18dp"
-        android:text="注 销"
-        android:textColor="#ffffff"
-        android:textSize="18sp" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
+    </android.support.v4.view.ViewPager>
 
+    <com.roughike.bottombar.BottomBar
+        android:id="@+id/admin_bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_gravity="bottom"
+        app:bb_tabXmlResource="@xml/admin_bottombar_tabs_color_changing"
+        app:bb_behavior="shifting|underNavbar" />
 </LinearLayout>

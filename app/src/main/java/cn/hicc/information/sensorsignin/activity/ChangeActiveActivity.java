@@ -1,7 +1,6 @@
 package cn.hicc.information.sensorsignin.activity;
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -25,6 +24,7 @@ import java.util.Calendar;
 
 import cn.hicc.information.sensorsignin.model.Active;
 import cn.hicc.information.sensorsignin.utils.Constant;
+import cn.hicc.information.sensorsignin.utils.Logs;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import okhttp3.Call;
 
@@ -40,14 +40,18 @@ public class ChangeActiveActivity extends AppCompatActivity {
     private EditText et_active_location;
     private Button bt_active_date;
     private Button bt_active_time;
+    private Button bt_active_end_date;
+    private Button bt_active_end_time;
     private Button bt_submit;
-    private Button bt_delete;
     private RadioGroup rg_rule;
     private ProgressDialog progressDialog;
     private String mTime = "";
     private String mDate = "";
+    private String mEndDate = "";
+    private String mEndTime = "";
     private int mRule = -1;
     private String oldDateTime;
+    private String oldEndDateTime;
     // 记录发请求的个数
     private int count = 0;
 
@@ -64,62 +68,16 @@ public class ChangeActiveActivity extends AppCompatActivity {
 
         // 修改活动点击事件
         submitActiveClick();
-
-        // 删除活动点击事件
-        deleteActiveClick();
     }
 
-    // 删除活动
-    private void deleteActive() {
-        OkHttpUtils
-                .get()
-                .url(Constant.API_URL + "api/TActivity/Delprofessional")
-                .addParams("Nid", active.getActiveId()+"")
-                .build()
-                .execute(new StringCallback() {
-                    @Override
-                    public void onError(Call call, Exception e, int id) {
-                        ToastUtil.show("删除失败，请稍后重试：" + e.toString());
-                        closeProgressDialog();
-                    }
-
-                    @Override
-                    public void onResponse(String response, int id) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(response);
-                            boolean sucessed = jsonObject.getBoolean("sucessed");
-                            if (sucessed) {
-                                ToastUtil.show("删除活动成功");
-                                finish();
-                            } else {
-                                ToastUtil.show("删除活动失败");
-                            }
-                            closeProgressDialog();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            ToastUtil.show("删除失败，请稍后重试：" + e.toString());
-                            closeProgressDialog();
-                        }
-                    }
-                });
-    }
-
-    // 删除活动点击事件
-    private void deleteActiveClick() {
-        bt_delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 显示询问对话框
-                showConfirmDialog();
-            }
-        });
-    }
 
     // 获得数据
     private void getData() {
         Intent intent = getIntent();
         active = (Active) intent.getSerializableExtra("active");
         oldDateTime = active.getActiveTime().replace("T"," ").substring(0, 16);
+        //oldEndDateTime = active.getEndTime().replace("T"," ").substring(0, 16);
+        Logs.d(active.getEndTime());
     }
 
     // 初始化控件
@@ -141,22 +99,29 @@ public class ChangeActiveActivity extends AppCompatActivity {
 
         bt_active_date = (Button) findViewById(R.id.bt_active_date);
         bt_active_time = (Button) findViewById(R.id.bt_active_time);
+        bt_active_end_date = (Button) findViewById(R.id.bt_active_end_date);
+        bt_active_end_time = (Button) findViewById(R.id.bt_active_end_time);
         bt_submit = (Button) findViewById(R.id.bt_submit);
-        bt_delete = (Button) findViewById(R.id.bt_delete);
 
         rg_rule = (RadioGroup) findViewById(R.id.rg_rule);
 
         // 设置初始数据
         String dateTime = active.getActiveTime();
         String[] dateAndTime = dateTime.split("T");
+        String endTime = active.getEndTime();
+        String[] et = endTime.split("T");
         et_active_name.setText(active.getActiveName());
         et_active_des.setText(active.getActiveDes());
         et_active_location.setText(active.getActiveLocation());
         // 设置初始数据
         mDate = dateAndTime[0];
         mTime = dateAndTime[1].substring(0, 5);
+        mEndDate = et[0];
+        mEndTime = et[1].substring(0, 5);
         bt_active_date.setText(mDate);
         bt_active_time.setText(mTime);
+        bt_active_end_date.setText(mEndDate);
+        bt_active_end_time.setText(mEndTime);
         // 设置初始数据
         int id = -1;
         mRule = active.getRule();
@@ -183,10 +148,12 @@ public class ChangeActiveActivity extends AppCompatActivity {
 
                 // 如果都不为空，提交活动
                 if (!activeName.equals("") && !activeDes.equals("") && !activeLocation.equals("")
-                        && !mDate.equals("") && !mTime.equals("") && mRule != -1) {
+                        && !mDate.equals("") && !mTime.equals("") && mRule != -1
+                        && !mEndDate.equals("") && !mEndTime.equals("")) {
                     String dateTime = mDate + " " + mTime;
+                    String endTime = mEndDate + " " + mEndTime;
                     // 提交修改的活动到服务器
-                    submitChangeActive(activeName, activeDes, activeLocation, dateTime, mRule);
+                    submitChangeActive(activeName, activeDes, activeLocation, dateTime, endTime, mRule);
                 } else {
                     ToastUtil.show("请将活动信息填写完整");
                 }
@@ -213,7 +180,7 @@ public class ChangeActiveActivity extends AppCompatActivity {
     }
 
     // 提交修改的活动  如果和原来的不一样 就提交修改
-    private void submitChangeActive(String activeName, String activeDes, String activeLocation, String dateTime, int mRule) {
+    private void submitChangeActive(String activeName, String activeDes, String activeLocation, String dateTime, String endTime, int mRule) {
         if (!activeName.equals(active.getActiveName())) {
             count++;
         }
@@ -230,6 +197,10 @@ public class ChangeActiveActivity extends AppCompatActivity {
             count++;
         }
 
+        if (!endTime.equals(oldEndDateTime)) {
+            count++;
+        }
+
         if (mRule != active.getRule()) {
             count++;
         }
@@ -238,13 +209,13 @@ public class ChangeActiveActivity extends AppCompatActivity {
         if (count == 0) {
             ToastUtil.show("您没有做任何修改");
         } else {
-            changeActive(activeName, activeDes, dateTime, activeLocation, mRule);
+            changeActive(activeName, activeDes, dateTime, activeLocation, mRule, endTime);
             showProgressDialog();
         }
     }
 
     // TODO 提交修改的活动到服务器
-    private void changeActive(String activityName, String activityDescription, String time, String location, int rule) {
+    private void changeActive(String activityName, String activityDescription, String time, String location, int rule, String endTime) {
         OkHttpUtils
                 .post()
                 .url(Constant.API_URL + "api/TActivity/UpdT_Activity")
@@ -252,6 +223,7 @@ public class ChangeActiveActivity extends AppCompatActivity {
                 .addParams("ActivityName", activityName)
                 .addParams("ActivityDescription", activityDescription)
                 .addParams("Time", time)
+                .addParams("EndTime", endTime)
                 .addParams("Location", location)
                 .addParams("Rule", rule+"")
                 .build()
@@ -329,38 +301,51 @@ public class ChangeActiveActivity extends AppCompatActivity {
                 tpd.show(getFragmentManager(), "Timepickerdialog");
             }
         });
-    }
 
-    // 显示确认对话框
-    protected void showConfirmDialog() {
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
-        // 设置对话框左上角图标
-        builder.setIcon(R.mipmap.logo);
-        // 设置不能取消
-        builder.setCancelable(false);
-        // 设置对话框标题
-        builder.setTitle("删除活动");
-        // 设置对话框内容
-        builder.setMessage("您确认删除该活动？");
-        // 设置积极的按钮
-        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+        // 选择结束日期按钮
+        bt_active_end_date.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // 提交活动
-                showProgressDialog();
-                deleteActive();
-                dialog.dismiss();
-            }
-        });
-        // 设置消极的按钮
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
+            public void onClick(View v) {
+                Calendar now = Calendar.getInstance();
+                DatePickerDialog dpd = DatePickerDialog.newInstance(
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePickerDialog datePickerDialog, int i, int i1, int i2) {
+                                mEndDate = i + "-" + (i1 + 1) + "-" + i2;
+                                bt_active_end_date.setText(mEndDate);
+                            }
+                        },
+                        now.get(Calendar.YEAR),
+                        now.get(Calendar.MONTH),
+                        now.get(Calendar.DAY_OF_MONTH)
+                );
+                //dpd.setVersion(DatePickerDialog.Version.VERSION_2);
+                dpd.setAccentColor("#154db4");
+                dpd.show(getFragmentManager(), "Datepickerdialog");
             }
         });
 
-        builder.show();
+        // 选择结束时间按钮
+        bt_active_end_time.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar now = Calendar.getInstance();
+                TimePickerDialog tpd = TimePickerDialog.newInstance(
+                        new TimePickerDialog.OnTimeSetListener() {
+                            @Override
+                            public void onTimeSet(TimePickerDialog timePickerDialog, int i, int i1, int i2) {
+                                mEndTime = i + ":" + i1;
+                                bt_active_end_time.setText(mEndTime);
+                            }
+                        },
+                        now.get(Calendar.HOUR_OF_DAY),
+                        now.get(Calendar.MINUTE),
+                        true
+                );
+                tpd.setAccentColor("#154db4");
+                tpd.show(getFragmentManager(), "Timepickerdialog");
+            }
+        });
     }
 
     private void showProgressDialog() {

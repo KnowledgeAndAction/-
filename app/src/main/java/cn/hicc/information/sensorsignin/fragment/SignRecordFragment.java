@@ -1,19 +1,13 @@
-package cn.hicc.information.sensorsignin.activity;
+package cn.hicc.information.sensorsignin.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import com.hicc.information.sensorsignin.R;
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -26,6 +20,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.hicc.information.sensorsignin.activity.SignRecordActivity;
+import cn.hicc.information.sensorsignin.adapter.SignRecordRecyclerAdapter;
 import cn.hicc.information.sensorsignin.model.Active;
 import cn.hicc.information.sensorsignin.utils.Constant;
 import cn.hicc.information.sensorsignin.utils.SpUtil;
@@ -33,60 +29,45 @@ import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import okhttp3.Call;
 
 /**
- * 查看管理员添加的活动——陈帅
+ * 签到记录
  */
 
-public class AdminActiveActivity extends AppCompatActivity {
+public class SignRecordFragment extends BaseFragment {
 
-    private Toolbar toolbar;
-    private ListView lv_active_info;
     private SwipeRefreshLayout swipe_refresh;
-    private MyAdapter myAdapter;
     private List<Active> mActiveList = new ArrayList<>();
-    private Toolbar.OnMenuItemClickListener onMenuItemClick = new Toolbar.OnMenuItemClickListener() {
-        @Override
-        public boolean onMenuItemClick(MenuItem menuItem) {
-            switch (menuItem.getItemId()) {
-                case R.id.action_add:
-                    startActivity(new Intent(AdminActiveActivity.this, AddActiveActivity.class));
-                    break;
-            }
-            return true;
-        }
-    };
+    private RecyclerView recyclerView;
+    private SignRecordRecyclerAdapter myAdapter;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_admin_active);
-
-        initView();
+    public void fetchData() {
     }
 
-    private void initView() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("管理活动");
-        setSupportActionBar(toolbar);
-        toolbar.setOnMenuItemClickListener(onMenuItemClick);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+    @Override
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_admin_active, container, false);
 
-        lv_active_info = (ListView) findViewById(R.id.lv_active_info);
-        swipe_refresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
+        initView(view);
+
+        return view;
+    }
+
+    private void initView(View view) {
+        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
+        swipe_refresh = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
+
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        myAdapter = new SignRecordRecyclerAdapter(mActiveList);
+        recyclerView.setAdapter(myAdapter);
 
         // 设置listview点击事件
-        lv_active_info.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        myAdapter.setItemClickListener(new SignRecordRecyclerAdapter.OnRecyclerViewOnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(View view, int position) {
                 // 跳转到修改活动界面
-                Intent intent = new Intent(AdminActiveActivity.this,ChangeActiveActivity.class);
-                // 把活动传过去
-                intent.putExtra("active",mActiveList.get(position));
+                Intent intent = new Intent(getContext(), SignRecordActivity.class);
+                intent.putExtra("id",mActiveList.get(position).getActiveId());
                 startActivity(intent);
             }
         });
@@ -103,13 +84,12 @@ public class AdminActiveActivity extends AppCompatActivity {
 
         // 设置开始就刷新
         swipe_refresh.setRefreshing(true);
-        myAdapter = new MyAdapter();
-        lv_active_info.setAdapter(myAdapter);
+
+
         // 获取活动
         getActive();
     }
 
-    // TODO 获取活动
     private void getActive() {
         OkHttpUtils
                 .get()
@@ -139,6 +119,7 @@ public class AdminActiveActivity extends AppCompatActivity {
                                     String location = activity.getString("Location");
                                     long activeId = activity.getLong("Nid");
                                     int rule = activity.getInt("Rule");
+                                    String endTime = activity.getString("EndTime");
 
                                     Active active = new Active();
                                     active.setActiveId(activeId);
@@ -147,6 +128,7 @@ public class AdminActiveActivity extends AppCompatActivity {
                                     active.setActiveDes(des);
                                     active.setActiveLocation(location);
                                     active.setRule(rule);
+                                    active.setEndTime(endTime);
                                     mActiveList.add(active);
                                 }
                             } else {
@@ -161,64 +143,5 @@ public class AdminActiveActivity extends AppCompatActivity {
                         }
                     }
                 });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        swipe_refresh.setRefreshing(true);
-        // 获取活动
-        getActive();
-    }
-
-    class MyAdapter extends BaseAdapter {
-
-        @Override
-        public int getCount() {
-            return mActiveList.size();
-        }
-
-        @Override
-        public Active getItem(int position) {
-            return mActiveList.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder viewHolder;
-            if (convertView == null) {
-                convertView = LayoutInflater.from(AdminActiveActivity.this).inflate(R.layout.item_activity_list, parent, false);
-                viewHolder = new ViewHolder();
-                viewHolder.tv_name = (TextView) convertView.findViewById(R.id.tv_name);
-                viewHolder.tv_location = (TextView) convertView.findViewById(R.id.tv_location);
-                viewHolder.tv_time = (TextView) convertView.findViewById(R.id.tv_time);
-                convertView.setTag(viewHolder);
-            } else {
-                viewHolder = (ViewHolder) convertView.getTag();
-            }
-
-            viewHolder.tv_name.setText(getItem(position).getActiveName());
-            viewHolder.tv_location.setText(getItem(position).getActiveLocation());
-            viewHolder.tv_time.setText(getItem(position).getActiveTime().replace("T", " ").substring(0, 16));
-
-            return convertView;
-        }
-    }
-
-    static class ViewHolder {
-        TextView tv_name;
-        TextView tv_location;
-        TextView tv_time;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_tool_bar, menu);
-        return true;
     }
 }

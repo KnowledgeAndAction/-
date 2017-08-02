@@ -4,8 +4,6 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,7 +18,9 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.hicc.information.sensorsignin.R;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.hicc.information.sensorsignin.utils.Constant;
+import cn.hicc.information.sensorsignin.utils.Logs;
 import cn.hicc.information.sensorsignin.utils.MD5Util;
 import cn.hicc.information.sensorsignin.utils.SpUtil;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
@@ -58,7 +59,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         //去掉Activity上面的状态栏
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_login_tow);
+        setContentView(R.layout.activity_login);
 
         // 初始化控件
         initView();
@@ -79,7 +80,7 @@ public class LoginActivity extends AppCompatActivity {
         //加载视频资源控件
         videoview = (CustomVideoView) findViewById(R.id.videoview);
         //设置播放加载路径
-        videoview.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.video));
+        videoview.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.video3));
         //播放
         videoview.start();
         //循环播放
@@ -184,9 +185,11 @@ public class LoginActivity extends AppCompatActivity {
         // 发送请求
         OkHttpUtils
                 .get()
-                .url(Constant.API_URL + "api/TStudentLogin/GetStudentType")
+                //.url(Constant.API_URL + "api/TStudentLogin/GetStudentType")
+                .url("http://123.206.57.216:8080/SchoolTestInterface/login.do")
                 .addParams("Account",account)
-                .addParams("pwd", MD5Pass)
+                //.addParams("pwd", MD5Pass)
+                .addParams("Password", MD5Pass)
                 .build()
                 .execute(new StringCallback() {
                     @Override
@@ -198,9 +201,49 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response, int id) {
                         // 解析json数据
-                        getJson(response,account,MD5Pass);
+                        //getJson(response,account,MD5Pass);
+                        getTemporaryJson(response,account,MD5Pass);
                     }
                 });
+    }
+
+    // 解析临时数据
+    private void getTemporaryJson(String response, String account, String password) {
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            boolean sucessed = jsonObject.getBoolean("sucessed");
+            if (sucessed) {
+                // 检测是否记住密码
+                checkUp(account,password);
+
+                // 登录成功
+                JSONObject data = jsonObject.getJSONObject("data");
+                SpUtil.putInt(Constant.USER_TYPE, data.getInt("type"));
+                SpUtil.putString(Constant.USER_NAME, data.getString("name"));
+                SpUtil.putInt(Constant.USER_GRADE, data.getInt("GradeCode"));
+                SpUtil.putString(Constant.USER_CLASS, data.getString("ClassDescription"));
+                String imageUrl = data.getString("NewImage");
+                if (!imageUrl.equals("null")) {
+                    SpUtil.putString(Constant.USER_IMAGE, "http://home.hicc.cn/StudentImage/" + imageUrl);
+                } else {
+                    imageUrl = data.getString("OldImage");
+                    SpUtil.putString(Constant.USER_IMAGE, "http://home.hicc.cn/OldImage/" + imageUrl);
+                }
+                closeProgressDialog();
+
+                // 根据用户类型，跳转到不同页面
+                enterApp(data.getInt("type"));
+            } else {
+                // 登录失败
+                closeProgressDialog();
+                ToastUtil.show("账号或密码错误");
+            }
+        } catch (JSONException e) {
+            // json解析异常
+            e.printStackTrace();
+            closeProgressDialog();
+            ToastUtil.show("登录失败：" + e.toString());
+        }
     }
 
     // 解析json数据
@@ -211,6 +254,9 @@ public class LoginActivity extends AppCompatActivity {
             if (sucessed) {
                 // 检测是否记住密码
                 checkUp(account,password);
+
+                // 获取用户姓名
+                getUserName(account);
 
                 // 登录成功
                 int type = jsonObject.getInt("data");
@@ -232,11 +278,53 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    // 获取用户姓名
+    private void getUserName(String account) {
+        // 发送请求
+        OkHttpUtils
+                .get()
+                .url(Constant.API_URL + "api/TStudentInfo/GetStudentInfo")
+                .addParams("studentNu",account)
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        closeProgressDialog();
+                        Logs.d("获取学生姓名失败"+e.toString());
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            if (jsonObject.getBoolean("sucessed")) {
+                                JSONObject data = jsonObject.getJSONObject("data");
+                                SpUtil.putString(Constant.USER_NAME, data.getString("StudentName"));
+                                SpUtil.putInt(Constant.USER_GRADE, data.getInt("GradeCode"));
+                                SpUtil.putString(Constant.USER_CLASS, data.getString("ClassDescription"));
+                                String imageUrl = data.getString("NewImage");
+                                if (!imageUrl.equals("null")) {
+                                    SpUtil.putString(Constant.USER_IMAGE, "http://home.hicc.cn/StudentImage/" + imageUrl);
+                                } else {
+                                    imageUrl = data.getString("OldImage");
+                                    SpUtil.putString(Constant.USER_IMAGE, "http://home.hicc.cn/OldImage/" + imageUrl);
+                                }
+                            } else {
+                                Logs.d("获取学生姓名失败" + jsonObject.getString("Msg"));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Logs.d("获取学生姓名失败"+e.toString());
+                        }
+                    }
+                });
+    }
+
     // 进入应用
     private void enterApp(int type) {
         if (type == USER_ORDINARY) {
             // 跳转到普通用户界面
-            startActivity(new Intent(getApplicationContext(), MainActivityTow.class));
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
             finish();
         } else if (type == USER_ADMIN) {
             // 跳转到管理员用户界面
@@ -273,9 +361,13 @@ public class LoginActivity extends AppCompatActivity {
         cb_remember = (CheckBox) findViewById(R.id.cb_remember);
         bt_login = (Button) findViewById(R.id.bt_login);
 
+        ImageView iv_bg = (ImageView) findViewById(R.id.iv_bg);
+        Glide.with(this).load(R.drawable.a).asGif().into(iv_bg);
+
         text_input_account = (TextInputLayout) findViewById(R.id.text_input_account);
         text_input_pass = (TextInputLayout) findViewById(R.id.text_input_pass);
 
+        // 设置输入框监听事件，当有内容时，将错误提示清除
         et_account.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -292,6 +384,7 @@ public class LoginActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
             }
         });
+        // 设置输入框监听事件，当有内容时，将错误提示清除
         et_password.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

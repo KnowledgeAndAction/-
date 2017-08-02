@@ -22,17 +22,33 @@ public class Constant {
      */
     public static final String USER_TYPE = "user_type";
     /**
+     * 用户姓名
+     */
+    public static final String USER_NAME = "user_name";
+    /**
      * sharedPreferences名字
      */
-    public static String SHAREDPREFERENCES_NAME = "config";
+    public static final String SHAREDPREFERENCES_NAME = "config";
 
     /**
      * 测试接口地址
      */
-    public static String TEST_URL = "http://123.206.57.216:8080/SchoolTestInterface/";
+    public static final String TEST_URL = "http://123.206.57.216:8080/SchoolTestInterface/";
 
     /**
      * 接口地址
      */
-    public static String API_URL = "http://api.hicc.cn/";
+    public static final String API_URL = "http://api.hicc.cn/";
+    /**
+     * 用户年级
+     */
+    public static final String USER_GRADE = "user_grade";
+    /**
+     * 用户班级
+     */
+    public static final String USER_CLASS = "user_class";
+    /**
+     * 用户头像
+     */
+    public static final String USER_IMAGE = "user_image";
 }

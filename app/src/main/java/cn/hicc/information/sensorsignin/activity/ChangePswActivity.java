@@ -1,20 +1,14 @@
 package cn.hicc.information.sensorsignin.activity;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.hicc.information.sensorsignin.R;
-import cn.hicc.information.sensorsignin.model.ExitEvent;
-import cn.hicc.information.sensorsignin.utils.Constant;
-import cn.hicc.information.sensorsignin.utils.Logs;
-import cn.hicc.information.sensorsignin.utils.MD5Util;
-import cn.hicc.information.sensorsignin.utils.SpUtil;
-import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -22,6 +16,12 @@ import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import cn.hicc.information.sensorsignin.model.ExitEvent;
+import cn.hicc.information.sensorsignin.utils.Constant;
+import cn.hicc.information.sensorsignin.utils.Logs;
+import cn.hicc.information.sensorsignin.utils.MD5Util;
+import cn.hicc.information.sensorsignin.utils.SpUtil;
+import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import okhttp3.Call;
 
 /**
@@ -72,10 +72,11 @@ public class ChangePswActivity extends AppCompatActivity {
                 Logs.d(MD5Pass);
                 OkHttpUtils
                         .post()
-                        .url(Constant.API_URL + "api/TStudentLogin/updstupassword")
+                        //.url(Constant.API_URL + "api/TStudentLogin/updstupassword")
+                        .url("http://123.206.57.216:8080/SchoolTestInterface/changePassword.do")
                         .addParams("Account", SpUtil.getString(Constant.ACCOUNT, ""))
                         .addParams("Password", MD5Pass)
-                        .addParams("Level","0")
+                        //.addParams("Level","0")
                         .build()
                         .execute(new StringCallback() {
                             @Override
@@ -86,7 +87,6 @@ public class ChangePswActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(String response, int id) {
                                 getJSON(response);
-
                             }
                         });
             }

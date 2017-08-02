@@ -27,7 +27,7 @@ public class HistoryDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_history_detail_tow);
+        setContentView(R.layout.activity_history_detail);
         Intent intent = getIntent();
         historyActivity = (HistoryActivity) intent.getSerializableExtra("ActivityId");
         initVie();
@@ -39,7 +39,12 @@ public class HistoryDetailActivity extends AppCompatActivity {
         tv_houttime = (TextView) findViewById(R.id.tv_houttime);
         tv_hlocation = (TextView) findViewById(R.id.tv_hlocation);
 
-        tv_details.setText("  " + historyActivity.getActivityDescription());
+        TextView tv_start_time = (TextView) findViewById(R.id.tv_start_time);
+        TextView tv_end_time = (TextView) findViewById(R.id.tv_end_time);
+        tv_start_time.setText("活动开始时间：" + historyActivity.gethTime().replace("T", " ").substring(0, 16));
+        tv_end_time.setText("活动结束时间：" + historyActivity.getEndTime().replace("T", " ").substring(0, 16));
+
+        tv_details.setText("    " + historyActivity.getActivityDescription());
         tv_hintime.setText("签到时间："+historyActivity.gethInTime().replace("T", " "));
         tv_houttime.setText("签离时间："+historyActivity.gethOutTime().replace("T", " "));
         tv_hlocation.setText("地点："+historyActivity.getLocation());

@@ -6,17 +6,22 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 
 import com.hicc.information.sensorsignin.R;
+import com.roughike.bottombar.BottomBar;
+import com.roughike.bottombar.OnTabSelectListener;
 import com.sensoro.cloud.SensoroManager;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.FileCallBack;
@@ -40,18 +45,19 @@ import cn.hicc.information.sensorsignin.model.ExitEvent;
 import cn.hicc.information.sensorsignin.model.TabItem;
 import cn.hicc.information.sensorsignin.service.SensorService;
 import cn.hicc.information.sensorsignin.utils.Logs;
+import cn.hicc.information.sensorsignin.utils.StatusBarUtils;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
-import cn.hicc.information.sensorsignin.view.MyTabLayout;
 import okhttp3.Call;
 
 public class MainActivity extends AppCompatActivity {
 
     private SensoroManager sensoroManager;
-    private MyTabLayout myTablayout_bottom;
     private ViewPager viewPager;
     private ArrayList<TabItem> tabs;
     private static Boolean isExit = false;
     private ProgressDialog progressDialog;
+    private BottomBar bottomBar;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -246,7 +252,12 @@ public class MainActivity extends AppCompatActivity {
     // 初始化控件
     private void initWidget() {
         viewPager = (ViewPager) findViewById(R.id.viewPager_top);
-        myTablayout_bottom = (MyTabLayout) findViewById(R.id.myTablayout_bottom);
+        bottomBar = (BottomBar) findViewById(R.id.bottomBar);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("活动");
+        toolbar.setBackgroundColor(Color.parseColor("#03A9F4"));
+        setSupportActionBar(toolbar);
 
         initLayout();
     }
@@ -273,13 +284,31 @@ public class MainActivity extends AppCompatActivity {
         tabs.add(new TabItem(R.drawable.bottom_activity_selector, R.string.tab_activity, ActivityFragment.class));
         tabs.add(new TabItem(R.drawable.bottom_history_selector, R.string.tab_history, HistoryFragment.class));
         tabs.add(new TabItem(R.drawable.bottom_setting_selector, R.string.tab_setting, SettingFragment.class));
-        myTablayout_bottom.initData(tabs, new MyTabLayout.OnTabClickListener() {
+        bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
-            public void onTabClick(TabItem tabItem) {
-                viewPager.setCurrentItem(tabs.indexOf(tabItem));
+            public void onTabSelected(@IdRes int tabId) {
+                switch (tabId) {
+                    case R.id.tab_active:
+                        viewPager.setCurrentItem(0);
+                        toolbar.setTitle("活动");
+                        toolbar.setBackgroundColor(Color.parseColor("#03A9F4"));
+                        StatusBarUtils.setWindowStatusBarColor(MainActivity.this, "#03A9F4");
+                        break;
+                    case R.id.tab_history:
+                        viewPager.setCurrentItem(1);
+                        toolbar.setTitle("历史");
+                        toolbar.setBackgroundColor(Color.parseColor("#5D4037"));
+                        StatusBarUtils.setWindowStatusBarColor(MainActivity.this, "#5D4037");
+                        break;
+                    case R.id.tab_setting:
+                        viewPager.setCurrentItem(2);
+                        toolbar.setTitle("设置");
+                        toolbar.setBackgroundColor(Color.parseColor("#045563"));
+                        StatusBarUtils.setWindowStatusBarColor(MainActivity.this, "#045563");
+                        break;
+                }
             }
         });
-        myTablayout_bottom.setCurrentTab(0);
 
         final FragmentAdapter adapter = new FragmentAdapter(getSupportFragmentManager());
         viewPager.setOffscreenPageLimit(3);
@@ -292,12 +321,28 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-                myTablayout_bottom.setCurrentTab(position);
+                bottomBar.selectTabAtPosition(position,true);
+                switch (position) {
+                    case 0:
+                        toolbar.setTitle("活动");
+                        toolbar.setBackgroundColor(Color.parseColor("#03A9F4"));
+                        StatusBarUtils.setWindowStatusBarColor(MainActivity.this, "#03A9F4");
+                        break;
+                    case 1:
+                        toolbar.setTitle("历史");
+                        toolbar.setBackgroundColor(Color.parseColor("#5D4037"));
+                        StatusBarUtils.setWindowStatusBarColor(MainActivity.this, "#5D4037");
+                        break;
+                    case 2:
+                        toolbar.setTitle("设置");
+                        toolbar.setBackgroundColor(Color.parseColor("#045563"));
+                        StatusBarUtils.setWindowStatusBarColor(MainActivity.this, "#045563");
+                        break;
+                }
             }
 
             @Override
             public void onPageScrollStateChanged(int state) {
-
             }
         });
     }

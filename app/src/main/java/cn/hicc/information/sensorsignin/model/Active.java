@@ -12,8 +12,17 @@ public class Active implements Serializable{
     private String activeTime;
     private String activeLocation;
     private String sersorID;
+    private String endTime;
     private long activeId;
     private int rule;
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
 
     public int getRule() {
         return rule;

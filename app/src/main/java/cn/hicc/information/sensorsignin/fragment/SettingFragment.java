@@ -1,6 +1,5 @@
 package cn.hicc.information.sensorsignin.fragment;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,30 +12,30 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.hicc.information.sensorsignin.R;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.FileCallBack;
 import com.zhy.http.okhttp.callback.StringCallback;
-
-import cn.hicc.information.sensorsignin.MyApplication;
-import cn.hicc.information.sensorsignin.activity.ChangePswActivity;
-import cn.hicc.information.sensorsignin.activity.LoginActivity;
-import cn.hicc.information.sensorsignin.activity.MainActivity;
-import cn.hicc.information.sensorsignin.model.ExitEvent;
-import cn.hicc.information.sensorsignin.utils.Constant;
-import cn.hicc.information.sensorsignin.utils.Logs;
-import cn.hicc.information.sensorsignin.utils.SpUtil;
-import cn.hicc.information.sensorsignin.utils.ToastUtil;
-import okhttp3.Call;
 
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+
+import cn.hicc.information.sensorsignin.MyApplication;
+import cn.hicc.information.sensorsignin.activity.ChangePswActivity;
+import cn.hicc.information.sensorsignin.activity.LoginActivity;
+import cn.hicc.information.sensorsignin.model.ExitEvent;
+import cn.hicc.information.sensorsignin.utils.Constant;
+import cn.hicc.information.sensorsignin.utils.Logs;
+import cn.hicc.information.sensorsignin.utils.SpUtil;
+import cn.hicc.information.sensorsignin.utils.ToastUtil;
+import okhttp3.Call;
 
 /**
  * 设置界面——崔国钊
@@ -48,7 +47,6 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
     private TextView tv_esc;
     private ProgressDialog progressDialog;
 
-    private Dialog dialog = new Dialog(MyApplication.getContext());
 
     @Override
     public void fetchData() {
@@ -74,6 +72,19 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
         tv_changePassWorld.setOnClickListener(this);
         tv_checkToUpdata.setOnClickListener(this);
         tv_esc.setOnClickListener(this);
+
+        ImageView iv_pic = (ImageView) view.findViewById(R.id.iv_pic);
+        TextView tv_name = (TextView) view.findViewById(R.id.tv_name);
+        TextView tv_grade = (TextView) view.findViewById(R.id.tv_grade);
+        TextView tv_class = (TextView) view.findViewById(R.id.tv_class);
+
+        Glide.with(getContext()).load(SpUtil.getString(Constant.USER_IMAGE,"")).placeholder(R.drawable.icon_pic)
+                .centerCrop()
+                .error(R.drawable.icon_pic)
+                .into(iv_pic);
+        tv_name.setText("姓名：" + SpUtil.getString(Constant.USER_NAME,""));
+        tv_grade.setText("年级：20" + SpUtil.getInt(Constant.USER_GRADE,17) + "级");
+        tv_class.setText("班级：" + SpUtil.getString(Constant.USER_CLASS,""));
     }
 
     //设置按钮的点击事件。
@@ -121,11 +132,11 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
         //设置对话框左上角图标
         builder.setIcon(R.mipmap.logo);
         //设置对话框标题
-        builder.setTitle("是否退出");
+        builder.setTitle("是否注销");
         //设置文本内容
-        builder.setMessage("您将会退出应用");
+        builder.setMessage("您将会注销应用");
         //设置积极的按钮
-        builder.setPositiveButton("确认退出", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("确认注销", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 EventBus.getDefault().post(new ExitEvent());
@@ -134,7 +145,7 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
             }
         });
         //设置消极的按钮
-        builder.setNegativeButton("暂不推出", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("暂不注销", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.dismiss();
@@ -142,22 +153,6 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
         });
         builder.show();
     }
-
-//    private void show_dialog(String s) {
-//        dialog = new Dialog(getContext());
-//        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_view, null);
-//        // 获取对话框的文本内容控件
-//        TextView tv_content = (TextView) view.findViewById(R.id.tv_action);
-//        // 给控件设置文本，这里根据你传过来的值进行设置
-//        tv_content.setText(s);
-//        // 设置Dialog没有标题，这个一定要在设置内容之前定义
-//        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        // 给对话框的内容设置一个自定义的view
-//        dialog.setContentView(view);
-//        // 显示对话框
-//        dialog.show();
-//
-//    }
 
     // 解析服务器返回的app信息数据
     private void getAppInfoJson(String response) {

@@ -18,9 +18,9 @@ import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,15 +73,26 @@ public class ActivityFragment extends BaseFragment {
                                     String time = activity.getString("Time");
                                     String location = activity.getString("Location");
                                     long activeId = activity.getLong("Nid");
+                                    String endTime = activity.getString("EndTime");
+                                    String rule = activity.getString("Rule");
 
-                                    Active active = new Active();
-                                    active.setActiveId(activeId);
-                                    active.setSersorID(yunziId);
-                                    active.setActiveName(name);
-                                    active.setActiveTime(time);
-                                    active.setActiveDes(des);
-                                    active.setActiveLocation(location);
-                                    mActiveList.add(active);
+                                    // 获取当前时间，判断该活动是否已经失效，不失效时才添加到集合中
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                                    String presentTime = sdf.format(new java.util.Date());
+                                    if (sdf.parse(presentTime).getTime() <= sdf.parse(endTime.replace("T", " ").substring(0, 16)).getTime()) {
+                                        Active active = new Active();
+                                        active.setActiveId(activeId);
+                                        active.setSersorID(yunziId);
+                                        active.setActiveName(name);
+                                        active.setActiveTime(time);
+                                        active.setActiveDes(des);
+                                        active.setActiveLocation(location);
+                                        active.setEndTime(endTime);
+                                        active.setRule(Integer.parseInt(rule));
+                                        mActiveList.add(active);
+                                    } else {
+                                        Logs.d("这个活动过期了:"+yunziId);
+                                    }
                                 }
 
                                 adapter.notifyDataSetChanged();
@@ -89,8 +100,9 @@ public class ActivityFragment extends BaseFragment {
                                 Logs.d("这个云子上没有活动："+yunziId);
                             }
 
-                        } catch (JSONException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
+                            Logs.d("异常");
                         }
                     }
                 });

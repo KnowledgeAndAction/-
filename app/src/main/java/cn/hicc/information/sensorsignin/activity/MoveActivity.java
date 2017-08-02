@@ -68,7 +68,9 @@ public class MoveActivity extends AppCompatActivity {
         activityDes = intent.getStringExtra("activityDes");
         yunziId = intent.getStringExtra("yunziId");
         activeId = intent.getLongExtra("activeId",0);
+        String endTime = intent.getStringExtra("endTime");
         SpUtil.putString("yunziId",yunziId);
+        SpUtil.putString("endTime",endTime);
 
         //初始化控件
         initView();
@@ -132,10 +134,23 @@ public class MoveActivity extends AppCompatActivity {
      * 获取签到时间
      */
     private void getInTime(){
-        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");//("HH:mm:ss")(小时：分钟：秒)
-        inTime = df.format(new Date());
-        tv_inTime.setText("签到时间：" + inTime);
+        if (SpUtil.getString("time","").equals("")) {
+            SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");//("HH:mm:ss")(小时：分钟：秒)
+            inTime = df.format(new Date());
+            tv_inTime.setText("签到时间：" + inTime);
+        } else {
+            inTime = SpUtil.getString("time","");
+            tv_inTime.setText("签到时间：" + inTime);
+            SpUtil.remove("time");
+        }
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        SpUtil.putString("time",inTime);
+    }
+
     /**
      * 获取签离时间
      */
@@ -184,6 +199,9 @@ public class MoveActivity extends AppCompatActivity {
         signActive.setOutTime(outTime);
 
         database.saveSignActive(signActive);
+
+        // 签离后将保存的活动结束时间清空
+        SpUtil.remove("endTime");
     }
 
 
@@ -263,6 +281,7 @@ public class MoveActivity extends AppCompatActivity {
             signForService();
         }
         SpUtil.remove("yunziId");
+        SpUtil.remove("time");
     }
 
     // 重写返回键  使其回到桌面

@@ -23,6 +23,7 @@ public class SensorService extends Service {
     private List<String> oldSerialNumber = new ArrayList<>();
     private String startTime = "";
     private boolean isCheck = false;
+    private boolean isOpen = false;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -32,13 +33,15 @@ public class SensorService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Logs.d("onCreate");
+        isOpen = true;
+        Logs.d("onCreate服务创建");
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Logs.d("onStartCommand");
+        Logs.d("onStartCommand服务连接");
         SpUtil.remove("yunziId");
+        SpUtil.remove("endTime");
         sensoroManager = SensoroManager.getInstance(this);
         setSDK();
         startSDK();
@@ -49,9 +52,11 @@ public class SensorService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Logs.d("onDestroy");
+        isOpen = false;
+        Logs.d("onDestroy服务销毁");
         if (sensoroManager != null) {
             sensoroManager.stopService();
+            Logs.d("停止sensoro服务");
         }
         // 如果activity销毁，就将集合清空
         oldSerialNumber.clear();
@@ -70,6 +75,7 @@ public class SensorService extends Service {
         try {
             Logs.d("开启sensoro服务");
             sensoroManager.startService();
+
         } catch (Exception e) {
             e.printStackTrace(); // 捕获异常信息
         }
@@ -153,7 +159,7 @@ public class SensorService extends Service {
             public void run() {
                 super.run();
                 try {
-                    while (true) {
+                    while (isOpen) {
                         SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
                         String endTime = df.format(new Date());
                         Logs.d("开始时间：" + startTime);
@@ -174,6 +180,26 @@ public class SensorService extends Service {
                                 sendBroadcast(intent);
                             }
                         }
+
+                        // 判断是否到了活动结束时间
+                        if (!SpUtil.getString("endTime","").equals("")) {
+                            String endTime1 = SpUtil.getString("endTime", "").replace("T", " ").substring(0, 16);
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                            String presentTime = sdf.format(new Date());//当前时间
+
+                            long end = sdf.parse(endTime1).getTime();
+                            long time = sdf.parse(presentTime).getTime();
+
+                            if (time > end) {
+                                // 自动签离
+                                Log.d("SIGN_TAG","发送自动签离的广播");
+                                Intent intent = new Intent();
+                                intent.setAction("SET_BROADCST_OUT");
+                                intent.putExtra("isLeave", true);
+                                sendBroadcast(intent);
+                            }
+                        }
+
                         // 每隔10秒检测一次
                         Thread.sleep(1000*10);
                     }

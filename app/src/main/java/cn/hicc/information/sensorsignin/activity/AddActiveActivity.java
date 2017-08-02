@@ -47,9 +47,13 @@ public class AddActiveActivity extends AppCompatActivity {
     private RadioGroup rg_rule;
     private ProgressDialog progressDialog;
     private String mTime = "";
+    private String mEndTime = "";
     private String mDate = "";
+    private String mEndDate = "";
     private int mRule = -1;
     private Toolbar toolbar;
+    private Button bt_active_end_time;
+    private Button bt_active_end_date;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +113,51 @@ public class AddActiveActivity extends AppCompatActivity {
                 tpd.show(getFragmentManager(), "Timepickerdialog");
             }
         });
+
+        // 选择结束日期按钮
+        bt_active_end_date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar now = Calendar.getInstance();
+                DatePickerDialog dpd = DatePickerDialog.newInstance(
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePickerDialog datePickerDialog, int i, int i1, int i2) {
+                                mEndDate = i + "-" + (i1 + 1) + "-" + i2;
+                                bt_active_end_date.setText(mEndDate);
+                            }
+                        },
+                        now.get(Calendar.YEAR),
+                        now.get(Calendar.MONTH),
+                        now.get(Calendar.DAY_OF_MONTH)
+                );
+                //dpd.setVersion(DatePickerDialog.Version.VERSION_2);
+                dpd.setAccentColor("#154db4");
+                dpd.show(getFragmentManager(), "Datepickerdialog");
+            }
+        });
+
+        // 选择结束时间按钮
+        bt_active_end_time.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar now = Calendar.getInstance();
+                TimePickerDialog tpd = TimePickerDialog.newInstance(
+                        new TimePickerDialog.OnTimeSetListener() {
+                            @Override
+                            public void onTimeSet(TimePickerDialog timePickerDialog, int i, int i1, int i2) {
+                                mEndTime = i + ":" + i1;
+                                bt_active_end_time.setText(mEndTime);
+                            }
+                        },
+                        now.get(Calendar.HOUR_OF_DAY),
+                        now.get(Calendar.MINUTE),
+                        true
+                );
+                tpd.setAccentColor("#154db4");
+                tpd.show(getFragmentManager(), "Timepickerdialog");
+            }
+        });
     }
 
     // 提交活动
@@ -124,9 +173,11 @@ public class AddActiveActivity extends AppCompatActivity {
 
                 // 如果都不为空，提交活动
                 if (!activeName.equals("") && !activeDes.equals("") && !activeLocation.equals("")
-                        && !yunziId.equals("") && !mDate.equals("") && !mTime.equals("") && mRule != -1) {
+                        && !yunziId.equals("") && !mDate.equals("") && !mTime.equals("") && mRule != -1
+                        && !mEndDate.equals("") && !mEndTime.equals("")) {
                     String dateTime = mDate + " " + mTime;
-                    showConfirmDialog(activeName, activeDes, activeLocation, yunziId, dateTime);
+                    String endDateTime = mEndDate + " " + mEndTime;
+                    showConfirmDialog(activeName, activeDes, activeLocation, yunziId, dateTime,endDateTime);
                 } else {
                     ToastUtil.show("请将活动信息填写完整");
                 }
@@ -153,7 +204,7 @@ public class AddActiveActivity extends AppCompatActivity {
     }
 
     // 显示确认对话框
-    protected void showConfirmDialog(final String activeName, final String activeDes, final String activeLocation, final String yunziId, final String dateTime) {
+    protected void showConfirmDialog(final String activeName, final String activeDes, final String activeLocation, final String yunziId, final String dateTime, final String endDateTime) {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         // 设置对话框左上角图标
         builder.setIcon(R.mipmap.logo);
@@ -169,7 +220,7 @@ public class AddActiveActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 // 提交活动
                 showProgressDialog();
-                submitService(activeName, activeDes, activeLocation, yunziId, dateTime, mRule);
+                submitService(activeName, activeDes, activeLocation, yunziId, dateTime,endDateTime, mRule);
                 dialog.dismiss();
             }
         });
@@ -185,7 +236,7 @@ public class AddActiveActivity extends AppCompatActivity {
     }
 
     // 提交活动信息到数据库
-    private void submitService(String activeName, String activeDes, String activeLocation, String yunziId, String dateTime, int mRule) {
+    private void submitService(String activeName, String activeDes, String activeLocation, String yunziId, String dateTime, String endDateTime, int mRule) {
         // GET方法提交
         OkHttpUtils
                 .get()
@@ -197,6 +248,7 @@ public class AddActiveActivity extends AppCompatActivity {
                 .addParams("location", activeLocation)
                 .addParams("rule", ""+mRule)
                 .addParams("account", SpUtil.getString(Constant.ACCOUNT,""))
+                .addParams("endtime", endDateTime)
                 .build()
                 .execute(new StringCallback() {
                     @Override
@@ -209,28 +261,6 @@ public class AddActiveActivity extends AppCompatActivity {
                         AnalysisJson(response);
                     }
                 });
-
-        // POST方法提交
-        /*OkHttpUtils
-                .post()
-                .url(Constant.API_URL + "api/TActivity/AddActivityPost")
-                .addParams("ActivityName", activeName)
-                .addParams("ActivityDescription", activeDes)
-                .addParams("Time", dateTime)
-                .addParams("Location", activeLocation)
-                .addParams("Rule", ""+mRule)
-                .build()
-                .execute(new StringCallback() {
-                    @Override
-                    public void onError(Call call, Exception e, int id) {
-                        ToastUtil.show("提交失败：" + e.toString());
-                    }
-
-                    @Override
-                    public void onResponse(String response, int id) {
-                        AnalysisJson(response);
-                    }
-                });*/
     }
 
     // 解析json数据
@@ -283,6 +313,8 @@ public class AddActiveActivity extends AppCompatActivity {
 
         bt_active_date = (Button) findViewById(R.id.bt_active_date);
         bt_active_time = (Button) findViewById(R.id.bt_active_time);
+        bt_active_end_date = (Button) findViewById(R.id.bt_active_end_date);
+        bt_active_end_time = (Button) findViewById(R.id.bt_active_end_time);
         bt_submit = (Button) findViewById(R.id.bt_submit);
 
         rg_rule = (RadioGroup) findViewById(R.id.rg_rule);

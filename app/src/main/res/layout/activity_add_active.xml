@@ -96,34 +96,87 @@
                     android:maxLines="1" />
             </android.support.design.widget.TextInputLayout>
 
-            <Button
-                android:id="@+id/bt_active_date"
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
-                android:backgroundTint="#154db4"
-                android:padding="20dp"
-                android:text="选择日期"
-                android:textColor="#ffffff"
-                android:textSize="14sp" />
+                android:text="选择开始时间"
+                android:textColor="#545151"
+                android:textSize="16sp" />
 
-            <Button
-                android:id="@+id/bt_active_time"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:backgroundTint="#154db4"
-                android:padding="20dp"
-                android:text="选择时间"
-                android:textColor="#ffffff"
-                android:textSize="14sp" />
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/bt_active_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="#154db4"
+                    android:padding="20dp"
+                    android:text="选择日期"
+                    android:textColor="#ffffff"
+                    android:textSize="14sp" />
+
+                <Button
+                    android:id="@+id/bt_active_time"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="#154db4"
+                    android:padding="20dp"
+                    android:text="选择时间"
+                    android:textColor="#ffffff"
+                    android:textSize="14sp" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
-                android:text="签到规则"
+                android:text="选择结束时间"
+                android:textColor="#545151"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/bt_active_end_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="#154db4"
+                    android:padding="20dp"
+                    android:text="选择日期"
+                    android:textColor="#ffffff"
+                    android:textSize="14sp" />
+
+                <Button
+                    android:id="@+id/bt_active_end_time"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:backgroundTint="#154db4"
+                    android:padding="20dp"
+                    android:text="选择时间"
+                    android:textColor="#ffffff"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:text="活动类型"
                 android:textColor="#545151"
                 android:textSize="16sp" />
 
@@ -138,14 +191,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:text="实时检测" />
+                    android:text="日常活动" />
 
                 <RadioButton
                     android:id="@+id/rb_no_real"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="30dp"
-                    android:text="不检测" />
+                    android:text="普通活动" />
             </RadioGroup>
 
             <Button
@@ -155,7 +208,7 @@
                 android:layout_margin="25dp"
                 android:background="@drawable/button_bg"
                 android:padding="10dp"
-                android:text="完  成"
+                android:text="添加活动"
                 android:textColor="#ffffff"
                 android:textSize="18sp" />
         </LinearLayout>
