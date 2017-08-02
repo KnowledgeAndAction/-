@@ -22,8 +22,13 @@
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+<<<<<<< Updated upstream
         android:layout_marginTop="15dp"
         app:passwordToggleEnabled="true">
+=======
+        app:passwordToggleEnabled="true"
+        android:layout_marginTop="15dp">
+>>>>>>> Stashed changes
 
         <EditText
             android:id="@+id/et_old"

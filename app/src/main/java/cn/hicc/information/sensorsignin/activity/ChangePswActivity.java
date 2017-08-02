@@ -1,5 +1,6 @@
 package cn.hicc.information.sensorsignin.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +25,8 @@ import cn.hicc.information.sensorsignin.utils.SpUtil;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import okhttp3.Call;
 
+import static cn.hicc.information.sensorsignin.MyApplication.getContext;
+
 /**
  * 修改密码界面——崔国钊
  */
@@ -33,6 +36,7 @@ public class ChangePswActivity extends AppCompatActivity {
     private EditText et_new_true;
     private Button bt_pwd_change;
     private Toolbar toolbar;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +72,7 @@ public class ChangePswActivity extends AppCompatActivity {
 
             //检查是否修改成功
             private void checkPassWorld(String new_password) {
+                showProgressDialogs();
                 final String MD5Pass = MD5Util.strToMD5(new_password);
                 Logs.d(MD5Pass);
                 OkHttpUtils
@@ -100,12 +105,14 @@ public class ChangePswActivity extends AppCompatActivity {
                         Intent intent=new Intent(ChangePswActivity.this,LoginActivity.class);
                         startActivity(intent);
                         SpUtil.putBoolean(Constant.IS_REMBER_PWD,false);
+                        closeProgressDialog();
                         finish();
                         ToastUtil.show("修改成功");
                     }else {
                         ToastUtil.show("网络错误，请重新修改");
                     }
                 } catch (JSONException e) {
+                    closeProgressDialog();
                     ToastUtil.show("修改失败"+e.toString());
                     e.printStackTrace();
                 }
@@ -131,5 +138,18 @@ public class ChangePswActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+    private void showProgressDialogs() {
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(this);
+        }
+        progressDialog.setMessage("更新密码中...");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+    }
+    private void closeProgressDialog() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
     }
 }
