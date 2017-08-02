@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/bg">
 
     <cn.hicc.information.sensorsignin.view.CustomVideoView
@@ -80,6 +81,9 @@
                 android:id="@+id/text_input_pass"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:passwordToggleEnabled="true"
+                app:passwordToggleTint="#7a03a9f4"
+                app:passwordToggleContentDescription=""
                 android:textColorHint="#c5c5c5">
 
                 <EditText

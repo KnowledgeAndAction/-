@@ -86,11 +86,7 @@ public class ChangePswActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(String response, int id) {
                                 getJSON(response);
-                                EventBus.getDefault().post(new ExitEvent());
-                                Intent intent=new Intent(ChangePswActivity.this,LoginActivity.class);
-                                startActivity(intent);
-                                SpUtil.putBoolean(Constant.IS_REMBER_PWD,false);
-                                finish();
+
                             }
                         });
             }
@@ -100,6 +96,11 @@ public class ChangePswActivity extends AppCompatActivity {
                     JSONObject jsonObject=new JSONObject(response);
                     boolean sucessed = jsonObject.getBoolean("sucessed");
                     if (sucessed){
+                        EventBus.getDefault().post(new ExitEvent());
+                        Intent intent=new Intent(ChangePswActivity.this,LoginActivity.class);
+                        startActivity(intent);
+                        SpUtil.putBoolean(Constant.IS_REMBER_PWD,false);
+                        finish();
                         ToastUtil.show("修改成功");
                     }else {
                         ToastUtil.show("网络错误，请重新修改");
