@@ -43,7 +43,7 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
     private ListView listView;
     private boolean respond;
     private SwipeRefreshLayout mSwipeLayout;
-    View view;
+    private View view;
     private MyAdapter adapter;
 
     @Override

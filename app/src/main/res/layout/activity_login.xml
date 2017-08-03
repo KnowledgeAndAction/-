@@ -69,8 +69,9 @@
                     android:background="@drawable/selector_bg_edit"
                     android:hint="用户名"
                     android:inputType="textPersonName"
-                    android:paddingBottom="2dp"
-                    android:textColor="#2fa881"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp"
+                    android:textColor="#ffffff"
                     android:textCursorDrawable="@drawable/bg_input_cursor"
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>
@@ -98,8 +99,7 @@
                     android:background="@drawable/selector_bg_edit"
                     android:hint="密码"
                     android:inputType="textPassword"
-                    android:paddingBottom="2dp"
-                    android:textColor="#2fa881"
+                    android:textColor="#ffffff"
                     android:textCursorDrawable="@drawable/bg_input_cursor"
                     android:textSize="18sp" />
             </android.support.design.widget.TextInputLayout>
