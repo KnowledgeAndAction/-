@@ -24,11 +24,12 @@ import java.util.Calendar;
 
 import cn.hicc.information.sensorsignin.model.Active;
 import cn.hicc.information.sensorsignin.utils.Constant;
-import cn.hicc.information.sensorsignin.utils.Logs;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import okhttp3.Call;
 
-
+/**
+ * 修改活动——陈帅
+ */
 public class ChangeActiveActivity extends AppCompatActivity {
 
     private static final int REAL = 1;
@@ -76,8 +77,7 @@ public class ChangeActiveActivity extends AppCompatActivity {
         Intent intent = getIntent();
         active = (Active) intent.getSerializableExtra("active");
         oldDateTime = active.getActiveTime().replace("T"," ").substring(0, 16);
-        //oldEndDateTime = active.getEndTime().replace("T"," ").substring(0, 16);
-        Logs.d(active.getEndTime());
+        oldEndDateTime = active.getEndTime().replace("T"," ").substring(0, 16);
     }
 
     // 初始化控件
@@ -105,7 +105,7 @@ public class ChangeActiveActivity extends AppCompatActivity {
 
         rg_rule = (RadioGroup) findViewById(R.id.rg_rule);
 
-        // 设置初始数据
+        // 设置活动名称，描述，地点
         String dateTime = active.getActiveTime();
         String[] dateAndTime = dateTime.split("T");
         String endTime = active.getEndTime();
@@ -113,7 +113,7 @@ public class ChangeActiveActivity extends AppCompatActivity {
         et_active_name.setText(active.getActiveName());
         et_active_des.setText(active.getActiveDes());
         et_active_location.setText(active.getActiveLocation());
-        // 设置初始数据
+        // 设置活动开始时间和结束时间
         mDate = dateAndTime[0];
         mTime = dateAndTime[1].substring(0, 5);
         mEndDate = et[0];
@@ -122,7 +122,7 @@ public class ChangeActiveActivity extends AppCompatActivity {
         bt_active_time.setText(mTime);
         bt_active_end_date.setText(mEndDate);
         bt_active_end_time.setText(mEndTime);
-        // 设置初始数据
+        // 设置活动类型
         int id = -1;
         mRule = active.getRule();
         switch (active.getRule()) {
@@ -136,7 +136,7 @@ public class ChangeActiveActivity extends AppCompatActivity {
         rg_rule.check(id);
     }
 
-    // 修改活动
+    // 修改活动按钮点击事件
     private void submitActiveClick() {
         // 修改活动按钮点击事件
         bt_submit.setOnClickListener(new View.OnClickListener() {

@@ -47,6 +47,51 @@ public class ActivityFragment extends BaseFragment {
     public void fetchData() {
     }
 
+    @Override
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_active, container, false);
+
+        // 注册广播接收者
+        initBroadcast();
+
+        initView(view);
+
+        return view;
+    }
+
+    private void initView(View view) {
+        listView = (ListView) view.findViewById(R.id.lv_active);
+        adapter = new MyAdapter();
+        listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Active active = mActiveList.get(position);
+                Intent intent = new Intent(getContext(), DetailActivity.class);
+                intent.putExtra("active", active);
+                intent.putExtra("yunziId", yunziId);
+                startActivity(intent);
+            }
+        });
+    }
+
+    // 注册广播接收者
+    private void initBroadcast() {
+        // 注册云子更新信息广播接收者
+        myBroadcast = new MyBroadcast();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("GET_YUNZI_ID");
+        getContext().registerReceiver(myBroadcast, intentFilter);
+
+        // 注册云子消失广播接收者
+        sensorGoneBroadcast = new SensorGoneBroadcast();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("SENSOR_GONE");
+        getContext().registerReceiver(sensorGoneBroadcast, filter);
+    }
+
+    // 从网络获取活动信息
     private void getActive(final String yunziId) {
         OkHttpUtils
                 .get()
@@ -56,7 +101,7 @@ public class ActivityFragment extends BaseFragment {
                 .execute(new StringCallback() {
                     @Override
                     public void onError(Call call, Exception e, int i) {
-                        ToastUtil.show("获取活动失败，请稍后重试");
+                        ToastUtil.show("获取活动失败，请稍后重试"+e.toString());
                     }
 
                     @Override
@@ -108,41 +153,8 @@ public class ActivityFragment extends BaseFragment {
                 });
     }
 
-    @Override
-    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_bottom_active, container, false);
-
-
-        myBroadcast = new MyBroadcast();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("GET_YUNZI_ID");
-        getContext().registerReceiver(myBroadcast, intentFilter);
-
-        sensorGoneBroadcast = new SensorGoneBroadcast();
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("SENSOR_GONE");
-        getContext().registerReceiver(sensorGoneBroadcast, filter);
-
-        listView = (ListView) view.findViewById(R.id.lv_active);
-        adapter = new MyAdapter();
-        listView.setAdapter(adapter);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Active active = mActiveList.get(position);
-                Intent intent = new Intent(getContext(), DetailActivity.class);
-                intent.putExtra("active", active);
-                intent.putExtra("yunziId", yunziId);
-                startActivity(intent);
-            }
-        });
-
-        return view;
-    }
-
+    // 云子消失广播接收者
     public class SensorGoneBroadcast extends BroadcastReceiver {
-        // 云子消失广播接受
         @Override
         public void onReceive(Context context, Intent intent) {
             Logs.d("接收到了云子消失的广播");
@@ -156,18 +168,18 @@ public class ActivityFragment extends BaseFragment {
         }
     }
 
+    // 云子更新信息广播接收者
     public class MyBroadcast extends BroadcastReceiver {
-        //云子更新信息广播接受
         @Override
         public void onReceive(Context context, Intent intent) {
+            Logs.d("发现云子:"+yunziId);
             yunziId = intent.getStringExtra("yunzi");
+            // 根据云子id从网络获取具体活动信息
             getActive(yunziId);
-
-            //ToastUtil.show("发现云子:"+yunziId);
         }
     }
 
-
+    // listview适配器
     class MyAdapter extends BaseAdapter {
 
         @Override
@@ -213,8 +225,6 @@ public class ActivityFragment extends BaseFragment {
         TextView tv_time;
     }
 
-
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -229,6 +239,7 @@ public class ActivityFragment extends BaseFragment {
         mActiveList.clear();
     }
 
+    // 根据云子id获取对应的活动对象
     private Active getActiveForSensor(String number) {
         for (Active active : mActiveList) {
             if (number.equals(active.getSersorID())) {

@@ -20,7 +20,6 @@ public class HistoryDetailActivity extends AppCompatActivity {
     private TextView tv_details;
     private TextView tv_hintime;
     private TextView tv_houttime;
-    private TextView tv_hname;
     private TextView tv_hlocation;
     private Toolbar toolbar;
 
@@ -28,12 +27,18 @@ public class HistoryDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history_detail);
-        Intent intent = getIntent();
-        historyActivity = (HistoryActivity) intent.getSerializableExtra("ActivityId");
-        initVie();
+
+        initData();
+
+        initView();
     }
 
-    private void initVie() {
+    private void initData() {
+        Intent intent = getIntent();
+        historyActivity = (HistoryActivity) intent.getSerializableExtra("ActivityId");
+    }
+
+    private void initView() {
         tv_details = (TextView) findViewById(R.id.tv_details);
         tv_hintime = (TextView) findViewById(R.id.tv_hintime);
         tv_houttime = (TextView) findViewById(R.id.tv_houttime);
@@ -66,8 +71,5 @@ public class HistoryDetailActivity extends AppCompatActivity {
 
         // 设置标题
         toolbarLayout.setTitle(historyActivity.gethActivityName());
-
     }
-
-
 }

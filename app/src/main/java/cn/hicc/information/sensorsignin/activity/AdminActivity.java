@@ -62,6 +62,7 @@ public class AdminActivity extends AppCompatActivity {
     private BottomBar bottomBar;
     private Toolbar toolbar;
     private FragmentAdapter fragmentAdapter;
+    // toolbar上菜单点击事件
     private Toolbar.OnMenuItemClickListener onMenuItemClick = new Toolbar.OnMenuItemClickListener() {
         @Override
         public boolean onMenuItemClick(MenuItem menuItem) {
@@ -278,6 +279,7 @@ public class AdminActivity extends AppCompatActivity {
         tabs.add(new TabItem(R.drawable.bottom_activity_selector, R.string.tab_admin_activity, AdminActivityFragment.class));
         tabs.add(new TabItem(R.drawable.bottom_history_selector, R.string.tab_admin_sign, SignRecordFragment.class));
         tabs.add(new TabItem(R.drawable.bottom_setting_selector, R.string.tab_setting, SettingFragment.class));
+        // 底部栏选择监听事件
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
             public void onTabSelected(@IdRes int tabId) {
@@ -304,13 +306,13 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
 
+        // 设置viewpager
         fragmentAdapter = new FragmentAdapter(getSupportFragmentManager());
         viewPager.setOffscreenPageLimit(3);
         viewPager.setAdapter(fragmentAdapter);
         viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
             }
 
             @Override
@@ -341,9 +343,7 @@ public class AdminActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * 设置底部条目及对应界面的适配器
-     */
+    // viewpager适配器
     class FragmentAdapter extends FragmentPagerAdapter {
         public FragmentAdapter(FragmentManager fm) {
             super(fm);
@@ -372,7 +372,6 @@ public class AdminActivity extends AppCompatActivity {
     public void onMessageEvent(ExitEvent event) {
         finish();
     }
-
 
     @Override
     protected void onDestroy() {
@@ -409,10 +408,10 @@ public class AdminActivity extends AppCompatActivity {
         }
     }
 
+    // 显示菜单
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_tool_bar, menu);
         return true;
     }
-
 }

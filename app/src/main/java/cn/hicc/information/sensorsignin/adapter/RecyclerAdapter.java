@@ -14,7 +14,7 @@ import java.util.List;
 import cn.hicc.information.sensorsignin.model.Active;
 
 /**
- * Created by Administrator on 2017/1/23/023.
+ * 管理员界面 管理活动RecyclerView适配器——陈帅
  */
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {

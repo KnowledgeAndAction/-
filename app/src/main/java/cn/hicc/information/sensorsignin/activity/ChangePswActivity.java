@@ -25,8 +25,6 @@ import cn.hicc.information.sensorsignin.utils.SpUtil;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import okhttp3.Call;
 
-import static cn.hicc.information.sensorsignin.MyApplication.getContext;
-
 /**
  * 修改密码界面——崔国钊
  */
@@ -42,8 +40,11 @@ public class ChangePswActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_psw);
-        initDate();
-        change();//设置按钮点击事件
+
+        initView();
+
+        // 设置按钮点击事件
+        change();
     }
 
     private void change() {
@@ -67,61 +68,59 @@ public class ChangePswActivity extends AppCompatActivity {
                 } else {
                     ToastUtil.show("密码不一致！");
                 }
-
-            }
-
-            //检查是否修改成功
-            private void checkPassWorld(String new_password) {
-                showProgressDialogs();
-                final String MD5Pass = MD5Util.strToMD5(new_password);
-                Logs.d(MD5Pass);
-                OkHttpUtils
-                        .post()
-                        //.url(Constant.API_URL + "api/TStudentLogin/updstupassword")
-                        .url("http://123.206.57.216:8080/SchoolTestInterface/changePassword.do")
-                        .addParams("Account", SpUtil.getString(Constant.ACCOUNT, ""))
-                        .addParams("Password", MD5Pass)
-                        //.addParams("Level","0")
-                        .build()
-                        .execute(new StringCallback() {
-                            @Override
-                            public void onError(Call call, Exception e, int id) {
-                                ToastUtil.show("修改失败：" + e.toString());
-                            }
-
-                            @Override
-                            public void onResponse(String response, int id) {
-                                getJSON(response);
-                            }
-                        });
-            }
-
-            private void getJSON(String response) {
-                try {
-                    JSONObject jsonObject=new JSONObject(response);
-                    boolean sucessed = jsonObject.getBoolean("sucessed");
-                    if (sucessed){
-                        EventBus.getDefault().post(new ExitEvent());
-                        Intent intent=new Intent(ChangePswActivity.this,LoginActivity.class);
-                        startActivity(intent);
-                        SpUtil.putBoolean(Constant.IS_REMBER_PWD,false);
-                        closeProgressDialog();
-                        finish();
-                        ToastUtil.show("修改成功");
-                    }else {
-                        ToastUtil.show("网络错误，请重新修改");
-                    }
-                } catch (JSONException e) {
-                    closeProgressDialog();
-                    ToastUtil.show("修改失败"+e.toString());
-                    e.printStackTrace();
-                }
             }
         });
     }
 
+    // TODO 检查是否修改成功 修改为临时接口
+    private void checkPassWorld(String new_password) {
+        showProgressDialogs();
+        final String MD5Pass = MD5Util.strToMD5(new_password);
+        Logs.d(MD5Pass);
+        OkHttpUtils
+                .post()
+                //.url(Constant.API_URL + "api/TStudentLogin/updstupassword")
+                .url("http://123.206.57.216:8080/SchoolTestInterface/changePassword.do")
+                .addParams("Account", SpUtil.getString(Constant.ACCOUNT, ""))
+                .addParams("Password", MD5Pass)
+                //.addParams("Level","0")
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        ToastUtil.show("修改失败：" + e.toString());
+                    }
 
-    private void initDate() {
+                    @Override
+                    public void onResponse(String response, int id) {
+                        getJSON(response);
+                    }
+                });
+    }
+
+    private void getJSON(String response) {
+        try {
+            JSONObject jsonObject=new JSONObject(response);
+            boolean sucessed = jsonObject.getBoolean("sucessed");
+            if (sucessed){
+                EventBus.getDefault().post(new ExitEvent());
+                Intent intent=new Intent(ChangePswActivity.this,LoginActivity.class);
+                startActivity(intent);
+                SpUtil.putBoolean(Constant.IS_REMBER_PWD,false);
+                closeProgressDialog();
+                finish();
+                ToastUtil.show("修改成功");
+            }else {
+                ToastUtil.show("网络错误，请重新修改");
+            }
+        } catch (JSONException e) {
+            closeProgressDialog();
+            ToastUtil.show("修改失败"+e.toString());
+            e.printStackTrace();
+        }
+    }
+
+    private void initView() {
         et_old = (EditText) findViewById(R.id.et_old);
         et_new = (EditText) findViewById(R.id.et_new);
         et_new_true = (EditText) findViewById(R.id.et_new_true);
@@ -139,6 +138,7 @@ public class ChangePswActivity extends AppCompatActivity {
             }
         });
     }
+
     private void showProgressDialogs() {
         if (progressDialog == null) {
             progressDialog = new ProgressDialog(this);
@@ -147,6 +147,7 @@ public class ChangePswActivity extends AppCompatActivity {
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
     }
+
     private void closeProgressDialog() {
         if (progressDialog != null) {
             progressDialog.dismiss();

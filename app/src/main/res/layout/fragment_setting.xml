@@ -14,8 +14,8 @@
 
         <ImageView
             android:id="@+id/iv_pic"
-            android:layout_width="124.8dp"
-            android:layout_height="166.4dp"
+            android:layout_width="97.5dp"
+            android:layout_height="130dp"
             android:layout_alignParentRight="true"
             android:layout_centerInParent="true"
             android:layout_marginRight="3dp"

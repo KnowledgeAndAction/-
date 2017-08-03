@@ -29,7 +29,7 @@ import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import okhttp3.Call;
 
 /**
- * 签到记录
+ * 签到记录——陈帅
  */
 
 public class SignRecordFragment extends BaseFragment {
@@ -74,6 +74,7 @@ public class SignRecordFragment extends BaseFragment {
 
         // 配置swipeRefresh
         swipe_refresh.setColorSchemeResources(R.color.colorPrimary , R.color.colorAccent, R.color.colorPrimaryDark);
+
         // 设置刷新事件
         swipe_refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -84,7 +85,6 @@ public class SignRecordFragment extends BaseFragment {
 
         // 设置开始就刷新
         swipe_refresh.setRefreshing(true);
-
 
         // 获取活动
         getActive();

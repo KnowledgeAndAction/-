@@ -18,21 +18,23 @@ import com.uuzuche.lib_zxing.activity.CodeUtils;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
 
 /**
- * 定制化显示扫描界面
+ * 定制化显示扫描界面——陈帅
  */
 public class ScanActivity extends AppCompatActivity {
 
     private CaptureFragment captureFragment;
+    public static boolean isOpen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
 
+        // 看是否允许使用相机
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
-            //请求权限
-            requestCameraPermission();
+            // 请求权限
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 0);
         }
 
         captureFragment = new CaptureFragment();
@@ -43,8 +45,6 @@ public class ScanActivity extends AppCompatActivity {
 
         initView();
     }
-
-    public static boolean isOpen = false;
 
     private void initView() {
         Button bt_light = (Button) findViewById(R.id.linear1);
@@ -63,9 +63,7 @@ public class ScanActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * 二维码解析回调函数
-     */
+    // 二维码解析回调函数
     CodeUtils.AnalyzeCallback analyzeCallback = new CodeUtils.AnalyzeCallback() {
         @Override
         public void onAnalyzeSuccess(Bitmap mBitmap, String result) {
@@ -89,15 +87,6 @@ public class ScanActivity extends AppCompatActivity {
             ScanActivity.this.finish();
         }
     };
-
-    // 请求权限
-    private void requestCameraPermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                Manifest.permission.CAMERA)) {
-        } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 0);
-        }
-    }
 
     // 请求权限结果
     @Override

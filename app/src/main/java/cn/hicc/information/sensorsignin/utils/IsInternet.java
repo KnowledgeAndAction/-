@@ -1,4 +1,4 @@
-package cn.hicc.information.sensorsignin.model;
+package cn.hicc.information.sensorsignin.utils;
 
 
 import android.app.Activity;

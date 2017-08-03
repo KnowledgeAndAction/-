@@ -50,20 +50,19 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
 
     @Override
     public void fetchData() {
-
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_bottom_setting, container, false);
+        View view = inflater.inflate(R.layout.fragment_setting, container, false);
+
         inItUI(view);
+
         return view;
     }
 
-    /**
-     * 实例化按钮
-     */
+    // 初始化控件
     private void inItUI(View view) {
         tv_changePassWorld = (TextView) view.findViewById(R.id.tv_changePassWorld);
         tv_checkToUpdata = (TextView) view.findViewById(R.id.tv_checkToUpdate);
@@ -127,6 +126,7 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
         }
     }
 
+    // 显示确认对话框
     private void showConfirmDialog() {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getContext());
         //设置对话框左上角图标
@@ -274,7 +274,6 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
         android.os.Process.killProcess(android.os.Process.myPid());
     }
 
-
     // 获取本应用版本号
     private int getVersionCode() {
         // 拿到包管理者
@@ -289,6 +288,7 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
         }
         return 0;
     }
+
     private void showProgressDialogs() {
         if (progressDialog == null) {
             progressDialog = new ProgressDialog(getContext());

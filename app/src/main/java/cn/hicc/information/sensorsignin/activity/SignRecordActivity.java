@@ -26,7 +26,9 @@ import cn.hicc.information.sensorsignin.utils.Logs;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import okhttp3.Call;
 
-
+/**
+ * 管理员查看签到记录界面——陈帅
+ */
 public class SignRecordActivity extends AppCompatActivity {
 
     private long activeId;
@@ -41,11 +43,13 @@ public class SignRecordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_record);
 
+        // 从上一个界面接收这个活动的id
         activeId = getIntent().getLongExtra("id", 0);
 
         initView();
     }
 
+    // 从网络获取数据
     private void initData() {
         signInfoList.clear();
         OkHttpUtils
@@ -67,6 +71,7 @@ public class SignRecordActivity extends AppCompatActivity {
                 });
     }
 
+    // 解析json数据
     private void getJson(String response) {
         try {
             JSONObject jsonObject = new JSONObject(response);
@@ -94,6 +99,7 @@ public class SignRecordActivity extends AppCompatActivity {
         }
     }
 
+    // 获取对应学号姓名
     private void getName(final SignInfo signInfo, final String account) {
         OkHttpUtils
                 .get()

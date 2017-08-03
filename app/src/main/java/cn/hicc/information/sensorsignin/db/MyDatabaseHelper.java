@@ -5,7 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
- * Created by Administrator on 2017/6/22.
+ * Created by 陈帅 on 2017/6/22.
+ * 数据库创建类
  */
 
 public class MyDatabaseHelper extends SQLiteOpenHelper {
@@ -28,6 +29,5 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
     }
 }

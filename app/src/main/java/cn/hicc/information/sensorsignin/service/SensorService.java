@@ -17,6 +17,9 @@ import java.util.List;
 import cn.hicc.information.sensorsignin.utils.Logs;
 import cn.hicc.information.sensorsignin.utils.SpUtil;
 
+/**
+ * 云子检查服务——陈帅
+ */
 public class SensorService extends Service {
 
     private SensoroManager sensoroManager;
@@ -81,9 +84,7 @@ public class SensorService extends Service {
         }
     }
 
-    /**
-     * 设置SDK
-     */
+    // 设置SDK
     private void setSDK() {
         BeaconManagerListener beaconManagerListener = new BeaconManagerListener() {
             /**
@@ -153,6 +154,7 @@ public class SensorService extends Service {
         sensoroManager.setBeaconManagerListener(beaconManagerListener);
     }
 
+    // 开启一个子线程，一直检测
     private void checkTime() {
         new Thread(){
             @Override

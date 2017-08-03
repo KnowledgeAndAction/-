@@ -12,43 +12,52 @@ import android.widget.RelativeLayout;
 import com.hicc.information.sensorsignin.R;
 import cn.hicc.information.sensorsignin.utils.SpUtil;
 
+/**
+ * 启动页——周凯歌
+ */
 public class SplashActivity extends AppCompatActivity {
+
     private static final int ENTER_HOME = 100;
+    private RelativeLayout sl_root;
     private Handler mHandler = new Handler() {
         @Override
-        //alt+ctrl+向下箭头,向下拷贝相同代码
         public void handleMessage(android.os.Message msg) {
             switch (msg.what) {
                 case ENTER_HOME:
-                    //进入应用程序主界面,activity跳转过程
+                    // 进入应用程序主界面,activity跳转过程
                     enterHome();
                     break;
             }
         }
     };
-    private RelativeLayout sl_root;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //去掉Activity上面的状态栏
+        // 去掉Activity上面的状态栏
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_splash);
 
-        //初始化UI
+        // 初始化UI
         initUI();
-        //初始化数据
+
         initData();
-        //初始化动画
+
+        // 初始化动画
         initAnimation();
+
+        // 开启一个子线程
         newThread();
     }
+
+    // 初始化动画
     private void initAnimation() {
         AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
         alphaAnimation.setDuration(3000);
         sl_root.startAnimation(alphaAnimation);
     }
 
+    // 初始化UI
     private void initUI() {
         sl_root = (RelativeLayout) findViewById(R.id.sl_root);
     }
@@ -57,6 +66,7 @@ public class SplashActivity extends AppCompatActivity {
         mHandler.sendEmptyMessageDelayed(ENTER_HOME, 3000);
     }
 
+    // 开启一个子线程
     private void newThread() {
         final Message msg = Message.obtain();
         new Thread() {
@@ -71,6 +81,8 @@ public class SplashActivity extends AppCompatActivity {
             }
         }.start();
     }
+
+    // 进入应用
     private void enterHome() {
         boolean is_first_enter = SpUtil.getBoolean("is_first_enter", true);
         if(is_first_enter){
@@ -82,7 +94,6 @@ public class SplashActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         }
-
     }
 }
 

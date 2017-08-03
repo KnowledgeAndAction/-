@@ -5,11 +5,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.hicc.information.sensorsignin.R;
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -32,7 +35,7 @@ import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import okhttp3.Call;
 
 /**
- * 管理活动
+ * 管理活动页——陈帅
  */
 
 public class AdminActivityFragment extends BaseFragment {
@@ -60,6 +63,7 @@ public class AdminActivityFragment extends BaseFragment {
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         swipe_refresh = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
 
+        // 初始化recyclerview
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         myAdapter = new RecyclerAdapter(mActiveList);
@@ -76,16 +80,18 @@ public class AdminActivityFragment extends BaseFragment {
                 startActivity(intent);
             }
         });
+
         // 设置删除活动点击事件
         myAdapter.setDeleteClickListener(new RecyclerAdapter.OnRecyclerViewDeleteClickListener() {
             @Override
             public void onDeleteClick(View view, int position) {
-                showConfirmDialog(position, (int) mActiveList.get(position).getActiveId());
+                showSafetyDialog(position, (int) mActiveList.get(position).getActiveId());
             }
         });
 
         // 配置swipeRefresh
         swipe_refresh.setColorSchemeResources(R.color.colorPrimary , R.color.colorAccent, R.color.colorPrimaryDark);
+
         // 设置刷新事件
         swipe_refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -96,7 +102,6 @@ public class AdminActivityFragment extends BaseFragment {
 
         // 设置开始就刷新
         swipe_refresh.setRefreshing(true);
-
 
         // 获取活动
         getActive();
@@ -111,6 +116,7 @@ public class AdminActivityFragment extends BaseFragment {
         getActive();
     }
 
+    // 从网络获取活动信息
     private void getActive() {
         OkHttpUtils
                 .get()
@@ -217,7 +223,7 @@ public class AdminActivityFragment extends BaseFragment {
         builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // 提交活动
+                // 删除活动
                 showProgressDialog();
                 deleteActive(position, id);
                 dialog.dismiss();
@@ -232,6 +238,43 @@ public class AdminActivityFragment extends BaseFragment {
         });
 
         builder.show();
+    }
+
+    // TODO 防止用户乱删活动
+    private void showSafetyDialog(final int position, final int id) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        final AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        View view = View.inflate(getContext(), R.layout.dialog_delete_active, null);
+        dialog.setView(view, 0, 0, 0, 0);
+
+        final EditText et_pass = (EditText) view.findViewById(R.id.et_password);
+        Button bt_cancel = (Button) view.findViewById(R.id.bt_cancel);
+        Button bt_confirm = (Button) view.findViewById(R.id.bt_confirm);
+
+        // 取消按钮
+        bt_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        // 确认按钮
+        bt_confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String pass = et_pass.getText().toString().trim();
+                if (pass.equals("shanchumima")) {
+                    showConfirmDialog(position, id);
+                    dialog.dismiss();
+                } else {
+                    ToastUtil.show("删除密码错误");
+                }
+            }
+        });
+
+        dialog.show();
     }
 
     private void showProgressDialog() {

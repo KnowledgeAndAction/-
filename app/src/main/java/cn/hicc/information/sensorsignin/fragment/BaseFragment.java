@@ -3,10 +3,7 @@ package cn.hicc.information.sensorsignin.fragment;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
-/**
- * Created by yx on 16/4/3.
- * activity_login
- */
+
 public abstract class BaseFragment extends Fragment {
 
     protected boolean isViewInitiated;

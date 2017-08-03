@@ -35,20 +35,27 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import cn.hicc.information.sensorsignin.db.MyDatabase;
 import cn.hicc.information.sensorsignin.fragment.ActivityFragment;
 import cn.hicc.information.sensorsignin.fragment.HistoryFragment;
 import cn.hicc.information.sensorsignin.fragment.SettingFragment;
 import cn.hicc.information.sensorsignin.model.ExitEvent;
+import cn.hicc.information.sensorsignin.model.SignActive;
 import cn.hicc.information.sensorsignin.model.TabItem;
 import cn.hicc.information.sensorsignin.service.SensorService;
+import cn.hicc.information.sensorsignin.utils.Constant;
 import cn.hicc.information.sensorsignin.utils.Logs;
 import cn.hicc.information.sensorsignin.utils.StatusBarUtils;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import okhttp3.Call;
 
+/**
+ * 普通用户主界面——陈帅
+ */
 public class MainActivity extends AppCompatActivity {
 
     private SensoroManager sensoroManager;
@@ -58,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private BottomBar bottomBar;
     private Toolbar toolbar;
+    private MyDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +85,52 @@ public class MainActivity extends AppCompatActivity {
 
         // 检测更新
         checkVersionCode();
+
+        // 上传未上传成功的记录
+        checkUnSign();
+    }
+
+    // 上传未上传成功的记录
+    private void checkUnSign() {
+        db = MyDatabase.getInstance();
+        List<SignActive> unSaveActives = db.getUnSaveActives();
+        for (SignActive unSaveActive : unSaveActives) {
+            // 上传时间数据
+            signForService(unSaveActive);
+        }
+    }
+
+    // 上传时间数据
+    private void signForService(final SignActive unSaveActive){
+        OkHttpUtils
+                .get()
+                .url(Constant.API_URL+"api/TSign/InsertSign")
+                .addParams("account", unSaveActive.getNumber())
+                .addParams("activityid",unSaveActive.getActiveId()+"")
+                .addParams("intime",unSaveActive.getInTime())
+                .addParams("outtime", unSaveActive.getOutTime())
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int i) {
+                        Logs.d("上传未成功签到的活动失败:"+e.toString());
+                    }
+
+                    @Override
+                    public void onResponse(String s, int i) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(s);
+                            if (jsonObject.getBoolean("sucessed")) {
+                                db.updateSignActive(unSaveActive.getActiveId(),true);
+                            } else {
+                                Logs.d("上传未成功签到的活动失败");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Logs.d("上传未成功签到的活动失败:"+e.toString());
+                        }
+                    }
+                });
     }
 
     // 检测更新
@@ -262,7 +316,6 @@ public class MainActivity extends AppCompatActivity {
         initLayout();
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -347,9 +400,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * 设置底部条目及对应界面的适配器
-     */
+    // viewpager适配器
     class FragmentAdapter extends FragmentPagerAdapter {
         public FragmentAdapter(FragmentManager fm) {
             super(fm);
@@ -379,12 +430,11 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
-        stopService(new Intent(this,SensorService.class));
+        //stopService(new Intent(this,SensorService.class));
     }
 
     // 监听返回键
@@ -414,5 +464,4 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
     }
-
 }

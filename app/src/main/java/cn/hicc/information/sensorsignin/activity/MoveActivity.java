@@ -54,14 +54,41 @@ public class MoveActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private boolean isClick = false;
     private TextView tv_total_time;
+    private int clickCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_move);
+
         // 获取数据库
         database = MyDatabase.getInstance();
 
+        getIntentData();
+
+        //初始化控件
+        initView();
+
+        //获取签到时间
+        getInTime();
+
+        // 注册自动签离广播接收者
+        initBroadcast();
+
+        // 更新计时
+        updataTime();
+    }
+
+    // 注册自动签离广播接收者
+    private void initBroadcast() {
+        myBroadcast = new MyBroadcast();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("SET_BROADCST_OUT");
+        registerReceiver(myBroadcast, intentFilter);
+    }
+
+    // 获取上一个页面的数据
+    private void getIntentData() {
         Intent intent = getIntent();
         activeName = intent.getStringExtra("activeName");
         location = intent.getStringExtra("location");
@@ -72,20 +99,14 @@ public class MoveActivity extends AppCompatActivity {
         SpUtil.putString("yunziId",yunziId);
         SpUtil.putString("endTime",endTime);
 
-        //初始化控件
-        initView();
-
-        //获取数据
-        getData();
-
-        myBroadcast = new MyBroadcast();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("SET_BROADCST_OUT");
-        registerReceiver(myBroadcast, intentFilter);
-
-        updataTime();
+        // 判断是不是对一个新的活动签离 如果是将以前的数据清空
+        if (SpUtil.getInt("MoveActiveId",-1) != (int) activeId) {
+            SpUtil.remove("time");
+            SpUtil.remove("MoveActiveId");
+        }
     }
 
+    // 更新计时
     private void updataTime() {
         new Thread(){
             @Override
@@ -122,26 +143,18 @@ public class MoveActivity extends AppCompatActivity {
         }.start();
     }
 
-    /**
-     * 获取数据的方法
-     */
-    private void getData() {
-        //获取签到时间
-        getInTime();
-    }
-
-    /**
-     * 获取签到时间
-     */
+    // 获取签到时间
     private void getInTime(){
         if (SpUtil.getString("time","").equals("")) {
-            SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");//("HH:mm:ss")(小时：分钟：秒)
+            // ("HH:mm:ss")(小时：分钟：秒)
+            SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
             inTime = df.format(new Date());
             tv_inTime.setText("签到时间：" + inTime);
         } else {
             inTime = SpUtil.getString("time","");
             tv_inTime.setText("签到时间：" + inTime);
             SpUtil.remove("time");
+            SpUtil.remove("MoveActiveId");
         }
     }
 
@@ -149,19 +162,17 @@ public class MoveActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         SpUtil.putString("time",inTime);
+        SpUtil.putInt("MoveActiveId",(int)activeId);
     }
 
-    /**
-     * 获取签离时间
-     */
+    // 获取签离时间
     private void getOutTime() {
-        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");//("HH:mm:ss")(小时：分钟：秒)
+        // ("HH:mm:ss")(小时：分钟：秒)
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
         outTime = df.format(new Date());
     }
 
-    /**
-     * 初始化控件
-     */
+    // 初始化控件
     private void initView() {
         tv_inTime = (TextView) findViewById(R.id.tv_inTime);
         tv_activityName = (TextView) findViewById(R.id.tv_activeName);
@@ -174,22 +185,20 @@ public class MoveActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 getOutTime();
-                // 如果可以签离
-                if(isCan){
+                // TODO 如果可以签离 为了优化用户体验，当连续点击10次，可以签到
+                if(isCan || clickCount > 9){
                     isClick = true;
                     // 发送时间数据
                     signForService();
                 }else {
+                    clickCount++;
                     ToastUtil.show("暂时无法签离，请稍后重试，并确保您在活动地点附近");
                 }
             }
         });
     }
 
-
-    /**
-     * 保存数据到本地
-     */
+    // 保存数据到本地
     private void saveSignData(int save) {
         SignActive signActive = new SignActive();
         signActive.setActiveId(activeId);
@@ -204,10 +213,7 @@ public class MoveActivity extends AppCompatActivity {
         SpUtil.remove("endTime");
     }
 
-
-    /**
-     * 发送时间数据
-     */
+    // 发送时间数据
     private void signForService(){
         showDialog();
         OkHttpUtils
@@ -247,6 +253,7 @@ public class MoveActivity extends AppCompatActivity {
                 });
     }
 
+    // 自动签离广播接收者
     public class MyBroadcast extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -275,6 +282,7 @@ public class MoveActivity extends AppCompatActivity {
         if(myBroadcast != null){
             unregisterReceiver(myBroadcast);
         }
+        // 在页面销毁时，如果没有点击过签离按钮，就自动签离
         if (!isClick) {
             getOutTime();
             Logs.d("onDestroy");
@@ -282,6 +290,7 @@ public class MoveActivity extends AppCompatActivity {
         }
         SpUtil.remove("yunziId");
         SpUtil.remove("time");
+        SpUtil.remove("MoveActiveId");
     }
 
     // 重写返回键  使其回到桌面

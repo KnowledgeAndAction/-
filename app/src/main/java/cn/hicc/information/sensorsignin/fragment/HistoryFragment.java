@@ -26,7 +26,7 @@ import java.util.List;
 
 import cn.hicc.information.sensorsignin.activity.HistoryDetailActivity;
 import cn.hicc.information.sensorsignin.model.HistoryActivity;
-import cn.hicc.information.sensorsignin.model.IsInternet;
+import cn.hicc.information.sensorsignin.utils.IsInternet;
 import cn.hicc.information.sensorsignin.utils.Constant;
 import cn.hicc.information.sensorsignin.utils.SpUtil;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
@@ -37,7 +37,7 @@ import okhttp3.Call;
  * 历史界面——崔国钊
  */
 
-public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener  {
+public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private List<HistoryActivity> mActiveList = new ArrayList<>();
     private ListView listView;
@@ -48,109 +48,113 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-         view = inflater.inflate(R.layout.activity_bottom_history, container, false);
-        initDate(view);
+        view = inflater.inflate(R.layout.fragment_history, container, false);
+
+        // 判断网络是否可用
+        IsInternet isInternet = new IsInternet();
+        respond = isInternet.isNetworkAvalible(getContext());
+
+        initView(view);
+
+        // 获取活动信息
         getActive();
-        IsInternet isInternet=new IsInternet();
-        respond=isInternet.isNetworkAvalible(getContext());
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-              public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                HistoryActivity historyActivity = mActiveList.get(position);
-                Intent intent = new Intent(getContext(), HistoryDetailActivity.class);
-                intent.putExtra("ActivityId", historyActivity);
-                startActivity(intent);
-            }
-        });
+
         return view;
     }
 
+    // 获取历史活动
     private void getActive() {
-            OkHttpUtils
-                    .get()
-                    .url(Constant.API_URL + "api/TSign/GetSign")
-                    .addParams("userId", SpUtil.getString(Constant.ACCOUNT, ""))
-                    .build()
-                    .execute(new StringCallback() {
-                        @Override
-                        public void onError(Call call, Exception e, int i) {
-                            mSwipeLayout.setRefreshing(false);
-                            if (respond){
-                                ToastUtil.show("历史记录响应失败");
-                            }else {
-                                ToastUtil.show("当前网络不可用，请检查网络连接");
-                            }
+        OkHttpUtils
+                .get()
+                .url(Constant.API_URL + "api/TSign/GetSign")
+                .addParams("userId", SpUtil.getString(Constant.ACCOUNT, ""))
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int i) {
+                        mSwipeLayout.setRefreshing(false);
+                        if (respond) {
+                            ToastUtil.show("历史记录响应失败");
+                        } else {
+                            ToastUtil.show("当前网络不可用，请检查网络连接");
                         }
+                    }
 
-                        @Override
-                        public void onResponse(String s, int i) {
-                            try {
-                                JSONObject jsonObject = new JSONObject(s);
-                                boolean sucessed = jsonObject.getBoolean("sucessed");
-                                mActiveList.clear();
-                                if (sucessed) {
-                                    JSONArray data = jsonObject.getJSONArray("data");
-                                    if (data.length() == 0) {
-                                        ToastUtil.show("没有历史记录");
-                                    } else {
-                                        for (int j = 0; j < data.length(); j++) {
-                                            JSONObject hActivity = data.getJSONObject(j);
-                                            String hActivityId = hActivity.getString("ActivityId");
-                                            String hStudnetNum = hActivity.getString("StudnetNum");
-                                            String hInTime = hActivity.getString("InTime");
-                                            String hOutTime = hActivity.getString("OutTime");
-                                            String hActivityDescription = hActivity.getString("ActivityDescription");
-                                            String hTime = hActivity.getString("Time");
-                                            String hLocation = hActivity.getString("Location");
-                                            String hActivityName = hActivity.getString("ActivityName");
-
-                                            HistoryActivity historyActivity = new HistoryActivity();
-                                            historyActivity.sethActivityId(hActivityId);
-                                            historyActivity.sethStudnetNum(hStudnetNum);
-                                            historyActivity.sethInTime(hInTime);
-                                            historyActivity.sethOutTime(hOutTime);
-                                            historyActivity.setActivityDescription(hActivityDescription);
-                                            historyActivity.sethActivityName(hActivityName);
-                                            historyActivity.sethLocation(hLocation);
-                                            historyActivity.sethTime(hTime);
-                                            historyActivity.setEndTime(hActivity.getString("EndTime"));
-                                            mActiveList.add(historyActivity);
-                                        }
-                                    }
+                    @Override
+                    public void onResponse(String s, int i) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(s);
+                            boolean sucessed = jsonObject.getBoolean("sucessed");
+                            mActiveList.clear();
+                            if (sucessed) {
+                                JSONArray data = jsonObject.getJSONArray("data");
+                                if (data.length() == 0) {
+                                    ToastUtil.show("没有历史记录");
                                 } else {
-                                    ToastUtil.show("没有记录");
-                                }
-                                mSwipeLayout.setRefreshing(false);
-                                adapter.notifyDataSetChanged();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                mSwipeLayout.setRefreshing(false);
-                            }
-                        }
-                    });
+                                    for (int j = 0; j < data.length(); j++) {
+                                        JSONObject hActivity = data.getJSONObject(j);
+                                        String hActivityId = hActivity.getString("ActivityId");
+                                        String hStudnetNum = hActivity.getString("StudnetNum");
+                                        String hInTime = hActivity.getString("InTime");
+                                        String hOutTime = hActivity.getString("OutTime");
+                                        String hActivityDescription = hActivity.getString("ActivityDescription");
+                                        String hTime = hActivity.getString("Time");
+                                        String hLocation = hActivity.getString("Location");
+                                        String hActivityName = hActivity.getString("ActivityName");
 
+                                        HistoryActivity historyActivity = new HistoryActivity();
+                                        historyActivity.sethActivityId(hActivityId);
+                                        historyActivity.sethStudnetNum(hStudnetNum);
+                                        historyActivity.sethInTime(hInTime);
+                                        historyActivity.sethOutTime(hOutTime);
+                                        historyActivity.setActivityDescription(hActivityDescription);
+                                        historyActivity.sethActivityName(hActivityName);
+                                        historyActivity.sethLocation(hLocation);
+                                        historyActivity.sethTime(hTime);
+                                        historyActivity.setEndTime(hActivity.getString("EndTime"));
+                                        mActiveList.add(historyActivity);
+                                    }
+                                }
+                            } else {
+                                ToastUtil.show("没有记录");
+                            }
+                            mSwipeLayout.setRefreshing(false);
+                            adapter.notifyDataSetChanged();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            mSwipeLayout.setRefreshing(false);
+                        }
+                    }
+                });
     }
 
     @Override
     public void fetchData() {
     }
 
-
-    private void initDate(View view) {
+    private void initView(View view) {
         listView = (ListView) view.findViewById(R.id.lv_history);
-        mSwipeLayout= (SwipeRefreshLayout) view.findViewById(R.id.id_swipe_ly);
-        mSwipeLayout.setColorSchemeResources(R.color.colorPrimary , R.color.colorAccent, R.color.colorPrimaryDark);
+        mSwipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.id_swipe_ly);
+        mSwipeLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorAccent, R.color.colorPrimaryDark);
         mSwipeLayout.setOnRefreshListener(this);
         adapter = new MyAdapter();
         listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                HistoryActivity historyActivity = mActiveList.get(position);
+                Intent intent = new Intent(getContext(), HistoryDetailActivity.class);
+                intent.putExtra("ActivityId", historyActivity);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
     public void onRefresh() {
-
         getActive();
     }
-
 
     class MyAdapter extends BaseAdapter {
 

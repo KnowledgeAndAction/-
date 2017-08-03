@@ -13,7 +13,7 @@ import java.util.List;
 import cn.hicc.information.sensorsignin.model.Active;
 
 /**
- * Created by Administrator on 2017/1/23/023.
+ * 管理员界面 活动签到RecyclerView适配器——陈帅
  */
 
 public class SignRecordRecyclerAdapter extends RecyclerView.Adapter<SignRecordRecyclerAdapter.ViewHolder> {

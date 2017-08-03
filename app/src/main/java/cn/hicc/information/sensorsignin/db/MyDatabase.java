@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +14,8 @@ import cn.hicc.information.sensorsignin.MyApplication;
 import cn.hicc.information.sensorsignin.model.SignActive;
 
 /**
- * Created by Administrator on 2017/7/15/015.
+ * Created by 陈帅 on 2017/7/15/015.
+ * 数据库
  */
 
 public class MyDatabase {
@@ -88,5 +91,24 @@ public class MyDatabase {
         }
         cursor.close();
         return false;
+    }
+
+    // 获取对一个活动最近签到的时间
+    public long getRecentSignTime(String number, long activeId) {
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+        long big = -1;
+        Cursor cursor = db.query("History", new String[]{"outTime"}, "number=? and activeId=?", new String[]{number,String.valueOf(activeId)}, null, null, null);
+        while (cursor.moveToNext()) {
+            String outTime = cursor.getString(cursor.getColumnIndex("outTime"));
+            try {
+                if (big < df.parse(outTime).getTime()) {
+                    big = df.parse(outTime).getTime();
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return -1;
+            }
+        }
+        return big;
     }
 }
