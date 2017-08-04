@@ -3,6 +3,7 @@ package cn.hicc.information.sensorsignin.activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -149,7 +150,7 @@ public class DetailActivity2 extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // 签到
-                signIn();
+                showSignConfirmDialog();
             }
         });
 
@@ -158,7 +159,7 @@ public class DetailActivity2 extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // 签离逻辑
-                signOut();
+                showSignOutConfirmDialog();
             }
         });
     }
@@ -438,5 +439,57 @@ public class DetailActivity2 extends AppCompatActivity {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
+    }
+
+    // 显示确认签到对话框
+    private void showSignConfirmDialog() {
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        //设置对话框左上角图标
+        builder.setIcon(R.mipmap.logo);
+        //设置对话框标题
+        builder.setTitle("确定要签到");
+        //设置文本内容
+        builder.setMessage("您确定要对该活动签到");
+        //设置积极的按钮
+        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                signIn();
+            }
+        });
+        //设置消极的按钮
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+    // 显示确认签离对话框
+    private void showSignOutConfirmDialog() {
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        //设置对话框左上角图标
+        builder.setIcon(R.mipmap.logo);
+        //设置对话框标题
+        builder.setTitle("确定要签离");
+        //设置文本内容
+        builder.setMessage("您确定要对该活动签离");
+        //设置积极的按钮
+        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                signOut();
+            }
+        });
+        //设置消极的按钮
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.show();
     }
 }
