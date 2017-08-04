@@ -1,0 +1,442 @@
+package cn.hicc.information.sensorsignin.activity;
+
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+import com.hicc.information.sensorsignin.R;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.StringCallback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import cn.hicc.information.sensorsignin.db.MyDatabase;
+import cn.hicc.information.sensorsignin.model.Active;
+import cn.hicc.information.sensorsignin.model.SignItem;
+import cn.hicc.information.sensorsignin.utils.Constant;
+import cn.hicc.information.sensorsignin.utils.Logs;
+import cn.hicc.information.sensorsignin.utils.SpUtil;
+import cn.hicc.information.sensorsignin.utils.ToastUtil;
+import okhttp3.Call;
+
+/**
+ * 此界面为活动详情——陈帅
+ */
+public class DetailActivity2 extends AppCompatActivity {
+
+    private Active active;
+    private MyBroadcast myBroadcast;
+    private String sensor2ID;
+    private String yunziId;
+    private boolean isCan = false;
+    private boolean stop = false;
+    private List<String> sensorList = new ArrayList<>();
+    private MyDatabase database;
+    private int clickCount = 0;
+    private int clickDebug = 0;
+    private ProgressDialog progressDialog;
+    private int mNid = -1;
+    private TextView tv_total_time;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_detail2);
+
+        //初始化数据
+        initData();
+
+        // 初始化控件
+        initView();
+
+        updataTime();
+    }
+
+    private void updataTime() {
+        // 如果没有签离
+        final SignItem signItem = new SignItem();
+        if (database.isSignOut(SpUtil.getString(Constant.ACCOUNT, ""), active.getActiveId(), signItem) == 0) {
+            tv_total_time.setVisibility(View.VISIBLE);
+            stop = true;
+            new Thread(){
+                @Override
+                public void run() {
+                    super.run();
+                    while (stop) {
+                        try {
+                            Thread.sleep(1000);
+                            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            // 获取当前时间
+                            long now = System.currentTimeMillis();
+                            // 计算从签到时间开始，经过了多长时间
+                            long total = now - df.parse(signItem.getInTime()).getTime();
+                            // 将毫秒转换成时间格式
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.setTimeInMillis(total);
+                            // 计算天数
+                            long days = total / (1000 * 60 * 60 * 24);
+                            // 计算小时数
+                            final long hours = (total - days * (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);
+                            // 转换成时间格式
+                            final String totalTime = df.format(calendar.getTime());
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tv_total_time.setText(hours + ":" + totalTime.substring(totalTime.indexOf(":") + 1));
+                                }
+                            });
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }.start();
+        }
+    }
+
+    // 初始化控件
+    private void initView() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
+        SwipeRefreshLayout refreshLayout = (SwipeRefreshLayout) findViewById(R.id.refreshLayout);
+        refreshLayout.setEnabled(false);
+
+        CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
+        // 设置标题和背景图
+        toolbarLayout.setTitle(active.getActiveName());
+        tv_total_time = (TextView) findViewById(R.id.tv_total_time);
+
+        TextView activityLocation = (TextView) findViewById(R.id.tv_location);
+        TextView activityDes = (TextView) findViewById(R.id.tv_des);
+        TextView tv_time = (TextView) findViewById(R.id.tv_time);
+        TextView tv_end_time = (TextView) findViewById(R.id.tv_end_time);
+        Button signButton = (Button) findViewById(R.id.loginButton);
+        Button bt_sign_out = (Button) findViewById(R.id.bt_sign_out);
+
+        activityLocation.setText("地点：" + active.getActiveLocation());
+        activityDes.setText("    " + active.getActiveDes());
+        tv_time.setText("开始时间：" + active.getActiveTime().replace("T", " ").substring(0, 16));
+        tv_end_time.setText("结束时间：" + active.getEndTime().replace("T", " ").substring(0, 16));
+
+        // 签到按钮点击事件
+        signButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 签到
+                signIn();
+            }
+        });
+
+        // 签离按钮点击事件
+        bt_sign_out.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 签离逻辑
+                signOut();
+            }
+        });
+    }
+
+    // 签离逻辑
+    private void signOut() {
+        // 如果没有签离
+        SignItem signItem = new SignItem();
+        int flag = database.isSignOut(SpUtil.getString(Constant.ACCOUNT, ""), active.getActiveId(), signItem);
+        switch (flag) {
+            // 没有签离
+            case 0:
+                mNid = signItem.getNid();
+                Logs.i("mNid:" + mNid);
+                signOutForService();
+                break;
+            // 已经签离
+            case 1:
+                ToastUtil.show("您已经签离了，请下次再来吧");
+                break;
+            // 没有签到
+            case 2:
+                ToastUtil.show("您还没有签到");
+                break;
+            // 异常
+            case 3:
+                break;
+        }
+    }
+
+    // 发送签离时间到网络
+    private void signOutForService() {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        final String outTime = df.format(new Date());
+        showDialog("签离中...");
+        OkHttpUtils
+                .get()
+                .url(Constant.API_URL + "api/TSign/UpdOutTime")
+                .addParams("nid", mNid+"")
+                .addParams("outtime", outTime)
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int i) {
+                        closeDialog();
+                        ToastUtil.show("签离失败:" + e.toString());
+                    }
+
+                    @Override
+                    public void onResponse(String s, int i) {
+                        closeDialog();
+                        try {
+                            JSONObject jsonObject = new JSONObject(s);
+                            if (jsonObject.getBoolean("sucessed")) {
+                                database.updateSignOutTime(mNid,outTime);
+                                tv_total_time.setVisibility(View.GONE);
+                                stop = false;
+                                finish();
+                                ToastUtil.show("签离成功");
+                            } else {
+                                ToastUtil.show("签离失败："+ jsonObject.getString("Msg"));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            ToastUtil.show("签离失败:" + e.toString());
+                        }
+                    }
+                });
+    }
+
+    // 签到逻辑
+    private void signIn() {
+        switch (active.getRule()) {
+            // 日常活动
+            case 1:
+                // 如果当前签到时间距离上一次签到时间不超过24个小时，就不能再次签到
+                if (database.isRecentSign(SpUtil.getString(Constant.ACCOUNT, ""), active.getActiveId()) || clickDebug > 24) {
+                    if (TimeCompareDay(active.getActiveTime().replace("T", " ").substring(11, 19))) {
+                        // TODO 如果能检测到云子 可以签到 为了优化用户体验，当连续点击15次，可以签到
+                        if (isCan || clickCount > 14) {
+                            signInForService();
+                        } else {
+                            ToastUtil.show("暂时无法进行签到，请稍后重试，并确保您在活动地点附近");
+                            clickCount++;
+                        }
+                    } else {
+                        ToastUtil.show("不符合签到时间");
+                    }
+                } else if (database.isSignOut(SpUtil.getString(Constant.ACCOUNT, ""), active.getActiveId(), new SignItem()) == 0){
+                    ToastUtil.show("您还没有签离，请先签离该活动");
+                } else {
+                    clickDebug++;
+                    ToastUtil.show("您今天已经签到过，请明天在来吧");
+                }
+                break;
+            // 普通活动
+            case 0:
+                int flag = database.isSign2(SpUtil.getString(Constant.ACCOUNT, ""), active.getActiveId());
+                switch (flag) {
+                    // 如果还没有签到过
+                    case 0:
+                        // 如果符合时间
+                        if (TimeCompare(active.getActiveTime().replace("T", " ").substring(0, 19))) {
+                            // 如果能检测到云子 可以签到
+                            if (isCan || clickCount > 14) {
+                                signInForService();
+                            } else {
+                                ToastUtil.show("暂时无法进行签到，请稍后重试，并确保您在活动地点附近");
+                                clickCount++;
+                            }
+                        } else {
+                            ToastUtil.show("不符合签到时间");
+                        }
+                        break;
+                    // 已经签到过
+                    case 1:
+                        ToastUtil.show("您已经签到过");
+                        break;
+                    // 没有签离
+                    case 2:
+                        ToastUtil.show("您还没有签离，请先签离");
+                        break;
+                }
+                break;
+        }
+    }
+
+    // 发送签到数据到网络
+    private void signInForService() {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        final String inTime = df.format(new Date());
+        showDialog("签到中...");
+        OkHttpUtils
+                .get()
+                .url(Constant.API_URL + "api/TSign/InsertSign")
+                .addParams("account", SpUtil.getString("account", ""))
+                .addParams("activityid", active.getActiveId() + "")
+                .addParams("intime", inTime)
+                .addParams("outtime", inTime)
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int i) {
+                        closeDialog();
+                        ToastUtil.show("签到失败:" + e.toString());
+                    }
+
+                    @Override
+                    public void onResponse(String s, int i) {
+                        closeDialog();
+                        try {
+                            JSONObject jsonObject = new JSONObject(s);
+                            if (jsonObject.getBoolean("sucessed")) {
+                                mNid = jsonObject.getInt("data");
+                                saveSignInData(inTime);
+                                ToastUtil.show("签到成功");
+                                tv_total_time.setVisibility(View.VISIBLE);
+                                stop = true;
+                                updataTime();
+                            } else {
+                                ToastUtil.show("签到失败："+ jsonObject.getString("Msg"));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            ToastUtil.show("签到失败:" + e.toString());
+                        }
+                    }
+                });
+    }
+
+    // 保存数据到本地数据库
+    private void saveSignInData(String inTime) {
+        SignItem signItem = new SignItem();
+
+        signItem.setNumber(SpUtil.getString(Constant.ACCOUNT,""));
+        signItem.setActiveId((int) active.getActiveId());
+        signItem.setInTime(inTime);
+        signItem.setOutTime(inTime);
+        signItem.setNid(mNid);
+
+        database.saveSignItem(signItem);
+    }
+
+    // 初始化数据
+    private void initData() {
+        database = MyDatabase.getInstance();
+
+        Intent intent = getIntent();
+
+        active = (Active) intent.getSerializableExtra("active");
+        yunziId = intent.getStringExtra("yunziId");
+
+        // 注册云子更新信息广播接收者
+        myBroadcast = new MyBroadcast();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("SET_BROADCST_OUT");
+        registerReceiver(myBroadcast, intentFilter);
+    }
+
+    // 云子更新信息广播接收者
+    public class MyBroadcast extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // 获取接收到的云子id，添加到集合中
+            sensor2ID = intent.getStringExtra("sensor2ID");
+            sensorList.add(sensor2ID);
+            // 如果当集合中包含进入活动的云子id，就可以签到
+            isCan = sensorList.contains(yunziId);
+        }
+    }
+
+    /**
+     * 判断是否到了签到时间
+     * @param signTime 需要签到的时间
+     */
+    private boolean TimeCompare(String signTime) {
+        // 设置时间格式
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        // 当前时间
+        String presentTime = sdf.format(new Date());
+        try {
+            Date beginTime = sdf.parse(signTime);
+            Date current = sdf.parse(presentTime);
+            Date aEndTime = sdf.parse(active.getEndTime().replace("T", " ").substring(0, 19));
+            // 可以提前10分钟签到     并且不能超过要活动结束时间
+            if (((current.getTime() + 1000 * 60 * 10) >= beginTime.getTime()) && (current.getTime() < aEndTime.getTime())) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    // 判断日常活动是否在指定时间范围内
+    private boolean TimeCompareDay(String signTime) {
+        // 设置时间格式
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        // 当前时间
+        String presentTime = sdf.format(new Date());
+        try {
+            Date beginTime = sdf.parse(signTime);
+            Date current = sdf.parse(presentTime);
+            Date aEndTime = sdf.parse(active.getEndTime().replace("T", " ").substring(11, 19));
+            // 可以提前10分钟签到     并且不能超过要活动结束时间
+            if (((current.getTime() + 1000 * 60 * 10) >= beginTime.getTime()) && (current.getTime() < aEndTime.getTime())) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (myBroadcast != null) {
+            unregisterReceiver(myBroadcast);
+        }
+    }
+
+    private void showDialog(String title) {
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(this);
+        }
+        progressDialog.setMessage(title);
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+    }
+
+    private void closeDialog() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
+    }
+}

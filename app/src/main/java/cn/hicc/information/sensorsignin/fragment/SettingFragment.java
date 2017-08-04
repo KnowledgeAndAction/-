@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,6 +85,25 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
         tv_name.setText("姓名：" + SpUtil.getString(Constant.USER_NAME,""));
         tv_grade.setText("年级：20" + SpUtil.getInt(Constant.USER_GRADE,17) + "级");
         tv_class.setText("班级：" + SpUtil.getString(Constant.USER_CLASS,""));
+
+        // 放大图片
+        iv_pic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                final AlertDialog dialog = builder.create();
+                View view = View.inflate(getContext(), R.layout.dialog_image_avatar, null);
+                dialog.setView(view, 0, 0, 0, 0);
+
+                ImageView iv_avatar = (ImageView) view.findViewById(R.id.iv_avatar);
+                Glide.with(getContext()).load(SpUtil.getString(Constant.USER_IMAGE,"")).placeholder(R.drawable.icon_pic)
+                        .centerCrop()
+                        .error(R.drawable.icon_pic)
+                        .into(iv_avatar);
+
+                dialog.show();
+            }
+        });
     }
 
     //设置按钮的点击事件。

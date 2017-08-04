@@ -26,7 +26,7 @@ import java.util.List;
 
 import cn.hicc.information.sensorsignin.activity.HistoryDetailActivity;
 import cn.hicc.information.sensorsignin.model.HistoryActivity;
-import cn.hicc.information.sensorsignin.utils.IsInternet;
+import cn.hicc.information.sensorsignin.utils.Utils;
 import cn.hicc.information.sensorsignin.utils.Constant;
 import cn.hicc.information.sensorsignin.utils.SpUtil;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
@@ -51,8 +51,7 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
         view = inflater.inflate(R.layout.fragment_history, container, false);
 
         // 判断网络是否可用
-        IsInternet isInternet = new IsInternet();
-        respond = isInternet.isNetworkAvalible(getContext());
+        respond = Utils.isNetworkAvalible(getContext());
 
         initView(view);
 
@@ -102,17 +101,20 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
                                         String hLocation = hActivity.getString("Location");
                                         String hActivityName = hActivity.getString("ActivityName");
 
-                                        HistoryActivity historyActivity = new HistoryActivity();
-                                        historyActivity.sethActivityId(hActivityId);
-                                        historyActivity.sethStudnetNum(hStudnetNum);
-                                        historyActivity.sethInTime(hInTime);
-                                        historyActivity.sethOutTime(hOutTime);
-                                        historyActivity.setActivityDescription(hActivityDescription);
-                                        historyActivity.sethActivityName(hActivityName);
-                                        historyActivity.sethLocation(hLocation);
-                                        historyActivity.sethTime(hTime);
-                                        historyActivity.setEndTime(hActivity.getString("EndTime"));
-                                        mActiveList.add(historyActivity);
+                                        // 如果是完成签离的活动才展示
+                                        if (!hInTime.equals(hOutTime)) {
+                                            HistoryActivity historyActivity = new HistoryActivity();
+                                            historyActivity.sethActivityId(hActivityId);
+                                            historyActivity.sethStudnetNum(hStudnetNum);
+                                            historyActivity.sethInTime(hInTime);
+                                            historyActivity.sethOutTime(hOutTime);
+                                            historyActivity.setActivityDescription(hActivityDescription);
+                                            historyActivity.sethActivityName(hActivityName);
+                                            historyActivity.sethLocation(hLocation);
+                                            historyActivity.sethTime(hTime);
+                                            historyActivity.setEndTime(hActivity.getString("EndTime"));
+                                            mActiveList.add(historyActivity);
+                                        }
                                     }
                                 }
                             } else {

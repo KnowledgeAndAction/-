@@ -24,6 +24,7 @@ import java.util.List;
 import cn.hicc.information.sensorsignin.db.MyDatabase;
 import cn.hicc.information.sensorsignin.model.Active;
 import cn.hicc.information.sensorsignin.utils.Constant;
+import cn.hicc.information.sensorsignin.utils.Logs;
 import cn.hicc.information.sensorsignin.utils.SpUtil;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
 
@@ -40,6 +41,7 @@ public class DetailActivity extends AppCompatActivity {
     private List<String> sensorList = new ArrayList<>();
     private MyDatabase database;
     private int clickCount = 0;
+    private int clickDebug = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,19 +114,20 @@ public class DetailActivity extends AppCompatActivity {
     // 签到逻辑
     private void signIn() {
         // 获取当前时间
-        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String current = df.format(new Date());
-        // 如果还没有签到过
         switch (active.getRule()) {
             // 日常活动
             case 1:
                 // 如果当前签到时间距离上一次签到时间不超过2个小时，就不能再次签到
                 try {
-                    if ((df.parse(current).getTime() - database.getRecentSignTime(SpUtil.getString(Constant.ACCOUNT, ""), active.getActiveId()))
-                            > 1000*60*60*2) {
-                        if (TimeCompare(active.getActiveTime().replace("T", " ").substring(0, 16))) {
-                            // TODO 如果能检测到云子 可以签到 为了优化用户体验，当连续点击10次，可以签到
-                            if (isCan || clickCount > 9) {
+                    Logs.i("数据库中的时间："+database.getRecentSignTime(SpUtil.getString(Constant.ACCOUNT, ""), active.getActiveId()));
+                    Logs.i("当前时间:"+df.parse(current).getTime());
+                    if (( (df.parse(current).getTime() - database.getRecentSignTime(SpUtil.getString(Constant.ACCOUNT, ""), active.getActiveId()))
+                            > 1000*60*60*2) || clickDebug > 29) {
+                        if (TimeCompare(active.getActiveTime().replace("T", " ").substring(0, 19))) {
+                            // TODO 如果能检测到云子 可以签到 为了优化用户体验，当连续点击15次，可以签到
+                            if (isCan || clickCount > 14) {
                                 Intent intent = new Intent(DetailActivity.this, MoveActivity.class);
                                 intent.putExtra("activeName", active.getActiveName());
                                 intent.putExtra("location", active.getActiveLocation());
@@ -143,6 +146,7 @@ public class DetailActivity extends AppCompatActivity {
                             ToastUtil.show("不符合签到时间");
                         }
                     } else {
+                        clickDebug++;
                         ToastUtil.show("您最近已经签到过，请下次再签到");
                     }
                 } catch (ParseException e) {
@@ -151,8 +155,9 @@ public class DetailActivity extends AppCompatActivity {
                 break;
             // 普通活动
             case 0:
+                // 如果还没有签到过
                 if (!database.isSign(SpUtil.getString(Constant.ACCOUNT, ""), active.getActiveId())) {
-                    if (TimeCompare(active.getActiveTime().replace("T", " ").substring(0, 16))) {
+                    if (TimeCompare(active.getActiveTime().replace("T", " ").substring(0, 19))) {
                         // 如果能检测到云子 可以签到
                         if (isCan) {
                             Intent intent = new Intent(DetailActivity.this, MoveActivity.class);
@@ -197,13 +202,13 @@ public class DetailActivity extends AppCompatActivity {
      */
     private boolean TimeCompare(String signTime) {
         // 设置时间格式
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         // 当前时间
         String presentTime = sdf.format(new java.util.Date());
         try {
             java.util.Date beginTime = sdf.parse(signTime);
             java.util.Date current = sdf.parse(presentTime);
-            java.util.Date aEndTime = sdf.parse(active.getEndTime().replace("T", " ").substring(0, 16));
+            java.util.Date aEndTime = sdf.parse(active.getEndTime().replace("T", " ").substring(0, 19));
             // 可以提前10分钟签到     并且不能超过要活动结束时间
             if (((current.getTime() + 1000*60*10) >= beginTime.getTime()) && (current.getTime() < aEndTime.getTime())) {
                 return true;

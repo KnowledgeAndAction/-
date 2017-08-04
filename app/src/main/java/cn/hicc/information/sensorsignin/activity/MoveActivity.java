@@ -115,7 +115,7 @@ public class MoveActivity extends AppCompatActivity {
                 while (true) {
                     try {
                         Thread.sleep(1000);
-                        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+                        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         // 获取当前时间
                         long now = System.currentTimeMillis();
                         // 计算从签到时间开始，经过了多长时间
@@ -147,12 +147,14 @@ public class MoveActivity extends AppCompatActivity {
     private void getInTime(){
         if (SpUtil.getString("time","").equals("")) {
             // ("HH:mm:ss")(小时：分钟：秒)
-            SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             inTime = df.format(new Date());
-            tv_inTime.setText("签到时间：" + inTime);
+            String time = inTime;
+            tv_inTime.setText("签到时间：" + time.substring(11));
         } else {
             inTime = SpUtil.getString("time","");
-            tv_inTime.setText("签到时间：" + inTime);
+            String time = inTime;
+            tv_inTime.setText("签到时间：" + time.substring(11));
             SpUtil.remove("time");
             SpUtil.remove("MoveActiveId");
         }
@@ -168,7 +170,7 @@ public class MoveActivity extends AppCompatActivity {
     // 获取签离时间
     private void getOutTime() {
         // ("HH:mm:ss")(小时：分钟：秒)
-        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         outTime = df.format(new Date());
     }
 
@@ -185,8 +187,8 @@ public class MoveActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 getOutTime();
-                // TODO 如果可以签离 为了优化用户体验，当连续点击10次，可以签到
-                if(isCan || clickCount > 9){
+                // TODO 如果可以签离 为了优化用户体验，当连续点击15次，可以签到
+                if(isCan || clickCount > 14){
                     isClick = true;
                     // 发送时间数据
                     signForService();

@@ -24,7 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.hicc.information.sensorsignin.activity.DetailActivity;
+import cn.hicc.information.sensorsignin.activity.DetailActivity2;
 import cn.hicc.information.sensorsignin.model.Active;
 import cn.hicc.information.sensorsignin.utils.Constant;
 import cn.hicc.information.sensorsignin.utils.Logs;
@@ -42,6 +42,7 @@ public class ActivityFragment extends BaseFragment {
     private String yunziId;
     private MyAdapter adapter;
     private SensorGoneBroadcast sensorGoneBroadcast;
+    private MyUpdataBroadcast myUpdataBroadcast;
 
     @Override
     public void fetchData() {
@@ -68,7 +69,7 @@ public class ActivityFragment extends BaseFragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Active active = mActiveList.get(position);
-                Intent intent = new Intent(getContext(), DetailActivity.class);
+                Intent intent = new Intent(getContext(), DetailActivity2.class);
                 intent.putExtra("active", active);
                 intent.putExtra("yunziId", yunziId);
                 startActivity(intent);
@@ -78,7 +79,7 @@ public class ActivityFragment extends BaseFragment {
 
     // 注册广播接收者
     private void initBroadcast() {
-        // 注册云子更新信息广播接收者
+        // 注册发现云子广播接收者
         myBroadcast = new MyBroadcast();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("GET_YUNZI_ID");
@@ -89,6 +90,12 @@ public class ActivityFragment extends BaseFragment {
         IntentFilter filter = new IntentFilter();
         filter.addAction("SENSOR_GONE");
         getContext().registerReceiver(sensorGoneBroadcast, filter);
+
+        // 注册云子更新信息广播接收者
+        myUpdataBroadcast = new MyUpdataBroadcast();
+        IntentFilter intentFilter2 = new IntentFilter();
+        intentFilter2.addAction("SET_BROADCST_OUT");
+        getContext().registerReceiver(myUpdataBroadcast, intentFilter2);
     }
 
     // 从网络获取活动信息
@@ -122,19 +129,31 @@ public class ActivityFragment extends BaseFragment {
                                     String rule = activity.getString("Rule");
 
                                     // 获取当前时间，判断该活动是否已经失效，不失效时才添加到集合中
-                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                                     String presentTime = sdf.format(new java.util.Date());
-                                    if (sdf.parse(presentTime).getTime() <= sdf.parse(endTime.replace("T", " ").substring(0, 16)).getTime()) {
-                                        Active active = new Active();
-                                        active.setActiveId(activeId);
-                                        active.setSersorID(yunziId);
-                                        active.setActiveName(name);
-                                        active.setActiveTime(time);
-                                        active.setActiveDes(des);
-                                        active.setActiveLocation(location);
-                                        active.setEndTime(endTime);
-                                        active.setRule(Integer.parseInt(rule));
-                                        mActiveList.add(active);
+                                    if (sdf.parse(presentTime).getTime() <= sdf.parse(endTime.replace("T", " ").substring(0, 19)).getTime()) {
+                                        if (mActiveList.contains(getActiveForSensor(yunziId))) {
+                                            Active activeForSensor = getActiveForSensor(yunziId);
+                                            activeForSensor.setActiveId(activeId);
+                                            activeForSensor.setSersorID(yunziId);
+                                            activeForSensor.setActiveName(name);
+                                            activeForSensor.setActiveTime(time);
+                                            activeForSensor.setActiveDes(des);
+                                            activeForSensor.setActiveLocation(location);
+                                            activeForSensor.setEndTime(endTime);
+                                            activeForSensor.setRule(Integer.parseInt(rule));
+                                        } else {
+                                            Active active = new Active();
+                                            active.setActiveId(activeId);
+                                            active.setSersorID(yunziId);
+                                            active.setActiveName(name);
+                                            active.setActiveTime(time);
+                                            active.setActiveDes(des);
+                                            active.setActiveLocation(location);
+                                            active.setEndTime(endTime);
+                                            active.setRule(Integer.parseInt(rule));
+                                            mActiveList.add(active);
+                                        }
                                     } else {
                                         Logs.d("这个活动过期了:"+yunziId);
                                     }
@@ -176,6 +195,15 @@ public class ActivityFragment extends BaseFragment {
             yunziId = intent.getStringExtra("yunzi");
             // 根据云子id从网络获取具体活动信息
             getActive(yunziId);
+        }
+    }
+
+    // 云子更新信息广播接收者
+    public class MyUpdataBroadcast extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String id = intent.getStringExtra("sensor2ID");
+            //getActive(id);
         }
     }
 
@@ -230,11 +258,13 @@ public class ActivityFragment extends BaseFragment {
         super.onDestroyView();
         // 取消注册广播
         if (myBroadcast != null) {
-            Logs.i("取消注册广播");
             getContext().unregisterReceiver(myBroadcast);
         }
         if (sensorGoneBroadcast != null) {
             getContext().unregisterReceiver(sensorGoneBroadcast);
+        }
+        if (myUpdataBroadcast != null) {
+            getContext().unregisterReceiver(myUpdataBroadcast);
         }
         mActiveList.clear();
     }

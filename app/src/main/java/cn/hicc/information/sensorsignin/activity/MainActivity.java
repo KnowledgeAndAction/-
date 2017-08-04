@@ -51,6 +51,7 @@ import cn.hicc.information.sensorsignin.utils.Constant;
 import cn.hicc.information.sensorsignin.utils.Logs;
 import cn.hicc.information.sensorsignin.utils.StatusBarUtils;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
+import cn.hicc.information.sensorsignin.utils.Utils;
 import okhttp3.Call;
 
 /**
@@ -298,8 +299,10 @@ public class MainActivity extends AppCompatActivity {
             Intent bluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(bluetoothIntent, 0);
         } else {
-            // 开启服务
-            startService(new Intent(this, SensorService.class));
+            // 如果服务没有运行，开启服务
+            if (!Utils.ServiceIsWorked(SensorService.class.getName())) {
+                startService(new Intent(this, SensorService.class));
+            }
         }
     }
 
@@ -323,7 +326,10 @@ public class MainActivity extends AppCompatActivity {
             case 0:
                 // 蓝牙可用
                 if (sensoroManager.isBluetoothEnabled()) {
-                    startService(new Intent(MainActivity.this, SensorService.class));
+                    // 如果服务没有运行，开启服务
+                    if (!Utils.ServiceIsWorked(SensorService.class.getName())) {
+                        startService(new Intent(this, SensorService.class));
+                    }
                 }
                 break;
             case 1:
@@ -434,7 +440,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
-        //stopService(new Intent(this,SensorService.class));
+        stopService(new Intent(this,SensorService.class));
     }
 
     // 监听返回键
@@ -462,6 +468,7 @@ public class MainActivity extends AppCompatActivity {
 
         } else {
             finish();
+            System.exit(0);
         }
     }
 }

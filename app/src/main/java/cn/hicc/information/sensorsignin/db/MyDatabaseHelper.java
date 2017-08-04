@@ -18,6 +18,14 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
             + "inTime text,"
             + "outTime text)";
 
+    public static final String SIGN_TABLE = "create table Sign("
+            + "id integer primary key autoincrement,"
+            + "number text,"
+            + "activeId integer,"
+            + "nid integer,"
+            + "inTime text,"
+            + "outTime text)";
+
     public MyDatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
     }
@@ -25,9 +33,15 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(HISTORY_TABLE);
+        //db.execSQL(SIGN_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        switch (newVersion) {
+            case 2:
+                db.execSQL(SIGN_TABLE);
+                break;
+        }
     }
 }

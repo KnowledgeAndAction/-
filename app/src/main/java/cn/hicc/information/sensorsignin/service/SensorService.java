@@ -78,7 +78,6 @@ public class SensorService extends Service {
         try {
             Logs.d("开启sensoro服务");
             sensoroManager.startService();
-
         } catch (Exception e) {
             e.printStackTrace(); // 捕获异常信息
         }
@@ -185,8 +184,8 @@ public class SensorService extends Service {
 
                         // 判断是否到了活动结束时间
                         if (!SpUtil.getString("endTime","").equals("")) {
-                            String endTime1 = SpUtil.getString("endTime", "").replace("T", " ").substring(0, 16);
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                            String endTime1 = SpUtil.getString("endTime", "").replace("T", " ").substring(0, 19);
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                             String presentTime = sdf.format(new Date());//当前时间
 
                             long end = sdf.parse(endTime1).getTime();

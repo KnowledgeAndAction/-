@@ -2,6 +2,7 @@ package cn.hicc.information.sensorsignin.utils;
 
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,10 +12,14 @@ import android.net.NetworkInfo;
 import android.provider.Settings;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
+import cn.hicc.information.sensorsignin.MyApplication;
+
 /**
- * Created by 崔国钊 on 2017/7/13.
+ * 工具类
  */
-public class IsInternet {
+public class Utils {
 
     /**
      * 判断网络情况
@@ -48,7 +53,7 @@ public class IsInternet {
 
     // 如果没有网络，则弹出网络设置对话框
     public static void checkNetwork(final Activity activity) {
-        if (!IsInternet.isNetworkAvalible(activity)) {
+        if (!Utils.isNetworkAvalible(activity)) {
             TextView msg = new TextView(activity);
             msg.setText("     当前没有可以使用的网络，部分功能可能无法使用，请设置网络！");
             new AlertDialog.Builder(activity)
@@ -75,5 +80,17 @@ public class IsInternet {
                             }).create().show();
         }
         return;
+    }
+
+    // 判断服务是否在运行
+    public static boolean ServiceIsWorked(String name) {
+        ActivityManager myManager = (ActivityManager) MyApplication.getContext().getSystemService(Context.ACTIVITY_SERVICE);
+        ArrayList<ActivityManager.RunningServiceInfo> runningService = (ArrayList <ActivityManager.RunningServiceInfo>)myManager.getRunningServices(300);
+        for (int i = 0; i < runningService.size(); i++) {
+            if (runningService.get(i).service.getClassName().toString().equals(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
