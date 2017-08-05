@@ -51,4 +51,24 @@ public class Constant {
      * 用户头像
      */
     public static final String USER_IMAGE = "user_image";
+    /**
+     * 未签离活动的云子id
+     */
+    public static final String SIGN_OUT_YUNZIID = "sign_out_yunziid";
+    /**
+     * 未签离活动的名称
+     */
+    public static final String SIGN_OUT_ACTIVE_NAME = "sign_out_active_name";
+    /**
+     * 未签离活动的地点
+     */
+    public static final String SIGN_OUT_LOCATION = "sign_out_location";
+    /**
+     * 未签离活动的id
+     */
+    public static final String SIGN_OUT_ACTIVE_ID = "sign_out_active_id";
+    /**
+     * 未签离活动的结束时间
+     */
+    public static final String SIGN_OUT_ENDTIME = "sign_out_endtime";
 }

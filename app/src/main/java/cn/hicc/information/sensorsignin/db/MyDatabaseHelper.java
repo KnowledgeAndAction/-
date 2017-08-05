@@ -33,7 +33,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(HISTORY_TABLE);
-        //db.execSQL(SIGN_TABLE);
+        db.execSQL(SIGN_TABLE);
     }
 
     @Override

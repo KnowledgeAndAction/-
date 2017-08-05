@@ -43,12 +43,14 @@ import cn.hicc.information.sensorsignin.db.MyDatabase;
 import cn.hicc.information.sensorsignin.fragment.ActivityFragment;
 import cn.hicc.information.sensorsignin.fragment.HistoryFragment;
 import cn.hicc.information.sensorsignin.fragment.SettingFragment;
+import cn.hicc.information.sensorsignin.model.Active;
 import cn.hicc.information.sensorsignin.model.ExitEvent;
 import cn.hicc.information.sensorsignin.model.SignActive;
 import cn.hicc.information.sensorsignin.model.TabItem;
 import cn.hicc.information.sensorsignin.service.SensorService;
 import cn.hicc.information.sensorsignin.utils.Constant;
 import cn.hicc.information.sensorsignin.utils.Logs;
+import cn.hicc.information.sensorsignin.utils.SpUtil;
 import cn.hicc.information.sensorsignin.utils.StatusBarUtils;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import cn.hicc.information.sensorsignin.utils.Utils;
@@ -89,6 +91,32 @@ public class MainActivity extends AppCompatActivity {
 
         // 上传未上传成功的记录
         checkUnSign();
+
+        // 检测是否有未签离的活动
+        checkUnSignOutActive();
+    }
+
+    private void checkUnSignOutActive() {
+        // 如果sp里有数据，说明有未签离的活动，需要跳转到签离界面
+        if (!SpUtil.getString(Constant.SIGN_OUT_ACTIVE_NAME,"").equals("")) {
+            Active active = new Active();
+
+            String activeName = SpUtil.getString(Constant.SIGN_OUT_ACTIVE_NAME, "");
+            String location = SpUtil.getString(Constant.SIGN_OUT_LOCATION, "");
+            int activeId = SpUtil.getInt(Constant.SIGN_OUT_ACTIVE_ID, 0);
+            String endTime = SpUtil.getString(Constant.SIGN_OUT_ENDTIME, "");
+
+            active.setActiveId(activeId);
+            active.setActiveName(activeName);
+            active.setActiveLocation(location);
+            active.setEndTime(endTime);
+
+            Intent intent = new Intent(this, MoveActivity2.class);
+            intent.putExtra("active",active);
+            intent.putExtra("yunziId", SpUtil.getString(Constant.SIGN_OUT_YUNZIID,""));
+
+            startActivity(intent);
+        }
     }
 
     // 上传未上传成功的记录

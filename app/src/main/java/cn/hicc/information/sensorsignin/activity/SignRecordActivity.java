@@ -79,11 +79,15 @@ public class SignRecordActivity extends AppCompatActivity {
                 JSONArray data = jsonObject.getJSONArray("data");
                 for (int i=0; i<data.length(); i++) {
                     JSONObject object = data.getJSONObject(i);
-                    SignInfo signInfo = new SignInfo();
-                    signInfo.setInTime(object.getString("InTime"));
-                    signInfo.setOutTime(object.getString("OutTime"));
-                    signInfoList.add(signInfo);
-                    getName(signInfoList.get(i), object.getString("StudnetNum"));
+                    String in = object.getString("InTime");
+                    String out = object.getString("OutTime");
+                    if (!in.equals(out)) {
+                        SignInfo signInfo = new SignInfo();
+                        signInfo.setInTime(in);
+                        signInfo.setOutTime(out);
+                        signInfoList.add(signInfo);
+                        getName(signInfoList.get(i), object.getString("StudnetNum"));
+                    }
                 }
 
                 swipe_refresh.setRefreshing(false);

@@ -25,7 +25,6 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -33,7 +32,6 @@ import cn.hicc.information.sensorsignin.db.MyDatabase;
 import cn.hicc.information.sensorsignin.model.Active;
 import cn.hicc.information.sensorsignin.model.SignItem;
 import cn.hicc.information.sensorsignin.utils.Constant;
-import cn.hicc.information.sensorsignin.utils.Logs;
 import cn.hicc.information.sensorsignin.utils.SpUtil;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import okhttp3.Call;
@@ -41,77 +39,30 @@ import okhttp3.Call;
 /**
  * 此界面为活动详情——陈帅
  */
-public class DetailActivity2 extends AppCompatActivity {
+public class DetailActivity3 extends AppCompatActivity {
 
     private Active active;
     private MyBroadcast myBroadcast;
     private String sensor2ID;
     private String yunziId;
     private boolean isCan = false;
-    private boolean stop = false;
     private List<String> sensorList = new ArrayList<>();
     private MyDatabase database;
     private int clickCount = 0;
     private int clickDebug = 0;
     private ProgressDialog progressDialog;
     private int mNid = -1;
-    private TextView tv_total_time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail2);
+        setContentView(R.layout.activity_detail3);
 
         //初始化数据
         initData();
 
         // 初始化控件
         initView();
-
-        // 更新时间
-        updataTime();
-    }
-
-    private void updataTime() {
-        // 如果没有签离
-        final SignItem signItem = new SignItem();
-        if (database.isSignOut(SpUtil.getString(Constant.ACCOUNT, ""), active.getActiveId(), signItem) == 0) {
-            tv_total_time.setVisibility(View.VISIBLE);
-            stop = true;
-            new Thread(){
-                @Override
-                public void run() {
-                    super.run();
-                    while (stop) {
-                        try {
-                            Thread.sleep(1000);
-                            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                            // 获取当前时间
-                            long now = System.currentTimeMillis();
-                            // 计算从签到时间开始，经过了多长时间
-                            long total = now - df.parse(signItem.getInTime()).getTime();
-                            // 将毫秒转换成时间格式
-                            Calendar calendar = Calendar.getInstance();
-                            calendar.setTimeInMillis(total);
-                            // 计算天数
-                            long days = total / (1000 * 60 * 60 * 24);
-                            // 计算小时数
-                            final long hours = (total - days * (1000 * 60 * 60 * 24)) / (1000 * 60 * 60);
-                            // 转换成时间格式
-                            final String totalTime = df.format(calendar.getTime());
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    tv_total_time.setText(hours + ":" + totalTime.substring(totalTime.indexOf(":") + 1));
-                                }
-                            });
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }.start();
-        }
     }
 
     // 初始化控件
@@ -132,14 +83,12 @@ public class DetailActivity2 extends AppCompatActivity {
         CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
         // 设置标题和背景图
         toolbarLayout.setTitle(active.getActiveName());
-        tv_total_time = (TextView) findViewById(R.id.tv_total_time);
 
         TextView activityLocation = (TextView) findViewById(R.id.tv_location);
         TextView activityDes = (TextView) findViewById(R.id.tv_des);
         TextView tv_time = (TextView) findViewById(R.id.tv_time);
         TextView tv_end_time = (TextView) findViewById(R.id.tv_end_time);
         Button signButton = (Button) findViewById(R.id.loginButton);
-        Button bt_sign_out = (Button) findViewById(R.id.bt_sign_out);
 
         activityLocation.setText("地点：" + active.getActiveLocation());
         activityDes.setText("    " + active.getActiveDes());
@@ -154,81 +103,6 @@ public class DetailActivity2 extends AppCompatActivity {
                 showSignConfirmDialog();
             }
         });
-
-        // 签离按钮点击事件
-        bt_sign_out.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 签离逻辑
-                showSignOutConfirmDialog();
-            }
-        });
-    }
-
-    // 签离逻辑
-    private void signOut() {
-        // 如果没有签离
-        SignItem signItem = new SignItem();
-        int flag = database.isSignOut(SpUtil.getString(Constant.ACCOUNT, ""), active.getActiveId(), signItem);
-        switch (flag) {
-            // 没有签离
-            case 0:
-                mNid = signItem.getNid();
-                Logs.i("mNid:" + mNid);
-                signOutForService();
-                break;
-            // 已经签离
-            case 1:
-                ToastUtil.show("您已经签离了，请下次再来吧");
-                break;
-            // 没有签到
-            case 2:
-                ToastUtil.show("您还没有签到");
-                break;
-            // 异常
-            case 3:
-                break;
-        }
-    }
-
-    // 发送签离时间到网络
-    private void signOutForService() {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        final String outTime = df.format(new Date());
-        showDialog("签离中...");
-        OkHttpUtils
-                .get()
-                .url(Constant.API_URL + "api/TSign/UpdOutTime")
-                .addParams("nid", mNid+"")
-                .addParams("outtime", outTime)
-                .build()
-                .execute(new StringCallback() {
-                    @Override
-                    public void onError(Call call, Exception e, int i) {
-                        closeDialog();
-                        ToastUtil.show("签离失败:" + e.toString());
-                    }
-
-                    @Override
-                    public void onResponse(String s, int i) {
-                        closeDialog();
-                        try {
-                            JSONObject jsonObject = new JSONObject(s);
-                            if (jsonObject.getBoolean("sucessed")) {
-                                database.updateSignOutTime(mNid,outTime);
-                                tv_total_time.setVisibility(View.GONE);
-                                stop = false;
-                                finish();
-                                ToastUtil.show("签离成功");
-                            } else {
-                                ToastUtil.show("签离失败："+ jsonObject.getString("Msg"));
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            ToastUtil.show("签离失败:" + e.toString());
-                        }
-                    }
-                });
     }
 
     // 签到逻辑
@@ -316,10 +190,12 @@ public class DetailActivity2 extends AppCompatActivity {
                             if (jsonObject.getBoolean("sucessed")) {
                                 mNid = jsonObject.getInt("data");
                                 saveSignInData(inTime);
-                                ToastUtil.show("签到成功");
-                                tv_total_time.setVisibility(View.VISIBLE);
-                                stop = true;
-                                updataTime();
+                                Intent intent = new Intent(DetailActivity3.this, MoveActivity2.class);
+                                intent.putExtra("active",active);
+                                intent.putExtra("yunziId", yunziId);
+
+                                startActivity(intent);
+                                finish();
                             } else {
                                 ToastUtil.show("签到失败："+ jsonObject.getString("Msg"));
                             }
@@ -453,32 +329,6 @@ public class DetailActivity2 extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 signIn();
-            }
-        });
-        //设置消极的按钮
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        });
-        builder.show();
-    }
-
-    // 显示确认签离对话框
-    private void showSignOutConfirmDialog() {
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
-        //设置对话框左上角图标
-        builder.setIcon(R.mipmap.logo);
-        //设置对话框标题
-        builder.setTitle("确定要签离");
-        //设置文本内容
-        builder.setMessage("您确定要对该活动签离");
-        //设置积极的按钮
-        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                signOut();
             }
         });
         //设置消极的按钮

@@ -24,7 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.hicc.information.sensorsignin.activity.DetailActivity2;
+import cn.hicc.information.sensorsignin.activity.DetailActivity3;
 import cn.hicc.information.sensorsignin.model.Active;
 import cn.hicc.information.sensorsignin.utils.Constant;
 import cn.hicc.information.sensorsignin.utils.Logs;
@@ -69,7 +69,7 @@ public class ActivityFragment extends BaseFragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Active active = mActiveList.get(position);
-                Intent intent = new Intent(getContext(), DetailActivity2.class);
+                Intent intent = new Intent(getContext(), DetailActivity3.class);
                 intent.putExtra("active", active);
                 intent.putExtra("yunziId", yunziId);
                 startActivity(intent);

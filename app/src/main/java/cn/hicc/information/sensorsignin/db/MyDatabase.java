@@ -151,19 +151,22 @@ public class MyDatabase {
         boolean flag = false;
         try {
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String currentTime = df.format(new Date());
             long big = -1;
+            String out = "";
             Cursor cursor = db.query("Sign", new String[]{"outTime"}, "number=? and activeId=?", new String[]{number, String.valueOf(activeId)}, null, null, null);
             while (cursor.moveToNext()) {
                 String outTime = cursor.getString(cursor.getColumnIndex("outTime"));
                 if (big < df.parse(outTime).getTime()) {
                     big = df.parse(outTime).getTime();
+                    out = outTime;
                 }
             }
             cursor.close();
 
-            // 如果当前时间超过上次签离时间24个小时，就可以签到
-            if ( (df.parse(currentTime).getTime() - big) >= 1000 * 60 * 60 * 24) {
+            // 如果当前时间超过上次签离时间一天，就可以签到
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String currentTime = sdf.format(new Date());
+            if (out.equals("") || (sdf.parse(currentTime).getTime() - sdf.parse(out.substring(0,10)).getTime()) >= 1000 * 60 * 60 * 24) {
                 flag = true;
             }
 
@@ -199,15 +202,19 @@ public class MyDatabase {
             long big = -1;
             String inTime = "";
             String endTime = "";
-            Cursor cursor = db.query("Sign", new String[]{"inTime","outTime","nid"}, "number=? and activeId=?", new String[]{number, String.valueOf(activeId)}, null, null, null);
+            Cursor cursor = db.query("Sign", null, "number=? and activeId=?", new String[]{number, String.valueOf(activeId)}, null, null, null);
             while (cursor.moveToNext()) {
                 String outTime = cursor.getString(cursor.getColumnIndex("outTime"));
                 if (big < df.parse(outTime).getTime()) {
                     big = df.parse(outTime).getTime();
                     inTime = cursor.getString(cursor.getColumnIndex("inTime"));
                     endTime = outTime;
-                    signItem.setNid(cursor.getInt(cursor.getColumnIndex("nid")));
                     Logs.i("nid:" + cursor.getInt(cursor.getColumnIndex("nid")));
+
+                    signItem.setActiveId(cursor.getInt(cursor.getColumnIndex("activeId")));
+                    signItem.setNumber(cursor.getString(cursor.getColumnIndex("number")));
+                    signItem.setNid(cursor.getInt(cursor.getColumnIndex("nid")));
+                    signItem.setOutTime(cursor.getString(cursor.getColumnIndex("outTime")));
                     signItem.setInTime(inTime);
                 }
             }

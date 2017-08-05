@@ -65,7 +65,6 @@ public class SensorService extends Service {
         oldSerialNumber.clear();
     }
 
-
     // 开启SDK
     private void startSDK() {
         /**

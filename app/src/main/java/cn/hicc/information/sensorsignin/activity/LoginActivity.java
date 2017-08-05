@@ -521,7 +521,7 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             SpUtil.putString(Constant.ACCOUNT,userName);
             SpUtil.putString(Constant.PASS_WORD,mPwd);
-            SpUtil.putBoolean(Constant.IS_REMBER_PWD,false);
+            SpUtil.putBoolean(Constant.IS_REMBER_PWD,true);
         }
     }
 
@@ -534,7 +534,6 @@ public class LoginActivity extends AppCompatActivity {
 
     // 初始化控件
     private void initView() {
-
         et_account = (EditText) findViewById(R.id.et_account);
         et_password = (EditText) findViewById(R.id.et_password);
         cb_remember = (CheckBox) findViewById(R.id.cb_remember);
