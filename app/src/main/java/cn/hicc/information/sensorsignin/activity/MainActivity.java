@@ -100,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
         // 如果sp里有数据，说明有未签离的活动，需要跳转到签离界面
         if (!SpUtil.getString(Constant.SIGN_OUT_ACTIVE_NAME,"").equals("")) {
             Active active = new Active();
-
             String activeName = SpUtil.getString(Constant.SIGN_OUT_ACTIVE_NAME, "");
             String location = SpUtil.getString(Constant.SIGN_OUT_LOCATION, "");
             int activeId = SpUtil.getInt(Constant.SIGN_OUT_ACTIVE_ID, 0);
