@@ -90,6 +90,12 @@
         <activity android:name="cn.hicc.information.sensorsignin.activity.SignRecordActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoTitle" />
+        <activity android:name="cn.hicc.information.sensorsignin.activity.FeedBackActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoTitle" />
+        <activity android:name="cn.hicc.information.sensorsignin.activity.LookFeedbackActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoTitle" />
 
         <service android:name="cn.hicc.information.sensorsignin.service.SensorService" />
         <service android:name="com.sensoro.beacon.kit.BeaconService" />

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/tv_account"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="10dp"
+            android:text="账号"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tv_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="10dp"
+            android:text="意见反馈信息，意见反馈信息"
+            android:textSize="18sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_phone"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_weight="1"
+                android:text="手机型号"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tv_version"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="android版本"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+</android.support.v7.widget.CardView>

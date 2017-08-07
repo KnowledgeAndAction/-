@@ -31,8 +31,10 @@ import java.io.File;
 
 import cn.hicc.information.sensorsignin.MyApplication;
 import cn.hicc.information.sensorsignin.activity.ChangePswActivity;
+import cn.hicc.information.sensorsignin.activity.FeedBackActivity;
 import cn.hicc.information.sensorsignin.activity.LoginActivity;
 import cn.hicc.information.sensorsignin.activity.LookActiveForIdActivity;
+import cn.hicc.information.sensorsignin.activity.LookFeedbackActivity;
 import cn.hicc.information.sensorsignin.model.ExitEvent;
 import cn.hicc.information.sensorsignin.utils.Constant;
 import cn.hicc.information.sensorsignin.utils.Logs;
@@ -47,9 +49,11 @@ import okhttp3.Call;
 public class SettingFragment extends BaseFragment implements View.OnClickListener {
     private TextView tv_changePassWorld;
     private TextView tv_checkToUpdata;
+    private TextView tv_feed_back;
     private TextView tv_esc;
     private ProgressDialog progressDialog;
     private long[] mHit = new long[6];
+    private TextView tv_look_feed_back;
 
 
     @Override
@@ -70,10 +74,14 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
     private void inItUI(View view) {
         tv_changePassWorld = (TextView) view.findViewById(R.id.tv_changePassWorld);
         tv_checkToUpdata = (TextView) view.findViewById(R.id.tv_checkToUpdate);
+        tv_feed_back = (TextView) view.findViewById(R.id.tv_feed_back);
+        tv_look_feed_back = (TextView) view.findViewById(R.id.tv_look_feed_back);
         tv_esc = (TextView) view.findViewById(R.id.tv_esc);
 
         tv_changePassWorld.setOnClickListener(this);
         tv_checkToUpdata.setOnClickListener(this);
+        tv_feed_back.setOnClickListener(this);
+        tv_look_feed_back.setOnClickListener(this);
         tv_esc.setOnClickListener(this);
 
         ImageView iv_pic = (ImageView) view.findViewById(R.id.iv_pic);
@@ -122,6 +130,15 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
                 dialog.show();
             }
         });
+
+        // 如果是开发者
+        if (SpUtil.getString(Constant.PASS_WORD,"").equals("ccce27a4d2a2cb38de55e3d207b03a47")) {
+            tv_look_feed_back.setVisibility(View.VISIBLE);
+            tv_feed_back.setVisibility(View.GONE);
+        } else {
+            tv_look_feed_back.setVisibility(View.GONE);
+            tv_feed_back.setVisibility(View.VISIBLE);
+        }
     }
 
     //设置按钮的点击事件。
@@ -157,6 +174,12 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
                                 getAppInfoJson(response);
                             }
                         });
+                break;
+            case R.id.tv_feed_back:
+                startActivity(new Intent(getContext(), FeedBackActivity.class));
+                break;
+            case R.id.tv_look_feed_back:
+                startActivity(new Intent(getContext(), LookFeedbackActivity.class));
                 break;
             case R.id.tv_esc:
                 showConfirmDialog();

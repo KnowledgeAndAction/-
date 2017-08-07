@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:elevation="0dp">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:background="#ffffff"
+        android:src="@drawable/ic_feed" />
+
+    <TextView
+        android:id="@+id/feedback_group_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="如果您遇到什么问题，可以随时联系我们，\nQQ讨论组：http://url.cn/4EyBiy9"
+        android:textSize="16sp" />
+
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:padding="5dp">
+
+        <EditText
+            android:id="@+id/feedback_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="请输入您的意见"
+            android:maxLines="5" />
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:id="@+id/submit_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:background="@drawable/button_bg"
+        android:text="提  交"
+        android:textColor="#fff"
+        android:textSize="16sp" />
+
+</LinearLayout>

@@ -98,6 +98,37 @@
         android:layout_height="1dp"
         android:background="#e6e6e6" />
 
+    <TextView
+        android:id="@+id/tv_feed_back"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="3dp"
+        android:layout_marginTop="3dp"
+        android:background="@drawable/button_esc_bg"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="意见反馈"
+        android:textSize="16sp"
+        android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/tv_look_feed_back"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="3dp"
+        android:layout_marginTop="3dp"
+        android:background="@drawable/button_esc_bg"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="查看意见反馈"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#e6e6e6" />
+
 
     <TextView
         android:id="@+id/tv_esc"
