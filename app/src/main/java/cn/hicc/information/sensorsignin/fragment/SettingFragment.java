@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -31,6 +32,7 @@ import java.io.File;
 import cn.hicc.information.sensorsignin.MyApplication;
 import cn.hicc.information.sensorsignin.activity.ChangePswActivity;
 import cn.hicc.information.sensorsignin.activity.LoginActivity;
+import cn.hicc.information.sensorsignin.activity.LookActiveForIdActivity;
 import cn.hicc.information.sensorsignin.model.ExitEvent;
 import cn.hicc.information.sensorsignin.utils.Constant;
 import cn.hicc.information.sensorsignin.utils.Logs;
@@ -47,6 +49,7 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
     private TextView tv_checkToUpdata;
     private TextView tv_esc;
     private ProgressDialog progressDialog;
+    private long[] mHit = new long[6];
 
 
     @Override
@@ -100,6 +103,21 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
                         .centerCrop()
                         .error(R.drawable.icon_pic)
                         .into(iv_avatar);
+
+                // 6击打开查看云子活动功能
+                iv_avatar.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // 如果是管理员，才有这个功能
+                        if (SpUtil.getString(Constant.ACCOUNT,"").equals("admin")) {
+                            System.arraycopy(mHit, 1, mHit, 0, mHit.length-1);
+                            mHit[mHit.length-1] = SystemClock.uptimeMillis();
+                            if(mHit[mHit.length-1]-mHit[0] < 1000){
+                                startActivity(new Intent(getContext(),LookActiveForIdActivity.class));
+                            }
+                        }
+                    }
+                });
 
                 dialog.show();
             }

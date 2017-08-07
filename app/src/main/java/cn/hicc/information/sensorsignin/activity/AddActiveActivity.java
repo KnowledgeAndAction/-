@@ -20,6 +20,7 @@ import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -220,7 +221,7 @@ public class AddActiveActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 // 提交活动
                 showProgressDialog();
-                submitService(activeName, activeDes, activeLocation, yunziId, dateTime,endDateTime, mRule);
+                quireYunziActive(activeName, activeDes, activeLocation, yunziId, dateTime,endDateTime);
                 dialog.dismiss();
             }
         });
@@ -233,6 +234,43 @@ public class AddActiveActivity extends AppCompatActivity {
         });
 
         builder.show();
+    }
+
+    // 查询该云子上是否已经有活动
+    private void quireYunziActive(final String activeName, final String activeDes, final String activeLocation, final String yunziId, final String dateTime, final String endDateTime) {
+        OkHttpUtils
+                .get()
+                .url(Constant.API_URL + "api/TActivity/GetActivity")
+                .addParams("sensorId", yunziId)
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int i) {
+                        ToastUtil.show("添加活动失败，请稍后重试"+e.toString());
+                        closeProgressDialog();
+                    }
+
+                    @Override
+                    public void onResponse(String s, int i) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(s);
+                            boolean sucessed = jsonObject.getBoolean("sucessed");
+                            if (sucessed) {
+                                JSONArray data = jsonObject.getJSONArray("data");
+                                JSONObject activity = data.getJSONObject(0);
+                                String name = activity.getString("ActivityName");
+                                ToastUtil.showLong("这个云子上已经有活动：" + name + "，请检查后重试");
+                                closeProgressDialog();
+                            } else {
+                                submitService(activeName, activeDes, activeLocation, yunziId, dateTime,endDateTime, mRule);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            ToastUtil.show("添加活动失败，请稍后重试"+e.toString());
+                            closeProgressDialog();
+                        }
+                    }
+                });
     }
 
     // 提交活动信息到数据库

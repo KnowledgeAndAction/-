@@ -68,6 +68,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoTitle" />
         <activity
+            android:name="cn.hicc.information.sensorsignin.activity.LookActiveForIdActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoTitle" />
+        <activity
             android:name="cn.hicc.information.sensorsignin.activity.GuideActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoTitle" />
