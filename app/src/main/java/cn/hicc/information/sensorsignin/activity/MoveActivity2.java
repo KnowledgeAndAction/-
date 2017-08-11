@@ -20,6 +20,7 @@ import com.zhy.http.okhttp.callback.StringCallback;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -59,6 +60,7 @@ public class MoveActivity2 extends AppCompatActivity {
     private boolean stop = true;
     private int mNid;
     private String endTime;
+    private SignItem signItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +83,36 @@ public class MoveActivity2 extends AppCompatActivity {
 
         // 保存未签离的数据
         saveUnSignOutData();
+
+        // 检测是否已经到了结束时间
+        checkSignOut();
+    }
+
+    // 检测是否已经到了结束时间
+    private void checkSignOut() {
+        // TODO 判断是否过了签离时间
+        try {
+            SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
+            String inTime = signItem.getInTime().substring(0,10);
+            String endTime1 = SpUtil.getString("endTime", "").replace("T", " ").substring(11, 19);
+            String dayTime = sdf1.format(new Date());//当前时间
+
+            SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm:ss");
+            String hourTime = sdf2.format(new Date());//当前时间
+            long end = sdf2.parse(endTime1).getTime();
+            long time = sdf2.parse(hourTime).getTime();
+
+            // 如果超过一天
+            if ((sdf1.parse(dayTime).getTime() - sdf1.parse(inTime).getTime()) >= 1000 * 60 * 60 * 24) {
+                outTime = inTime + " " + endTime1;
+                signForService();
+            } else if (time > end) {
+                outTime = inTime + " " + endTime1;
+                signForService();
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     // 清除未签离的活动数据
@@ -94,11 +126,11 @@ public class MoveActivity2 extends AppCompatActivity {
 
     // 保存未签离的数据
     private void saveUnSignOutData() {
-        SpUtil.putString(Constant.SIGN_OUT_YUNZIID,yunziId);
-        SpUtil.putString(Constant.SIGN_OUT_ACTIVE_NAME,activeName);
-        SpUtil.putString(Constant.SIGN_OUT_LOCATION,location);
+        SpUtil.putString(Constant.SIGN_OUT_YUNZIID, yunziId);
+        SpUtil.putString(Constant.SIGN_OUT_ACTIVE_NAME, activeName);
+        SpUtil.putString(Constant.SIGN_OUT_LOCATION, location);
         SpUtil.putInt(Constant.SIGN_OUT_ACTIVE_ID, (int) activeId);
-        SpUtil.putString(Constant.SIGN_OUT_ENDTIME,endTime);
+        SpUtil.putString(Constant.SIGN_OUT_ENDTIME, endTime);
     }
 
     // 注册自动签离广播接收者
@@ -121,20 +153,20 @@ public class MoveActivity2 extends AppCompatActivity {
             activeId = active.getActiveId();
             endTime = active.getEndTime();
 
-            SpUtil.putString("yunziId",yunziId);
-            SpUtil.putString("endTime",endTime);
+            SpUtil.putString("yunziId", yunziId);
+            SpUtil.putString("endTime", endTime);
         }
     }
 
     // 更新计时
     private void updataTime() {
         // 如果还没有签离
-        final SignItem signItem = new SignItem();
+        signItem = new SignItem();
         int flag = database.isSignOut(SpUtil.getString(Constant.ACCOUNT, ""), activeId, signItem);
         tv_inTime.setText("签到时间：" + signItem.getInTime().substring(11));
         mNid = signItem.getNid();
         if (flag == 0) {
-            new Thread(){
+            new Thread() {
                 @Override
                 public void run() {
                     super.run();
@@ -200,20 +232,21 @@ public class MoveActivity2 extends AppCompatActivity {
     private void signOut() {
         getOutTime();
         // TODO 如果可以签离 为了优化用户体验，当连续点击15次，可以签到
-        if(isCan || clickCount > 14){
+        if (isCan || clickCount > 14) {
             isClick = true;
             // 发送时间数据
             signForService();
-        }else {
+        } else {
             clickCount++;
             ToastUtil.show("暂时无法签离，请稍后重试，并确保您在活动地点附近");
         }
     }
 
     // 发送时间数据
-    private void signForService(){
+    private void signForService() {
         showDialog();
-        OkHttpUtils
+        // get
+        /*OkHttpUtils
                 .get()
                 .url(Constant.API_URL + "api/TSign/UpdOutTime")
                 .addParams("nid", mNid+"")
@@ -249,6 +282,49 @@ public class MoveActivity2 extends AppCompatActivity {
                             ToastUtil.show("签离失败:" + e.toString());
                         }
                     }
+                });*/
+
+        // post
+        OkHttpUtils
+                .post()
+                .url(Constant.API_URL + "api/TSign/UpdSign")
+                .addParams("Nid", mNid + "")
+                .addParams("OutTime", outTime)
+                .addParams("StudnetNum", signItem.getNumber())
+                .addParams("InTime", signItem.getInTime())
+                .addParams("ActivityId", signItem.getActiveId() + "")
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int i) {
+                        closeDialog();
+                        ToastUtil.show("签离失败:" + e.toString());
+                    }
+
+                    @Override
+                    public void onResponse(String s, int i) {
+                        closeDialog();
+                        try {
+                            JSONObject jsonObject = new JSONObject(s);
+                            if (jsonObject.getBoolean("sucessed")) {
+                                database.updateSignOutTime(mNid, outTime);
+                                stop = false;
+                                ToastUtil.show("签离成功");
+
+                                // 签离后将保存的活动结束时间清空
+                                SpUtil.remove("endTime");
+                                SpUtil.remove("yunziId");
+                                clearUnSignOutData();
+
+                                finish();
+                            } else {
+                                ToastUtil.show("签离失败：" + jsonObject.getString("Msg"));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            ToastUtil.show("签离失败:" + e.toString());
+                        }
+                    }
                 });
     }
 
@@ -263,7 +339,7 @@ public class MoveActivity2 extends AppCompatActivity {
             // 如果当集合中包含进入活动的云子id，就可以签离
             isCan = sensorList.contains(yunziId);
 
-            // 离开时间超过10分钟，自动签离
+            // 离开时间超过10分钟，或到了结束时间，自动签离
             boolean isLeave = intent.getBooleanExtra("isLeave", false);
             if (isLeave) {
                 isClick = true;
@@ -277,7 +353,7 @@ public class MoveActivity2 extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(myBroadcast != null){
+        if (myBroadcast != null) {
             unregisterReceiver(myBroadcast);
         }
         // 在页面销毁时，如果没有点击过签离按钮，就自动签离
@@ -285,7 +361,6 @@ public class MoveActivity2 extends AppCompatActivity {
             getOutTime();
             signForService();
         }
-        SpUtil.remove("yunziId");
     }
 
     // 重写返回键  使其回到桌面
@@ -321,7 +396,7 @@ public class MoveActivity2 extends AppCompatActivity {
     private void showSignOutConfirmDialog() {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         //设置对话框左上角图标
-        builder.setIcon(R.mipmap.logo);
+        builder.setIcon(R.mipmap.logo2);
         //设置对话框标题
         builder.setTitle("确定要签离");
         //设置文本内容

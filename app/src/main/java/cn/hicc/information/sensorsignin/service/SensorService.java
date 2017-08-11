@@ -96,12 +96,17 @@ public class SensorService extends Service {
                 // 如果存储的云子id中不包含此次发现的  就将新的添加到集合中，发送广播
                 if (!oldSerialNumber.contains(serialNumber)) {
                     oldSerialNumber.add(serialNumber);
-                    Logs.d("service发现新云子:" + serialNumber);
+                    /*Logs.d("service发现新云子:" + serialNumber);
                     Intent intent = new Intent();
                     intent.putExtra("yunzi", serialNumber);
                     intent.setAction("GET_YUNZI_ID");
-                    sendBroadcast(intent);
+                    sendBroadcast(intent);*/
                 }
+                Logs.d("service发现新云子:" + serialNumber);
+                Intent intentNew = new Intent();
+                intentNew.putExtra("yunzi", serialNumber);
+                intentNew.setAction("GET_YUNZI_ID");
+                sendBroadcast(intentNew);
 
                 // 签到 签离界面需要的广播
                 Intent intent = new Intent();
@@ -114,12 +119,14 @@ public class SensorService extends Service {
                 }
             }
 
+            /**
+             * 一个传感器消失
+             */
             @Override
             public void onGoneBeacon(Beacon beacon) {
                 Logs.d("service一个云子消失了:" + beacon.getSerialNumber());
                 if (oldSerialNumber.contains(beacon.getSerialNumber())) {
-                    // TODO 暂时不做动态的
-                    //oldSerialNumber.remove(beacon.getSerialNumber());
+                    oldSerialNumber.remove(beacon.getSerialNumber());
                     Intent intent = new Intent();
                     intent.setAction("SENSOR_GONE");
                     intent.putExtra("sensorNumber", beacon.getSerialNumber());
@@ -183,8 +190,8 @@ public class SensorService extends Service {
 
                         // 判断是否到了活动结束时间
                         if (!SpUtil.getString("endTime","").equals("")) {
-                            String endTime1 = SpUtil.getString("endTime", "").replace("T", " ").substring(0, 19);
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            String endTime1 = SpUtil.getString("endTime", "").replace("T", " ").substring(11, 19);
+                            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
                             String presentTime = sdf.format(new Date());//当前时间
 
                             long end = sdf.parse(endTime1).getTime();

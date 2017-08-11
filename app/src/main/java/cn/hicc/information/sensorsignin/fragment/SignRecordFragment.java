@@ -29,7 +29,7 @@ import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import okhttp3.Call;
 
 /**
- * 签到记录——陈帅
+ * 管理员查看签到记录——陈帅
  */
 
 public class SignRecordFragment extends BaseFragment {
@@ -120,16 +120,19 @@ public class SignRecordFragment extends BaseFragment {
                                     long activeId = activity.getLong("Nid");
                                     int rule = activity.getInt("Rule");
                                     String endTime = activity.getString("EndTime");
+                                    int show = activity.getInt("Show");
 
-                                    Active active = new Active();
-                                    active.setActiveId(activeId);
-                                    active.setActiveName(name);
-                                    active.setActiveTime(time);
-                                    active.setActiveDes(des);
-                                    active.setActiveLocation(location);
-                                    active.setRule(rule);
-                                    active.setEndTime(endTime);
-                                    mActiveList.add(active);
+                                    if (show == 1) {
+                                        Active active = new Active();
+                                        active.setActiveId(activeId);
+                                        active.setActiveName(name);
+                                        active.setActiveTime(time);
+                                        active.setActiveDes(des);
+                                        active.setActiveLocation(location);
+                                        active.setRule(rule);
+                                        active.setEndTime(endTime);
+                                        mActiveList.add(active);
+                                    }
                                 }
                             } else {
                                 ToastUtil.show("暂无数据");
@@ -143,5 +146,13 @@ public class SignRecordFragment extends BaseFragment {
                         }
                     }
                 });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        swipe_refresh.setRefreshing(true);
+        // 获取活动
+        getActive();
     }
 }

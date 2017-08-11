@@ -1,10 +1,13 @@
 package cn.hicc.information.sensorsignin.fragment;
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.hicc.information.sensorsignin.activity.DetailActivity3;
+import cn.hicc.information.sensorsignin.db.MyDatabase;
 import cn.hicc.information.sensorsignin.model.Active;
+import cn.hicc.information.sensorsignin.model.Saying;
 import cn.hicc.information.sensorsignin.utils.Constant;
 import cn.hicc.information.sensorsignin.utils.Logs;
 import cn.hicc.information.sensorsignin.utils.ToastUtil;
@@ -42,7 +47,25 @@ public class ActivityFragment extends BaseFragment {
     private String yunziId;
     private MyAdapter adapter;
     private SensorGoneBroadcast sensorGoneBroadcast;
-    private MyUpdataBroadcast myUpdataBroadcast;
+    private ProgressDialog progressDialog;
+    private MyDatabase db;
+    private List<Saying> sayingList;
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case 0:
+                    closeDialog();
+                    break;
+                case 1:
+                    closeDialog();
+                    break;
+            }
+
+        }
+    };
+    private long startTime;
 
     @Override
     public void fetchData() {
@@ -52,10 +75,18 @@ public class ActivityFragment extends BaseFragment {
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_active, container, false);
 
+        db = MyDatabase.getInstance();
+        sayingList = db.getSaying();
+
         // 注册广播接收者
         initBroadcast();
 
         initView(view);
+
+        startTime = System.currentTimeMillis();
+        showDialog();
+
+        Logs.d("saying" + sayingList.size());
 
         return view;
     }
@@ -90,12 +121,6 @@ public class ActivityFragment extends BaseFragment {
         IntentFilter filter = new IntentFilter();
         filter.addAction("SENSOR_GONE");
         getContext().registerReceiver(sensorGoneBroadcast, filter);
-
-        // 注册云子更新信息广播接收者
-        myUpdataBroadcast = new MyUpdataBroadcast();
-        IntentFilter intentFilter2 = new IntentFilter();
-        intentFilter2.addAction("SET_BROADCST_OUT");
-        getContext().registerReceiver(myUpdataBroadcast, intentFilter2);
     }
 
     // 从网络获取活动信息
@@ -108,11 +133,12 @@ public class ActivityFragment extends BaseFragment {
                 .execute(new StringCallback() {
                     @Override
                     public void onError(Call call, Exception e, int i) {
-                        ToastUtil.show("获取活动失败，请稍后重试"+e.toString());
+                        ToastUtil.show("获取活动失败，请稍后重试" + e.toString());
                     }
 
                     @Override
                     public void onResponse(String s, int i) {
+                        System.out.println(s);
                         try {
                             JSONObject jsonObject = new JSONObject(s);
                             boolean sucessed = jsonObject.getBoolean("sucessed");
@@ -127,43 +153,57 @@ public class ActivityFragment extends BaseFragment {
                                     long activeId = activity.getLong("Nid");
                                     String endTime = activity.getString("EndTime");
                                     String rule = activity.getString("Rule");
+                                    int show = activity.getInt("Show");
 
-                                    // 获取当前时间，判断该活动是否已经失效，不失效时才添加到集合中
-                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                    String presentTime = sdf.format(new java.util.Date());
-                                    if (sdf.parse(presentTime).getTime() <= sdf.parse(endTime.replace("T", " ").substring(0, 19)).getTime()) {
-                                        if (mActiveList.contains(getActiveForSensor(yunziId))) {
-                                            Active activeForSensor = getActiveForSensor(yunziId);
-                                            activeForSensor.setActiveId(activeId);
-                                            activeForSensor.setSersorID(yunziId);
-                                            activeForSensor.setActiveName(name);
-                                            activeForSensor.setActiveTime(time);
-                                            activeForSensor.setActiveDes(des);
-                                            activeForSensor.setActiveLocation(location);
-                                            activeForSensor.setEndTime(endTime);
-                                            activeForSensor.setRule(Integer.parseInt(rule));
+                                    if (show == 1) {
+                                        // 获取当前时间，判断该活动是否已经失效，不失效时才添加到集合中
+                                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                        String presentTime = sdf.format(new java.util.Date());
+                                        if (sdf.parse(presentTime).getTime() <= sdf.parse(endTime.replace("T", " ").substring(0, 19)).getTime()) {
+                                            if (getActiveForNid(activeId) != null) {
+                                                Active activeForId = getActiveForNid(activeId);
+                                                activeForId.setActiveId(activeId);
+                                                activeForId.setSersorID(yunziId);
+                                                activeForId.setActiveName(name);
+                                                activeForId.setActiveTime(time);
+                                                activeForId.setActiveDes(des);
+                                                activeForId.setActiveLocation(location);
+                                                activeForId.setEndTime(endTime);
+                                                activeForId.setRule(Integer.parseInt(rule));
+                                                Logs.d("活动信息更新:" + name);
+                                            } else {
+                                                Active active = new Active();
+                                                active.setActiveId(activeId);
+                                                active.setSersorID(yunziId);
+                                                active.setActiveName(name);
+                                                active.setActiveTime(time);
+                                                active.setActiveDes(des);
+                                                active.setActiveLocation(location);
+                                                active.setEndTime(endTime);
+                                                active.setRule(Integer.parseInt(rule));
+                                                mActiveList.add(active);
+                                                Logs.d("添加一个活动:" + name);
+                                            }
                                         } else {
-                                            Active active = new Active();
-                                            active.setActiveId(activeId);
-                                            active.setSersorID(yunziId);
-                                            active.setActiveName(name);
-                                            active.setActiveTime(time);
-                                            active.setActiveDes(des);
-                                            active.setActiveLocation(location);
-                                            active.setEndTime(endTime);
-                                            active.setRule(Integer.parseInt(rule));
-                                            mActiveList.add(active);
+                                            Active activeForId = getActiveForNid(activeId);
+                                            mActiveList.remove(activeForId);
+                                            Logs.d("这个活动过期了:" + name);
                                         }
                                     } else {
-                                        Logs.d("这个活动过期了:"+yunziId);
+                                        Logs.e("该活动被删除：" + name);
                                     }
                                 }
 
                                 adapter.notifyDataSetChanged();
+                                long endTime = System.currentTimeMillis();
+                                if ((endTime - startTime) < 4000) {
+                                    mHandler.sendEmptyMessageDelayed(0, 4000 - (endTime - startTime));
+                                } else {
+                                    mHandler.sendEmptyMessage(1);
+                                }
                             } else {
-                                Logs.d("这个云子上没有活动："+yunziId);
+                                Logs.d("这个云子上没有活动：" + yunziId);
                             }
-
                         } catch (Exception e) {
                             e.printStackTrace();
                             Logs.d("异常");
@@ -178,8 +218,8 @@ public class ActivityFragment extends BaseFragment {
         public void onReceive(Context context, Intent intent) {
             Logs.d("接收到了云子消失的广播");
             String sensorNumber = intent.getStringExtra("sensorNumber");
-            Active active = getActiveForSensor(sensorNumber);
-            if (active != null) {
+            List<Active> list = getActiveForSensor(sensorNumber);
+            for (Active active : list) {
                 // TODO 暂时不动态更新
                 //mActiveList.remove(active);
                 //adapter.notifyDataSetChanged();
@@ -187,23 +227,14 @@ public class ActivityFragment extends BaseFragment {
         }
     }
 
-    // 云子更新信息广播接收者
+    // 发现云子
     public class MyBroadcast extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Logs.d("发现云子:"+yunziId);
+            Logs.d("发现云子:" + yunziId);
             yunziId = intent.getStringExtra("yunzi");
             // 根据云子id从网络获取具体活动信息
             getActive(yunziId);
-        }
-    }
-
-    // 云子更新信息广播接收者
-    public class MyUpdataBroadcast extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String id = intent.getStringExtra("sensor2ID");
-            //getActive(id);
         }
     }
 
@@ -263,19 +294,46 @@ public class ActivityFragment extends BaseFragment {
         if (sensorGoneBroadcast != null) {
             getContext().unregisterReceiver(sensorGoneBroadcast);
         }
-        if (myUpdataBroadcast != null) {
-            getContext().unregisterReceiver(myUpdataBroadcast);
-        }
         mActiveList.clear();
     }
 
-    // 根据云子id获取对应的活动对象
-    private Active getActiveForSensor(String number) {
+    // 根据云子id获取对应的活动对象集合
+    private List<Active> getActiveForSensor(String number) {
+        List<Active> list = new ArrayList<>();
         for (Active active : mActiveList) {
             if (number.equals(active.getSersorID())) {
+                list.add(active);
+            }
+        }
+        return list;
+    }
+    // 根据Nid获取对应的活动对象
+    private Active getActiveForNid(long nid) {
+        for (Active active : mActiveList) {
+            if (active.getActiveId() == nid) {
                 return active;
             }
         }
         return null;
+    }
+
+    private void showDialog() {
+        // 产生一个随机数
+        int number = (int) (Math.random() * 100) + 1;
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(getContext());
+        }
+        if (sayingList.size() > 0) {
+            int position = number % sayingList.size();
+            progressDialog.setMessage(sayingList.get(position).getContent());
+        }
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+    }
+
+    private void closeDialog() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
     }
 }

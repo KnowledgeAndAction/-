@@ -20,7 +20,6 @@ import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -208,7 +207,7 @@ public class AddActiveActivity extends AppCompatActivity {
     protected void showConfirmDialog(final String activeName, final String activeDes, final String activeLocation, final String yunziId, final String dateTime, final String endDateTime) {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         // 设置对话框左上角图标
-        builder.setIcon(R.mipmap.logo);
+        builder.setIcon(R.mipmap.logo2);
         // 设置不能取消
         builder.setCancelable(false);
         // 设置对话框标题
@@ -221,7 +220,7 @@ public class AddActiveActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 // 提交活动
                 showProgressDialog();
-                quireYunziActive(activeName, activeDes, activeLocation, yunziId, dateTime,endDateTime);
+                submitService(activeName, activeDes, activeLocation, yunziId, dateTime,endDateTime,mRule);
                 dialog.dismiss();
             }
         });
@@ -236,47 +235,10 @@ public class AddActiveActivity extends AppCompatActivity {
         builder.show();
     }
 
-    // 查询该云子上是否已经有活动
-    private void quireYunziActive(final String activeName, final String activeDes, final String activeLocation, final String yunziId, final String dateTime, final String endDateTime) {
-        OkHttpUtils
-                .get()
-                .url(Constant.API_URL + "api/TActivity/GetActivity")
-                .addParams("sensorId", yunziId)
-                .build()
-                .execute(new StringCallback() {
-                    @Override
-                    public void onError(Call call, Exception e, int i) {
-                        ToastUtil.show("添加活动失败，请稍后重试"+e.toString());
-                        closeProgressDialog();
-                    }
-
-                    @Override
-                    public void onResponse(String s, int i) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(s);
-                            boolean sucessed = jsonObject.getBoolean("sucessed");
-                            if (sucessed) {
-                                JSONArray data = jsonObject.getJSONArray("data");
-                                JSONObject activity = data.getJSONObject(0);
-                                String name = activity.getString("ActivityName");
-                                ToastUtil.showLong("这个云子上已经有活动：" + name + "，请检查后重试");
-                                closeProgressDialog();
-                            } else {
-                                submitService(activeName, activeDes, activeLocation, yunziId, dateTime,endDateTime, mRule);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            ToastUtil.show("添加活动失败，请稍后重试"+e.toString());
-                            closeProgressDialog();
-                        }
-                    }
-                });
-    }
-
     // 提交活动信息到数据库
     private void submitService(String activeName, String activeDes, String activeLocation, String yunziId, String dateTime, String endDateTime, int mRule) {
         // GET方法提交
-        OkHttpUtils
+        /*OkHttpUtils
                 .get()
                 .url(Constant.API_URL + "api/TActivity/AddActivity")
                 .addParams("activityname", activeName)
@@ -287,6 +249,30 @@ public class AddActiveActivity extends AppCompatActivity {
                 .addParams("rule", ""+mRule)
                 .addParams("account", SpUtil.getString(Constant.ACCOUNT,""))
                 .addParams("endtime", endDateTime)
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        ToastUtil.show("提交失败：" + e.toString());
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        AnalysisJson(response);
+                    }
+                });*/
+
+        // post
+        OkHttpUtils
+                .post()
+                .url(Constant.API_URL + "api/TActivity/AddActivityPost?sensroId=" + yunziId)
+                .addParams("ActivityName", activeName)
+                .addParams("ActivityDescription", activeDes)
+                .addParams("Time", dateTime)
+                .addParams("Location", activeLocation)
+                .addParams("Rule", ""+mRule)
+                .addParams("Account", SpUtil.getString(Constant.ACCOUNT,""))
+                .addParams("EndTime", endDateTime)
                 .build()
                 .execute(new StringCallback() {
                     @Override

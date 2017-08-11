@@ -3,26 +3,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg">
+    android:background="@drawable/bg_login2">
 
-    <cn.hicc.information.sensorsignin.view.CustomVideoView
+    <!--<cn.hicc.information.sensorsignin.view.CustomVideoView
         android:id="@+id/videoview"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true" />-->
 
-    <ImageView
+    <!--<ImageView
         android:id="@+id/iv_bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
-        android:visibility="gone" />
+        android:visibility="gone" />-->
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:orientation="vertical">
 
         <LinearLayout
@@ -32,19 +35,25 @@
             android:layout_marginTop="100dp"
             android:orientation="horizontal">
 
-            <ImageView
+            <!--<ImageView
                 android:layout_width="38dp"
                 android:layout_height="38dp"
-                android:src="@mipmap/logo" />
+                android:src="@mipmap/logo2" />-->
+            <cn.hicc.information.sensorsignin.view.CircleImageView
+                android:id="@+id/icon"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/hicc_logo" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="10dp"
-                android:text="智慧校园"
+                android:text="小蜜蜂"
                 android:textColor="#ffffff"
-                android:textSize="24sp" />
+                android:textSize="22sp" />
 
         </LinearLayout>
 

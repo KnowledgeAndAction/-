@@ -85,7 +85,8 @@ public class AdminActivityFragment extends BaseFragment {
         myAdapter.setDeleteClickListener(new RecyclerAdapter.OnRecyclerViewDeleteClickListener() {
             @Override
             public void onDeleteClick(View view, int position) {
-                showSafetyDialog(position, (int) mActiveList.get(position).getActiveId());
+                // 显示确认对话框
+                showConfirmDialog(position, (int) mActiveList.get(position).getActiveId());
             }
         });
 
@@ -110,7 +111,6 @@ public class AdminActivityFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        Logs.d("fragment刷新执行了吗");
         swipe_refresh.setRefreshing(true);
         // 获取活动
         getActive();
@@ -147,16 +147,19 @@ public class AdminActivityFragment extends BaseFragment {
                                     long activeId = activity.getLong("Nid");
                                     int rule = activity.getInt("Rule");
                                     String endTime = activity.getString("EndTime");
+                                    int show = activity.getInt("Show");
 
-                                    Active active = new Active();
-                                    active.setActiveId(activeId);
-                                    active.setActiveName(name);
-                                    active.setActiveTime(time);
-                                    active.setActiveDes(des);
-                                    active.setActiveLocation(location);
-                                    active.setRule(rule);
-                                    active.setEndTime(endTime);
-                                    mActiveList.add(active);
+                                    if (show == 1) {
+                                        Active active = new Active();
+                                        active.setActiveId(activeId);
+                                        active.setActiveName(name);
+                                        active.setActiveTime(time);
+                                        active.setActiveDes(des);
+                                        active.setActiveLocation(location);
+                                        active.setRule(rule);
+                                        active.setEndTime(endTime);
+                                        mActiveList.add(active);
+                                    }
                                 }
                             } else {
                                 ToastUtil.show("暂无数据");
@@ -174,9 +177,44 @@ public class AdminActivityFragment extends BaseFragment {
 
     // 删除活动
     private void deleteActive(final int position, int id) {
+        // 真删除
+        /*OkHttpUtils
+                .get()
+                .url(Constant.API_URL + "api/TActivity/DelActivity")
+                .addParams("Nid", id+"")
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        ToastUtil.show("删除失败，请稍后重试：" + e.toString());
+                        closeProgressDialog();
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            boolean sucessed = jsonObject.getBoolean("sucessed");
+                            if (sucessed) {
+                                ToastUtil.show("删除活动成功");
+                                mActiveList.remove(position);
+                                myAdapter.notifyDataSetChanged();
+                            } else {
+                                ToastUtil.show("删除活动失败");
+                            }
+                            closeProgressDialog();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            ToastUtil.show("删除失败，请稍后重试：" + e.toString());
+                            closeProgressDialog();
+                        }
+                    }
+                });*/
+
+        // 假删除
         OkHttpUtils
                 .get()
-                .url(Constant.API_URL + "api/TActivity/Delprofessional")
+                .url(Constant.API_URL + "api/TActivity/DelActivityFalse")
                 .addParams("Nid", id+"")
                 .build()
                 .execute(new StringCallback() {
@@ -212,7 +250,7 @@ public class AdminActivityFragment extends BaseFragment {
     protected void showConfirmDialog(final int position, final int id) {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getContext());
         // 设置对话框左上角图标
-        builder.setIcon(R.mipmap.logo);
+        builder.setIcon(R.mipmap.logo2);
         // 设置不能取消
         builder.setCancelable(false);
         // 设置对话框标题
@@ -281,7 +319,7 @@ public class AdminActivityFragment extends BaseFragment {
         if (progressDialog == null) {
             progressDialog = new ProgressDialog(getContext());
         }
-        progressDialog.setMessage("修改中...");
+        progressDialog.setMessage("删除中...");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
     }

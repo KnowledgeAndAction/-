@@ -5,10 +5,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.hicc.information.sensorsignin.R;
@@ -24,22 +26,17 @@ import cn.hicc.information.sensorsignin.utils.ToastUtil;
 import okhttp3.Call;
 
 /**
- * 管理员添加活动界面——陈帅
+ * 管理员查看云子上的活动——陈帅
  */
 public class LookActiveForIdActivity extends AppCompatActivity {
     private static final int SCAN_CODE = 0;
     private static final int REAL = 1;
     private static final int NO_REAL = 0;
     private EditText et_yunzi_id;
-    private TextView tv_active_name;
-    private TextView tv_active_des;
-    private TextView tv_active_location;
-    private TextView tv_active_date;
-    private TextView tv_active_end_date;
-    private TextView tv_active_type;
     private Button bt_submit;
     private ProgressDialog progressDialog;
     private Toolbar toolbar;
+    private LinearLayout ll_root;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,12 +60,7 @@ public class LookActiveForIdActivity extends AppCompatActivity {
                 String yunziId = et_yunzi_id.getText().toString().trim();
                 // 如果不为空，查看活动
                 if (!yunziId.equals("")) {
-                    tv_active_name.setText("活动名称：");
-                    tv_active_des.setText("活动详情：");
-                    tv_active_location.setText("活动地点：");
-                    tv_active_date.setText("活动开始时间：");
-                    tv_active_end_date.setText("活动结束时间：");
-                    tv_active_type.setText("活动类型：");
+                    ll_root.removeAllViews();
 
                     showProgressDialog();
                     quireYunziActive(yunziId);
@@ -101,27 +93,56 @@ public class LookActiveForIdActivity extends AppCompatActivity {
                             boolean sucessed = jsonObject.getBoolean("sucessed");
                             if (sucessed) {
                                 JSONArray data = jsonObject.getJSONArray("data");
-                                JSONObject activity = data.getJSONObject(0);
-                                String name = activity.getString("ActivityName");
-                                String des = activity.getString("ActivityDescription");
-                                String location = activity.getString("Location");
-                                String time = activity.getString("Time");
-                                String endTime = activity.getString("EndTime");
-                                String rule = activity.getString("Rule");
+                                for (int j=0; j<data.length(); j++) {
+                                    JSONObject activity = data.getJSONObject(j);
+                                    String name = activity.getString("ActivityName");
+                                    String des = activity.getString("ActivityDescription");
+                                    String location = activity.getString("Location");
+                                    String time = activity.getString("Time");
+                                    String endTime = activity.getString("EndTime");
+                                    String rule = activity.getString("Rule");
+                                    int show = activity.getInt("Show");
 
-                                tv_active_name.setText("活动名称：" + name);
-                                tv_active_des.setText("活动详情：" + des);
-                                tv_active_location.setText("活动地点：" + location);
-                                tv_active_date.setText("活动开始时间：" + time.replace("T", " ").substring(0, 16));
-                                tv_active_end_date.setText("活动结束时间：" + endTime.replace("T", " ").substring(0, 16));
-                                switch (Integer.valueOf(rule)) {
-                                    case REAL:
-                                        tv_active_type.setText("活动类型：日常活动");
-                                        break;
-                                    case NO_REAL:
-                                        tv_active_type.setText("活动类型：普通活动");
-                                        break;
+                                    // 创建view
+                                    View view = LayoutInflater.from(LookActiveForIdActivity.this).inflate(R.layout.item_look_active, ll_root, false);
+                                    // 初始化控件
+                                    TextView tv_active_name = (TextView) view.findViewById(R.id.tv_active_name);
+                                    TextView tv_active_des = (TextView) view.findViewById(R.id.tv_active_des);
+                                    TextView tv_active_location = (TextView) view.findViewById(R.id.tv_active_location);
+                                    TextView tv_active_date = (TextView) view.findViewById(R.id.tv_active_date);
+                                    TextView tv_active_end_date = (TextView) view.findViewById(R.id.tv_active_end_date);
+                                    TextView tv_active_type = (TextView) view.findViewById(R.id.tv_active_type);
+                                    TextView tv_active_show = (TextView) view.findViewById(R.id.tv_active_show);
+                                    // 展示信息
+                                    tv_active_name.setText("活动名称：" + name);
+                                    tv_active_des.setText("活动详情：" + des);
+                                    tv_active_location.setText("活动地点：" + location);
+                                    tv_active_date.setText("活动开始时间：" + time.replace("T", " ").substring(0, 16));
+                                    tv_active_end_date.setText("活动结束时间：" + endTime.replace("T", " ").substring(0, 16));
+                                    switch (Integer.valueOf(rule)) {
+                                        case REAL:
+                                            tv_active_type.setText("活动类型：日常活动");
+                                            break;
+                                        case NO_REAL:
+                                            tv_active_type.setText("活动类型：普通活动");
+                                            break;
+                                    }
+                                    switch (show) {
+                                        case 0:
+                                            tv_active_show.setText("已删除");
+                                            break;
+                                        case 1:
+                                            tv_active_show.setText("未删除");
+                                            break;
+                                    }
+                                    // 添加到父布局中
+                                    ll_root.addView(view);
                                 }
+
+                                if (data.length() == 0) {
+                                    ToastUtil.show("这个云子上没有活动");
+                                }
+
                                 closeProgressDialog();
                             } else {
                                 ToastUtil.showLong("这个云子上没有活动");
@@ -150,13 +171,8 @@ public class LookActiveForIdActivity extends AppCompatActivity {
             }
         });
 
+        ll_root = (LinearLayout) findViewById(R.id.ll_root);
         et_yunzi_id = (EditText) findViewById(R.id.et_yunzi_id);
-        tv_active_name = (TextView) findViewById(R.id.tv_active_name);
-        tv_active_des = (TextView) findViewById(R.id.tv_active_des);
-        tv_active_location = (TextView) findViewById(R.id.tv_active_location);
-        tv_active_date = (TextView) findViewById(R.id.tv_active_date);
-        tv_active_end_date = (TextView) findViewById(R.id.tv_active_end_date);
-        tv_active_type = (TextView) findViewById(R.id.tv_active_type);
 
         bt_submit = (Button) findViewById(R.id.bt_submit);
 

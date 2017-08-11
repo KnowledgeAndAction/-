@@ -191,7 +191,7 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
     private void showConfirmDialog() {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getContext());
         //设置对话框左上角图标
-        builder.setIcon(R.mipmap.logo);
+        builder.setIcon(R.mipmap.logo2);
         //设置对话框标题
         builder.setTitle("是否注销");
         //设置文本内容
@@ -251,7 +251,7 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
     protected void showUpDataDialog(String description, final String appUrl) {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getContext());
         //设置对话框左上角图标
-        builder.setIcon(R.mipmap.logo);
+        builder.setIcon(R.mipmap.logo2);
         //设置对话框标题
         builder.setTitle("发现新版本");
         //设置对话框内容
@@ -283,7 +283,7 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
                 .get()
                 .url(appUrl)
                 .build()
-                .execute(new FileCallBack(MyApplication.getContext().getExternalFilesDir("apk").getPath(), "智慧校园.apk") {
+                .execute(new FileCallBack(MyApplication.getContext().getExternalFilesDir("apk").getPath(), "小蜜蜂.apk") {
                     @Override
                     public void onError(Call call, Exception e, int id) {
                         ToastUtil.show("下载失败：" + e.toString());
@@ -311,7 +311,7 @@ public class SettingFragment extends BaseFragment implements View.OnClickListene
     // 下载的进度条对话框
     protected void showProgressDialog() {
         progressDialog = new ProgressDialog(getContext());
-        progressDialog.setIcon(R.mipmap.logo);
+        progressDialog.setIcon(R.mipmap.logo2);
         progressDialog.setTitle("下载安装包中");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {

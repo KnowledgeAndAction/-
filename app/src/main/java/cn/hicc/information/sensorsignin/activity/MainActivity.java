@@ -30,6 +30,7 @@ import com.zhy.http.okhttp.callback.StringCallback;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,6 +46,7 @@ import cn.hicc.information.sensorsignin.fragment.HistoryFragment;
 import cn.hicc.information.sensorsignin.fragment.SettingFragment;
 import cn.hicc.information.sensorsignin.model.Active;
 import cn.hicc.information.sensorsignin.model.ExitEvent;
+import cn.hicc.information.sensorsignin.model.Saying;
 import cn.hicc.information.sensorsignin.model.SignActive;
 import cn.hicc.information.sensorsignin.model.TabItem;
 import cn.hicc.information.sensorsignin.service.SensorService;
@@ -94,6 +96,54 @@ public class MainActivity extends AppCompatActivity {
 
         // 检测是否有未签离的活动
         checkUnSignOutActive();
+
+        // 初始化名言数据
+        initSaying();
+    }
+
+    // 初始化名言数据
+    private void initSaying() {
+        OkHttpUtils
+                .get()
+                .url("http://123.206.57.216:8080/SchoolTestInterface/getSaying.do")
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        Logs.e("获取名言失败"+e.toString());
+                    }
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            if (jsonObject.getBoolean("sucessed")) {
+                                JSONArray jsonArray = jsonObject.getJSONArray("data");
+                                // 如果本地数据库和服务器数据不同
+                                if (jsonArray.length() != db.getSaying().size()) {
+                                    db.deleteSaying();
+                                    for (int i=0; i<jsonArray.length(); i++) {
+                                        JSONObject object = jsonArray.getJSONObject(i);
+                                        Saying saying = new Saying();
+                                        saying.setContent(object.getString("content"));
+                                        db.saveSaying(saying);
+                                    }
+                                    Logs.d("数据库更新");
+                                } else {
+                                    Logs.e("数据库没更新");
+                                }
+                            } else {
+                                Logs.e("获取名言失败");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Logs.e("获取名言失败"+e.toString());
+                        }
+                    }
+                });
+        if (db.getSaying().size() == 0) {
+
+        }
     }
 
     private void checkUnSignOutActive() {
@@ -219,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
     protected void showUpDataDialog(String description, final String appUrl) {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         // 设置对话框左上角图标
-        builder.setIcon(R.mipmap.logo);
+        builder.setIcon(R.mipmap.logo2);
         // 设置不能取消
         builder.setCancelable(false);
         // 设置对话框标题
@@ -253,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
                 .get()
                 .url(appUrl)
                 .build()
-                .execute(new FileCallBack(getExternalFilesDir("apk").getPath(),"智慧校园.apk") {
+                .execute(new FileCallBack(getExternalFilesDir("apk").getPath(),"小蜜蜂.apk") {
                     @Override
                     public void onError(Call call, Exception e, int id) {
                         ToastUtil.show("下载失败："+e.toString());
@@ -281,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
     // 下载的进度条对话框
     protected void showProgressDialog() {
         progressDialog = new ProgressDialog(this);
-        progressDialog.setIcon(R.mipmap.logo);
+        progressDialog.setIcon(R.mipmap.logo2);
         progressDialog.setTitle("下载安装包中");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {

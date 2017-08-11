@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -69,7 +68,7 @@ public class LoginActivity extends AppCompatActivity {
         initView();
 
         // 设置背景视频
-        initVideo();
+        //initVideo();
 
         // 检查是否已经登录
         checkIsEnter();
@@ -141,7 +140,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void showUpDataDialog(String description, final String appUrl) {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         // 设置对话框左上角图标
-        builder.setIcon(R.mipmap.logo);
+        builder.setIcon(R.mipmap.logo2);
         // 设置不能取消
         builder.setCancelable(false);
         // 设置对话框标题
@@ -175,7 +174,7 @@ public class LoginActivity extends AppCompatActivity {
                 .get()
                 .url(appUrl)
                 .build()
-                .execute(new FileCallBack(getExternalFilesDir("apk").getPath(),"智慧校园.apk") {
+                .execute(new FileCallBack(getExternalFilesDir("apk").getPath(),"小蜜蜂.apk") {
                     @Override
                     public void onError(Call call, Exception e, int id) {
                         ToastUtil.show("下载失败："+e.toString());
@@ -203,7 +202,7 @@ public class LoginActivity extends AppCompatActivity {
     // 下载的进度条对话框
     protected void showDownloadProgressDialog() {
         downloadProgressDialog = new ProgressDialog(this);
-        downloadProgressDialog.setIcon(R.mipmap.logo);
+        downloadProgressDialog.setIcon(R.mipmap.logo2);
         downloadProgressDialog.setTitle("下载安装包中");
         downloadProgressDialog.setCanceledOnTouchOutside(false);
         downloadProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -252,7 +251,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     // 初始化背景视频
-    private void initVideo() {
+    /*private void initVideo() {
         //加载视频资源控件
         videoview = (CustomVideoView) findViewById(R.id.videoview);
         //设置播放加载路径
@@ -266,19 +265,19 @@ public class LoginActivity extends AppCompatActivity {
                 videoview.start();
             }
         });
-    }
+    }*/
 
     //返回重启加载
     @Override
     protected void onRestart() {
-        initVideo();
+        //initVideo();
         super.onRestart();
     }
 
     //防止锁屏或者切出的时候，音乐在播放
     @Override
     protected void onStop() {
-        videoview.stopPlayback();
+        //videoview.stopPlayback();
         super.onStop();
     }
 
@@ -286,9 +285,9 @@ public class LoginActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         // 释放资源
-        if (videoview != null) {
+        /*if (videoview != null) {
             videoview.suspend();
-        }
+        }*/
     }
 
     // 检查权限

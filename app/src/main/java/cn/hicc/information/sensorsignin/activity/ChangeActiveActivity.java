@@ -226,6 +226,7 @@ public class ChangeActiveActivity extends AppCompatActivity {
                 .addParams("EndTime", endTime)
                 .addParams("Location", location)
                 .addParams("Rule", rule+"")
+                .addParams("Show", "1")
                 .build()
                 .execute(new StringCallback() {
                     @Override

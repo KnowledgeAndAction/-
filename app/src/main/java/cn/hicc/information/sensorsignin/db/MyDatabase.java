@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 import cn.hicc.information.sensorsignin.MyApplication;
+import cn.hicc.information.sensorsignin.model.Saying;
 import cn.hicc.information.sensorsignin.model.SignActive;
 import cn.hicc.information.sensorsignin.model.SignItem;
 import cn.hicc.information.sensorsignin.utils.Logs;
@@ -30,7 +31,7 @@ public class MyDatabase {
     /**
      * 数据库版本
      */
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
 
     private final SQLiteDatabase db;
     private static MyDatabase myDatabase;
@@ -243,5 +244,32 @@ public class MyDatabase {
         ContentValues values = new ContentValues();
         values.put("outTime", time);
         db.update("Sign", values, "nid = ?", new String[]{String.valueOf(nid)});
+    }
+
+    // 保存名言到数据库
+    public void saveSaying(Saying saying) {
+        if (saying != null) {
+            ContentValues values = new ContentValues();
+            values.put("content", saying.getContent());
+            db.insert("Saying", null, values);
+        }
+    }
+
+    // 获取数据库中的所有名言
+    public List<Saying> getSaying() {
+        List<Saying> list = new ArrayList<>();
+        Cursor cursor = db.query("Saying", null, null, null, null, null, null);
+        while (cursor.moveToNext()) {
+            Saying saying = new Saying();
+            saying.setContent(cursor.getString(cursor.getColumnIndex("content")));
+            list.add(saying);
+        }
+        cursor.close();
+        return list;
+    }
+
+    // 删除名言信息
+    public void deleteSaying() {
+        db.delete("Saying", null, null);
     }
 }

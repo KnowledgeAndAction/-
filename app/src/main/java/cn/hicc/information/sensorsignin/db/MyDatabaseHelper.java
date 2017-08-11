@@ -18,6 +18,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
             + "inTime text,"
             + "outTime text)";
 
+    // 记录签到签离信息
     public static final String SIGN_TABLE = "create table Sign("
             + "id integer primary key autoincrement,"
             + "number text,"
@@ -25,6 +26,22 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
             + "nid integer,"
             + "inTime text,"
             + "outTime text)";
+
+    // 名言表
+    public static final String SAYING_TABLE = "create table Saying("
+            + "id integer primary key autoincrement,"
+            + "content text)";
+
+    // 签到分析表
+    public static final String ANALYZE_SIGN_TABLE = "create table AnalyzeSign("
+            + "id integer primary key autoincrement,"
+            + "number text,"
+            + "activeName text,"
+            + "rule integer,"
+            + "inTime text,"
+            + "outTime text,"
+            + "time text,"
+            + "endTime text)";
 
     public MyDatabaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -34,6 +51,8 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(HISTORY_TABLE);
         db.execSQL(SIGN_TABLE);
+        db.execSQL(SAYING_TABLE);
+        db.execSQL(ANALYZE_SIGN_TABLE);
     }
 
     @Override
@@ -41,6 +60,10 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
         switch (newVersion) {
             case 2:
                 db.execSQL(SIGN_TABLE);
+                break;
+            case 3:
+                db.execSQL(SAYING_TABLE);
+                db.execSQL(ANALYZE_SIGN_TABLE);
                 break;
         }
     }

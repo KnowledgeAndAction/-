@@ -77,7 +77,7 @@ public class SignRecordActivity extends AppCompatActivity {
             JSONObject jsonObject = new JSONObject(response);
             if (jsonObject.getBoolean("sucessed")) {
                 JSONArray data = jsonObject.getJSONArray("data");
-                for (int i=0; i<data.length(); i++) {
+                for (int i=0,j=0; i<data.length(); i++) {
                     JSONObject object = data.getJSONObject(i);
                     String in = object.getString("InTime");
                     String out = object.getString("OutTime");
@@ -86,7 +86,8 @@ public class SignRecordActivity extends AppCompatActivity {
                         signInfo.setInTime(in);
                         signInfo.setOutTime(out);
                         signInfoList.add(signInfo);
-                        getName(signInfoList.get(i), object.getString("StudnetNum"));
+                        getName(signInfoList.get(j), object.getString("StudnetNum"));
+                        j++;
                     }
                 }
 

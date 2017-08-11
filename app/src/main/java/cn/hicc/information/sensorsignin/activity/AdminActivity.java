@@ -148,7 +148,7 @@ public class AdminActivity extends AppCompatActivity {
     protected void showUpDataDialog(String description, final String appUrl) {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         // 设置对话框左上角图标
-        builder.setIcon(R.mipmap.logo);
+        builder.setIcon(R.mipmap.logo2);
         // 设置不能取消
         builder.setCancelable(false);
         // 设置对话框标题
@@ -182,7 +182,7 @@ public class AdminActivity extends AppCompatActivity {
                 .get()
                 .url(appUrl)
                 .build()
-                .execute(new FileCallBack(getExternalFilesDir("apk").getPath(), "智慧校园.apk") {
+                .execute(new FileCallBack(getExternalFilesDir("apk").getPath(), "小蜜蜂.apk") {
                     @Override
                     public void onError(Call call, Exception e, int id) {
                         ToastUtil.show("下载失败：" + e.toString());
@@ -210,7 +210,7 @@ public class AdminActivity extends AppCompatActivity {
     // 下载的进度条对话框
     protected void showProgressDialog() {
         progressDialog = new ProgressDialog(this);
-        progressDialog.setIcon(R.mipmap.logo);
+        progressDialog.setIcon(R.mipmap.logo2);
         progressDialog.setTitle("下载安装包中");
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {

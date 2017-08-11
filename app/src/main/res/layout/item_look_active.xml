@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+
+    <TextView
+        android:id="@+id/tv_active_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:padding="5dp"
+        android:text="活动名称"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tv_active_des"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:padding="5dp"
+        android:text="活动详情"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tv_active_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:padding="5dp"
+        android:text="活动地点"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tv_active_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:padding="5dp"
+        android:text="活动开始时间"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tv_active_end_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:padding="5dp"
+        android:text="活动结束时间"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tv_active_type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:padding="5dp"
+        android:text="活动类型"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tv_active_show"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:padding="5dp"
+        android:text="是否删除"
+        android:textSize="16sp" />
+
+
+</LinearLayout>

@@ -443,7 +443,7 @@ public class DetailActivity2 extends AppCompatActivity {
     private void showSignConfirmDialog() {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         //设置对话框左上角图标
-        builder.setIcon(R.mipmap.logo);
+        builder.setIcon(R.mipmap.logo2);
         //设置对话框标题
         builder.setTitle("确定要签到");
         //设置文本内容
@@ -469,7 +469,7 @@ public class DetailActivity2 extends AppCompatActivity {
     private void showSignOutConfirmDialog() {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         //设置对话框左上角图标
-        builder.setIcon(R.mipmap.logo);
+        builder.setIcon(R.mipmap.logo2);
         //设置对话框标题
         builder.setTitle("确定要签离");
         //设置文本内容

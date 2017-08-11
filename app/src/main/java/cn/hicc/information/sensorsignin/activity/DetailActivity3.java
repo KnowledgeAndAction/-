@@ -167,13 +167,54 @@ public class DetailActivity3 extends AppCompatActivity {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         final String inTime = df.format(new Date());
         showDialog("签到中...");
-        OkHttpUtils
+        // get
+        /*OkHttpUtils
                 .get()
                 .url(Constant.API_URL + "api/TSign/InsertSign")
                 .addParams("account", SpUtil.getString("account", ""))
                 .addParams("activityid", active.getActiveId() + "")
                 .addParams("intime", inTime)
                 .addParams("outtime", inTime)
+                .build()
+                .execute(new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int i) {
+                        closeDialog();
+                        ToastUtil.show("签到失败:" + e.toString());
+                    }
+
+                    @Override
+                    public void onResponse(String s, int i) {
+                        closeDialog();
+                        try {
+                            JSONObject jsonObject = new JSONObject(s);
+                            if (jsonObject.getBoolean("sucessed")) {
+                                mNid = jsonObject.getInt("data");
+                                saveSignInData(inTime);
+                                Intent intent = new Intent(DetailActivity3.this, MoveActivity2.class);
+                                intent.putExtra("active",active);
+                                intent.putExtra("yunziId", yunziId);
+
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                ToastUtil.show("签到失败："+ jsonObject.getString("Msg"));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            ToastUtil.show("签到失败:" + e.toString());
+                        }
+                    }
+                });*/
+
+        // post
+        OkHttpUtils
+                .post()
+                .url(Constant.API_URL + "api/TSign/InsertSignPost")
+                .addParams("StudnetNum", SpUtil.getString("account", ""))
+                .addParams("ActivityId", active.getActiveId() + "")
+                .addParams("InTime", inTime)
+                .addParams("OutTime", inTime)
                 .build()
                 .execute(new StringCallback() {
                     @Override
@@ -319,7 +360,7 @@ public class DetailActivity3 extends AppCompatActivity {
     private void showSignConfirmDialog() {
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         //设置对话框左上角图标
-        builder.setIcon(R.mipmap.logo);
+        builder.setIcon(R.mipmap.logo2);
         //设置对话框标题
         builder.setTitle("确定要签到");
         //设置文本内容
