@@ -142,7 +142,7 @@ public class ActivityFragment extends BaseFragment {
                         try {
                             JSONObject jsonObject = new JSONObject(s);
                             boolean sucessed = jsonObject.getBoolean("sucessed");
-                            if (sucessed) {
+                            if (sucessed && jsonObject.getJSONArray("data").length()>0) {
                                 JSONArray data = jsonObject.getJSONArray("data");
                                 for (int j = 0; j < data.length(); j++) {
                                     JSONObject activity = data.getJSONObject(j);
@@ -195,18 +195,22 @@ public class ActivityFragment extends BaseFragment {
                                 }
 
                                 adapter.notifyDataSetChanged();
-                                long endTime = System.currentTimeMillis();
-                                if ((endTime - startTime) < 4000) {
-                                    mHandler.sendEmptyMessageDelayed(0, 4000 - (endTime - startTime));
-                                } else {
-                                    mHandler.sendEmptyMessage(1);
-                                }
+
                             } else {
                                 Logs.d("这个云子上没有活动：" + yunziId);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
                             Logs.d("异常");
+                        } finally {
+                            if (mActiveList.size() > 0) {
+                                long endTime = System.currentTimeMillis();
+                                if ((endTime - startTime) < 4000) {
+                                    mHandler.sendEmptyMessageDelayed(0, 4000 - (endTime - startTime));
+                                } else {
+                                    mHandler.sendEmptyMessage(1);
+                                }
+                            }
                         }
                     }
                 });
