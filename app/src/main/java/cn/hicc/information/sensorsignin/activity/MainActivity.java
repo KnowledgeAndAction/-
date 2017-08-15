@@ -42,7 +42,7 @@ import java.util.TimerTask;
 
 import cn.hicc.information.sensorsignin.db.MyDatabase;
 import cn.hicc.information.sensorsignin.fragment.ActivityFragment;
-import cn.hicc.information.sensorsignin.fragment.HistoryFragment;
+import cn.hicc.information.sensorsignin.fragment.HistoryFragment2;
 import cn.hicc.information.sensorsignin.fragment.SettingFragment;
 import cn.hicc.information.sensorsignin.model.Active;
 import cn.hicc.information.sensorsignin.model.ExitEvent;
@@ -418,7 +418,7 @@ public class MainActivity extends AppCompatActivity {
     private void initLayout() {
         tabs = new ArrayList<>();
         tabs.add(new TabItem(R.drawable.bottom_activity_selector, R.string.tab_activity, ActivityFragment.class));
-        tabs.add(new TabItem(R.drawable.bottom_history_selector, R.string.tab_history, HistoryFragment.class));
+        tabs.add(new TabItem(R.drawable.bottom_history_selector, R.string.tab_history, HistoryFragment2.class));
         tabs.add(new TabItem(R.drawable.bottom_setting_selector, R.string.tab_setting, SettingFragment.class));
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override

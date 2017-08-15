@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 import cn.hicc.information.sensorsignin.MyApplication;
+import cn.hicc.information.sensorsignin.model.AnalyzeSign;
 import cn.hicc.information.sensorsignin.model.Saying;
 import cn.hicc.information.sensorsignin.model.SignActive;
 import cn.hicc.information.sensorsignin.model.SignItem;
@@ -271,5 +272,25 @@ public class MyDatabase {
     // 删除名言信息
     public void deleteSaying() {
         db.delete("Saying", null, null);
+    }
+
+    // 保存需要分析的签到数据
+    public void saveAnalyzeSign(AnalyzeSign analyzeSign) {
+        if (analyzeSign != null) {
+            ContentValues values = new ContentValues();
+            values.put("number", analyzeSign.getNumber());
+            values.put("activeName", analyzeSign.getActiveName());
+            values.put("rule", analyzeSign.getRule());
+            values.put("inTime", analyzeSign.getInTime());
+            values.put("outTime", analyzeSign.getOutTime());
+            values.put("time", analyzeSign.getTime());
+            values.put("endTime", analyzeSign.getEndTime());
+            db.insert("AnalyzeSign", null, values);
+        }
+    }
+
+    // 删除数据库中分析签到数据
+    public void deleteAnalyzeSign() {
+        db.delete("AnalyzeSign",null,null);
     }
 }

@@ -6,7 +6,7 @@ import java.io.Serializable;
  * Created by 666 on 2017/7/12.
  */
 
-public class HistoryActivity implements Serializable{
+public class HistoryActive implements Serializable{
     private String hStudentNum;
     private String hInTime;
     private String hActivityId;

@@ -10,13 +10,13 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.hicc.information.sensorsignin.R;
-import cn.hicc.information.sensorsignin.model.HistoryActivity;
+import cn.hicc.information.sensorsignin.model.HistoryActive;
 
 /**
  * 历史活动详情——崔国钊
  */
 public class HistoryDetailActivity extends AppCompatActivity {
-    private HistoryActivity historyActivity;
+    private HistoryActive historyActive;
     private TextView tv_details;
     private TextView tv_hintime;
     private TextView tv_houttime;
@@ -35,7 +35,7 @@ public class HistoryDetailActivity extends AppCompatActivity {
 
     private void initData() {
         Intent intent = getIntent();
-        historyActivity = (HistoryActivity) intent.getSerializableExtra("ActivityId");
+        historyActive = (HistoryActive) intent.getSerializableExtra("ActivityId");
     }
 
     private void initView() {
@@ -46,13 +46,13 @@ public class HistoryDetailActivity extends AppCompatActivity {
 
         TextView tv_start_time = (TextView) findViewById(R.id.tv_start_time);
         TextView tv_end_time = (TextView) findViewById(R.id.tv_end_time);
-        tv_start_time.setText("活动开始时间：" + historyActivity.gethTime().replace("T", " ").substring(0, 16));
-        tv_end_time.setText("活动结束时间：" + historyActivity.getEndTime().replace("T", " ").substring(0, 16));
+        tv_start_time.setText("活动开始时间：" + historyActive.gethTime().replace("T", " ").substring(0, 16));
+        tv_end_time.setText("活动结束时间：" + historyActive.getEndTime().replace("T", " ").substring(0, 16));
 
-        tv_details.setText("    " + historyActivity.getActivityDescription());
-        tv_hintime.setText("签到时间："+historyActivity.gethInTime().replace("T", " "));
-        tv_houttime.setText("签离时间："+historyActivity.gethOutTime().replace("T", " "));
-        tv_hlocation.setText("地点："+historyActivity.getLocation());
+        tv_details.setText("    " + historyActive.getActivityDescription());
+        tv_hintime.setText("签到时间："+ historyActive.gethInTime().replace("T", " "));
+        tv_houttime.setText("签离时间："+ historyActive.gethOutTime().replace("T", " "));
+        tv_hlocation.setText("地点："+ historyActive.getLocation());
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -70,6 +70,6 @@ public class HistoryDetailActivity extends AppCompatActivity {
         CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
 
         // 设置标题
-        toolbarLayout.setTitle(historyActivity.gethActivityName());
+        toolbarLayout.setTitle(historyActive.gethActivityName());
     }
 }
