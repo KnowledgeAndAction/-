@@ -13,6 +13,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+
 import com.hicc.information.sensorsignin.R;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -45,7 +46,6 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
     private SwipeRefreshLayout mSwipeLayout;
     private View view;
     private MyAdapter adapter;
-
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_history, container, false);
@@ -62,7 +62,7 @@ public class HistoryFragment extends BaseFragment implements SwipeRefreshLayout.
     }
 
     // 获取历史活动
-    private void getActive() {
+    private void getActive()  {
         OkHttpUtils
                 .get()
                 .url(Constant.API_URL + "api/TSign/GetSign")
