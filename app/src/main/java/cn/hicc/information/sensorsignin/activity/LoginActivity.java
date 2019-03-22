@@ -365,7 +365,6 @@ public class LoginActivity extends AppCompatActivity {
                 //.url(Constant.API_URL + "api/TStudentLogin/GetStudentType")
                 .url("http://123.206.57.216:8080/SchoolTestInterface/login.do")
                 .addParams("Account",account)
-                //.addParams("pwd", MD5Pass)
                 .addParams("Password", MD5Pass)
                 .build()
                 .execute(new StringCallback() {
